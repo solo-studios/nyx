@@ -1,0 +1,45 @@
+[versions]
+kotlin = "1.9.10"
+dokka = "1.9.10"
+axion-release = "1.15.5"
+apache-commons = "1.11.0"
+guava = "32.1.3-jre"
+guava-kotlin = "0.1.0"
+
+
+quilt-loom = "1.4.1"
+
+fabric-loom = "1.5.7"
+
+architectury = "3.4.151"
+architectury-loom = "1.5.388"
+
+[plugins]
+## Kotlin Plugins
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
+
+## Axion release plugin
+### Gradle release and version management plugin.
+axion-release = { id = "pl.allegro.tech.build.axion-release", version.ref = "axion-release" }
+
+
+[libraries]
+## Kotlin stdlib
+kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlin" }
+
+kotlin-plugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
+
+## Apache Commons Text
+apache-commons = { group = "org.apache.commons", name = "commons-text", version.ref = "apache-commons" }
+
+## Guava
+guava = { group = "com.google.guava", name = "guava", version.ref = "guava" }
+guava-kotlin = { group = "ca.solo-studios", name = "guava-kotlin", version.ref = "guava-kotlin" }
+
+fabric-loom = { group = "fabric-loom", name = "fabric-loom.gradle.plugin", version.ref = "fabric-loom" }
+
+quilt-loom = { group = "org.quiltmc.loom", name = "org.quiltmc.loom.gradle.plugin", version.ref = "quilt-loom" }
+
+architectury = { group = "architectury-plugin", name = "architectury-plugin.gradle.plugin", version.ref = "architectury" }
+architectury-loom = { group = "dev.architectury.loom", name = "dev.architectury.loom.gradle.plugin", version.ref = "architectury-loom" }
