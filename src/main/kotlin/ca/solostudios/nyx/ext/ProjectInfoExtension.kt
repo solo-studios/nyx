@@ -35,7 +35,9 @@ public class ProjectInfoExtension(override val project: Project) : HasProject {
         project.description.toStringOrEmpty()
     }
 
-    public val url: Property<String> = property<String>()
+    public val organizationUrl: Property<String> = property()
+
+    public val organizationName: Property<String> = property()
 
     @Nested
     public val repository: RepositoryInfo = RepositoryInfo(project)

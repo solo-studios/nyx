@@ -55,7 +55,8 @@ public open class PublishingExtension(
     internal fun MavenPublication.configurePublication(applyArtifactId: Boolean = true) {
         groupId = projectInfo.group.getOrEmpty()
         // This will break on kotlin/multiplatform. Fix this.
-        artifactId = projectInfo.module.getOrEmpty()
+        if (applyArtifactId)
+            artifactId = projectInfo.module.getOrEmpty()
         version = projectInfo.version.getOrEmpty()
 
         pom {
@@ -64,6 +65,10 @@ public open class PublishingExtension(
             url = projectInfo.repository.projectUrl
 
             // inceptionYear = projectInfo.inceptionYear
+            organization {
+                name = projectInfo.organizationName
+                url = projectInfo.organizationUrl
+            }
 
             // we assume there is only ever a single license
             licenses {
@@ -72,9 +77,6 @@ public open class PublishingExtension(
                     url = projectInfo.license.url
                 }
             }
-
-            // developers {
-            // }
 
             issueManagement {
                 system = projectInfo.repository.issueManagement
