@@ -1,11 +1,17 @@
 [versions]
+
 kotlin = "1.9.10"
+
 dokka = "1.9.10"
+
 axion-release = "1.15.5"
+
 apache-commons = "1.11.0"
+
 guava = "32.1.3-jre"
 guava-kotlin = "0.1.0"
 
+slf4k = "0.5.2"
 
 quilt-loom = "1.4.1"
 
@@ -36,6 +42,10 @@ apache-commons = { group = "org.apache.commons", name = "commons-text", version.
 ## Guava
 guava = { group = "com.google.guava", name = "guava", version.ref = "guava" }
 guava-kotlin = { group = "ca.solo-studios", name = "guava-kotlin", version.ref = "guava-kotlin" }
+
+# SLF4K
+## SLF4K is a set of kotlin extensions for SLF4J
+slf4k = { group = "ca.solo-studios", name = "slf4k", version.ref = "slf4k" }
 
 fabric-loom = { group = "fabric-loom", name = "fabric-loom.gradle.plugin", version.ref = "fabric-loom" }
 

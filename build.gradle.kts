@@ -57,6 +57,8 @@ dependencies {
 
     api(libs.apache.commons)
 
+    implementation(libs.slf4k)
+
     compileOnly(libs.kotlin.plugin)
 
     // Minecraft plugins

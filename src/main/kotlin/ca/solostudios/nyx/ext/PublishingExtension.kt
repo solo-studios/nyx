@@ -1,58 +1,75 @@
 package ca.solostudios.nyx.ext
 
+import ca.solostudios.nyx.api.ConfiguresProject
+import ca.solostudios.nyx.api.HasProject
 import ca.solostudios.nyx.util.getOrEmpty
+import ca.solostudios.nyx.util.property
+import ca.solostudios.nyx.util.publishing
 import org.gradle.api.Project
 import org.gradle.api.provider.Property
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.publish.maven.plugins.MavenPublishPlugin
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.assign
+import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.hasPlugin
-import org.gradle.kotlin.dsl.property
+import org.gradle.kotlin.dsl.withType
 import org.gradle.plugins.signing.SigningPlugin
-import org.jetbrains.kotlin.gradle.plugin.HasProject
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinMultiplatformPlugin
 
-public open class PublishingExtension(override val project: Project) : HasProject {
-    public val publishDependsOnSign: Property<Boolean> = project.objects.property<Boolean>().convention(true)
+public open class PublishingExtension(
+    override val project: Project,
+    private val projectInfo: ProjectInfoExtension,
+) : ConfiguresProject, HasProject {
+    public val publishDependsOnSign: Property<Boolean> = property<Boolean>().convention(true)
 
-    public val publish: Property<Boolean> = project.objects.property<Boolean>().convention(false)
+    public val publish: Property<Boolean> = property<Boolean>().convention(false)
 
-    internal fun configureProject(info: ProjectInfo) {
+    override fun configureProject() {
         if (!publish.isPresent || !publish.get())
             return
 
         project.apply<MavenPublishPlugin>()
         project.apply<SigningPlugin>()
 
-        when {
-            project.plugins.hasPlugin(KotlinMultiplatformPlugin::class) -> {
-                // handle multiplatform publishing (do not create publication
-            }
+        publishing {
+            publications {
+                when {
+                    project.plugins.hasPlugin(KotlinMultiplatformPlugin::class) -> {
+                        // when using kotlin multiplatform, publications will be created for you
+                        withType<MavenPublication>().configureEach {
+                            configurePublication(false)
+                        }
+                    }
 
-            else -> {
-                // handle default case (create new publication)
+                    else -> {
+                        create<MavenPublication>("test") {
+                            configurePublication()
+                        }
+                    }
+                }
             }
         }
     }
 
-    internal fun MavenPublication.configurePublication(info: ProjectInfo) {
-        groupId = info.group.getOrEmpty()
+    internal fun MavenPublication.configurePublication(applyArtifactId: Boolean = true) {
+        groupId = projectInfo.group.getOrEmpty()
         // This will break on kotlin/multiplatform. Fix this.
-        artifactId = info.module.getOrEmpty()
-        version = info.version.getOrEmpty()
+        artifactId = projectInfo.module.getOrEmpty()
+        version = projectInfo.version.getOrEmpty()
 
         pom {
-            name = info.name
-            description = info.description
-            url = info.repository.projectUrl
+            name = projectInfo.name
+            description = projectInfo.description
+            url = projectInfo.repository.projectUrl
 
-            // inceptionYear = info.inceptionYear
+            // inceptionYear = projectInfo.inceptionYear
 
+            // we assume there is only ever a single license
             licenses {
                 license {
-                    name = info.license.name
-                    url = info.license.url
+                    name = projectInfo.license.name
+                    url = projectInfo.license.url
                 }
             }
 
@@ -60,14 +77,14 @@ public open class PublishingExtension(override val project: Project) : HasProjec
             // }
 
             issueManagement {
-                // system = "GitHub"
-                url = info.repository.projectIssues
+                system = projectInfo.repository.issueManagement
+                url = projectInfo.repository.projectIssues
             }
 
             scm {
-                connection = info.repository.projectCloneBaseUri.map { "scm:git:https://$it" }
-                developerConnection = info.repository.projectCloneBaseUri.map { "scm:git:ssh://$it" }
-                url = info.repository.projectUrl
+                connection = projectInfo.repository.projectCloneBaseUri.map { "scm:git:https://$it" }
+                developerConnection = projectInfo.repository.projectCloneBaseUri.map { "scm:git:ssh://$it" }
+                url = projectInfo.repository.projectUrl
             }
         }
     }

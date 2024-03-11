@@ -1,7 +1,9 @@
 package ca.solostudios.nyx.ext
 
+import ca.solostudios.nyx.api.HasProject
 import ca.solostudios.nyx.util.convention
 import ca.solostudios.nyx.util.formatAsName
+import ca.solostudios.nyx.util.property
 import ca.solostudios.nyx.util.tasks
 import ca.solostudios.nyx.util.toStringOrEmpty
 import org.gradle.api.Action
@@ -10,37 +12,36 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.bundling.AbstractArchiveTask
 import org.gradle.kotlin.dsl.assign
-import org.gradle.kotlin.dsl.newInstance
-import org.gradle.kotlin.dsl.property
 import org.gradle.kotlin.dsl.withType
-import org.jetbrains.kotlin.gradle.plugin.HasProject
 
-public open class ProjectInfo(override val project: Project) : HasProject {
-    public val name: Property<String> = project.objects.property<String>().convention(project) {
+public class ProjectInfoExtension(override val project: Project) : HasProject {
+    public val name: Property<String> = property<String>().convention(project) {
         project.name.formatAsName()
     }
 
-    public val group: Property<String> = project.objects.property<String>().convention(project) {
+    public val group: Property<String> = property<String>().convention(project) {
         project.group.toStringOrEmpty()
     }
 
-    public val module: Property<String> = project.objects.property<String>().convention(project) {
+    public val module: Property<String> = property<String>().convention(project) {
         project.name
     }
 
-    public val version: Property<String> = project.objects.property<String>().convention(project) {
+    public val version: Property<String> = property<String>().convention(project) {
         project.version.toStringOrEmpty()
     }
 
-    public val description: Property<String> = project.objects.property<String>().convention(project) {
+    public val description: Property<String> = property<String>().convention(project) {
         project.description.toStringOrEmpty()
     }
 
-    @Nested
-    public val repository: RepositoryInfo = project.objects.newInstance(project)
+    public val url: Property<String> = property<String>()
 
     @Nested
-    public val license: LicenseInfo = project.objects.newInstance(project)
+    public val repository: RepositoryInfo = RepositoryInfo(project)
+
+    @Nested
+    public val license: LicenseInfoExtension = LicenseInfoExtension(project)
 
     // fun applyAxionRelease() {
     //     scmVersion {
@@ -61,11 +62,11 @@ public open class ProjectInfo(override val project: Project) : HasProject {
         repository.apply(action)
     }
 
-    public fun license(action: Action<LicenseInfo>) {
+    public fun license(action: Action<LicenseInfoExtension>) {
         action.execute(license)
     }
 
-    public fun license(action: (LicenseInfo).() -> Unit) {
+    public fun license(action: (LicenseInfoExtension).() -> Unit) {
         license.apply(action)
     }
 
@@ -76,6 +77,8 @@ public open class ProjectInfo(override val project: Project) : HasProject {
             }
         }
 
+        // update the version/group/description according to the properties
+        // if they have not been set, it will just be updating the value with its existing contents.
         project.version = version.get()
         project.group = group.get()
         project.description = description.get()

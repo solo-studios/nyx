@@ -32,7 +32,6 @@ import net.fabricmc.loom.api.LoomGradleExtensionAPI
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
-import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
 
 public class NyxPlugin : Plugin<Project> {
     override fun apply(project: Project) {
@@ -43,11 +42,14 @@ public class NyxPlugin : Plugin<Project> {
             project.configure<LoomGradleExtensionAPI> {
 
             }
-        }
-        project.pluginManager.withPlugin("org.jetbrains.kotlin.multiplatform") {
-            project.configure<KotlinMultiplatformPluginWrapper> {
 
-            }
+        }
+
+        project.pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
+            // println("Has kotlin gradle plugin")
+            // project.plugins.withType<KotlinMultiplatformPluginWrapper> {
+            //
+            // }
         }
 
         configureBuild(extension, project)

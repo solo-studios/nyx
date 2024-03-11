@@ -1,7 +1,8 @@
 package ca.solostudios.nyx.ext.code
 
+import ca.solostudios.nyx.api.ConfiguresProject
+import ca.solostudios.nyx.api.HasProject
 import ca.solostudios.nyx.util.findLicenseFile
-import ca.solostudios.nyx.util.newInstance
 import ca.solostudios.nyx.util.property
 import ca.solostudios.nyx.util.tasks
 import org.gradle.api.Action
@@ -15,15 +16,8 @@ import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.withType
-import org.jetbrains.kotlin.gradle.plugin.HasProject
 
-public class CompileExtension(override val project: Project) : HasProject {
-    @Nested
-    public val kotlin: KotlinExtension = newInstance(project)
-
-    @Nested
-    public val java: JavaExtension = newInstance(project)
-
+public class CompileExtension(override val project: Project) : ConfiguresProject, HasProject {
     public val warningsAsErrors: Property<Boolean> = property<Boolean>().convention(false)
 
     public val allWarnings: Property<Boolean> = property<Boolean>().convention(false)
@@ -36,10 +30,41 @@ public class CompileExtension(override val project: Project) : HasProject {
 
     public val buildDependsOnJar: Property<Boolean> = property<Boolean>().convention(true)
 
+    public val suppressWarnings: Property<Boolean> = property<Boolean>().convention(false)
+
+    public val jvmToolchain: Property<Int> = property()
+
+    public val jvmTarget: Property<Int> = property()
+
+    @Nested
+    public val kotlin: KotlinExtension = KotlinExtension(
+        project,
+        warningsAsErrors,
+        suppressWarnings,
+        jvmToolchain,
+        jvmTarget
+    )
+
+    @Nested
+    public val java: JavaExtension = JavaExtension(
+        project,
+        encoding,
+        warningsAsErrors,
+        allWarnings,
+        suppressWarnings,
+        jvmToolchain,
+        jvmTarget
+    )
+
+
     public fun withSourcesJar() {
         project.configure<JavaPluginExtension> {
             withSourcesJar()
         }
+    }
+
+    public fun withJavadocJar() {
+        // configure dokka or javadocs
     }
 
     public fun kotlin(action: Action<KotlinExtension>) {
@@ -58,9 +83,12 @@ public class CompileExtension(override val project: Project) : HasProject {
         java.apply(action)
     }
 
-    internal fun configureProject() {
-        java.configureProject(encoding, warningsAsErrors, allWarnings)
-        kotlin.configureProject(warningsAsErrors)
+    override fun configureProject() {
+        if (project.plugins.hasPlugin("java"))
+            java.configureProject()
+
+        if (project.plugins.hasPlugin("org.jetbrains.kotlin.jvm"))
+            kotlin.configureProject()
 
         tasks {
             if (distributeLicense.isPresent && distributeLicense.get())

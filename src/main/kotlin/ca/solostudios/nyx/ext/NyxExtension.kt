@@ -27,30 +27,34 @@
 
 package ca.solostudios.nyx.ext
 
+import ca.solostudios.nyx.api.ConfiguresProject
 import ca.solostudios.nyx.ext.code.CompileExtension
+import ca.solostudios.nyx.ext.mc.LoomExtension
+import ca.solostudios.nyx.util.create
 import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.tasks.Nested
-import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.getByType
-import org.gradle.kotlin.dsl.newInstance
 
-public open class NyxExtension(project: Project) {
-
-    @Nested
-    public val project: ProjectInfo = project.objects.newInstance(project)
+public open class NyxExtension(project: Project) : ConfiguresProject {
 
     @Nested
-    public val publishing: PublishingExtension = project.objects.newInstance(project)
+    public val project: ProjectInfoExtension = ProjectInfoExtension(project)
 
     @Nested
-    public val compile: CompileExtension = project.objects.newInstance(project)
+    public val publishing: PublishingExtension = PublishingExtension(project, this.project)
 
-    public fun project(action: Action<ProjectInfo>) {
+    @Nested
+    public val compile: CompileExtension = CompileExtension(project)
+
+    @Nested
+    public val loom: LoomExtension = LoomExtension(project)
+
+    public fun project(action: Action<ProjectInfoExtension>) {
         action.execute(project)
     }
 
-    public fun project(action: (ProjectInfo).() -> Unit) {
+    public fun project(action: (ProjectInfoExtension).() -> Unit) {
         project.apply(action)
     }
 
@@ -70,10 +74,19 @@ public open class NyxExtension(project: Project) {
         compile.apply(action)
     }
 
-    internal fun configureProject() {
+    public fun loom(action: Action<LoomExtension>) {
+        action.execute(loom)
+    }
+
+    public fun loom(action: (LoomExtension).() -> Unit) {
+        loom.apply(action)
+    }
+
+    override fun configureProject() {
         project.configureProject()
         compile.configureProject()
-        publishing.configureProject(project)
+        publishing.configureProject()
+        loom.configureProject()
     }
 
     public companion object {
@@ -81,6 +94,7 @@ public open class NyxExtension(project: Project) {
 
         public operator fun get(project: Project): NyxExtension = project.extensions.getByType<NyxExtension>()
 
-        public fun create(project: Project): NyxExtension = project.extensions.create<NyxExtension>(NAME, project)
+        // public fun create(project: Project): NyxExtension = project.extensions.create<NyxExtension>(NAME, project)
+        public fun create(project: Project): NyxExtension = project.create<NyxExtension>(NAME, project)
     }
 }
