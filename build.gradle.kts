@@ -59,7 +59,9 @@ dependencies {
 
     implementation(libs.slf4k)
 
+    // Kotlin stuff
     compileOnly(libs.kotlin.plugin)
+    compileOnly(libs.dokka)
 
     // Minecraft plugins
     compileOnly(libs.fabric.loom)

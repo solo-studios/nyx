@@ -3,17 +3,17 @@ package ca.solostudios.nyx.ext.code
 import ca.solostudios.nyx.api.ConfiguresProject
 import ca.solostudios.nyx.api.HasProject
 import ca.solostudios.nyx.util.findLicenseFile
+import ca.solostudios.nyx.util.isTrue
 import ca.solostudios.nyx.util.property
 import ca.solostudios.nyx.util.tasks
 import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.Task
-import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.bundling.Zip
 import org.gradle.jvm.tasks.Jar
-import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.withType
 
@@ -36,13 +36,19 @@ public class CompileExtension(override val project: Project) : ConfiguresProject
 
     public val jvmTarget: Property<Int> = property()
 
+    public val withSourcesJar: Property<Boolean> = property()
+
+    public val withJavadocJar: Property<Boolean> = property()
+
     @Nested
     public val kotlin: KotlinExtension = KotlinExtension(
         project,
         warningsAsErrors,
         suppressWarnings,
         jvmToolchain,
-        jvmTarget
+        jvmTarget,
+        withSourcesJar,
+        withJavadocJar,
     )
 
     @Nested
@@ -53,18 +59,18 @@ public class CompileExtension(override val project: Project) : ConfiguresProject
         allWarnings,
         suppressWarnings,
         jvmToolchain,
-        jvmTarget
+        jvmTarget,
+        withSourcesJar,
+        withJavadocJar,
     )
 
 
     public fun withSourcesJar() {
-        project.configure<JavaPluginExtension> {
-            withSourcesJar()
-        }
+        withSourcesJar = true
     }
 
     public fun withJavadocJar() {
-        // configure dokka or javadocs
+        withJavadocJar = true
     }
 
     public fun kotlin(action: Action<KotlinExtension>) {
@@ -91,7 +97,7 @@ public class CompileExtension(override val project: Project) : ConfiguresProject
             kotlin.configureProject()
 
         tasks {
-            if (distributeLicense.isPresent && distributeLicense.get())
+            if (distributeLicense.isTrue)
                 withType<Jar>().configureEach {
                     val license = project.findLicenseFile()
                     if (license != null)
@@ -100,14 +106,14 @@ public class CompileExtension(override val project: Project) : ConfiguresProject
                         }
                 }
 
-            if (buildDependsOnJar.isPresent && buildDependsOnJar.get())
+            if (buildDependsOnJar.isTrue)
                 named<Task>("build") {
                     dependsOn(withType<Jar>())
                 }
 
-            if (zip64.isPresent && zip64.get()) {
+            if (zip64.isTrue) {
                 withType<Zip>().configureEach {
-                    isZip64 = zip64.get()
+                    isZip64 = true
                 }
             }
         }

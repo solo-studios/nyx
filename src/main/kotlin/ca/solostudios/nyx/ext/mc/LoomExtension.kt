@@ -7,6 +7,7 @@ import ca.solostudios.nyx.util.sourceSets
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.get
+import org.gradle.kotlin.dsl.provideDelegate
 import org.jetbrains.annotations.ApiStatus
 import org.slf4j.kotlin.getLogger
 import org.slf4j.kotlin.warn
@@ -18,7 +19,6 @@ import kotlin.io.path.writeText
 public class LoomExtension(override val project: Project) : ConfiguresProject, HasProject {
     private val logger by getLogger()
 
-    // val default
     public fun accessWidener(name: String = project.name) {
         loom {
             // src/main/resources/$name.accesswidener

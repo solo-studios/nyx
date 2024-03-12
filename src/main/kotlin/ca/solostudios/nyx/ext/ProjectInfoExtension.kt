@@ -3,12 +3,15 @@ package ca.solostudios.nyx.ext
 import ca.solostudios.nyx.api.HasProject
 import ca.solostudios.nyx.util.convention
 import ca.solostudios.nyx.util.formatAsName
+import ca.solostudios.nyx.util.listProperty
 import ca.solostudios.nyx.util.property
 import ca.solostudios.nyx.util.tasks
 import ca.solostudios.nyx.util.toStringOrEmpty
 import org.gradle.api.Action
 import org.gradle.api.Project
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.publish.maven.MavenPomDeveloper
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.bundling.AbstractArchiveTask
 import org.gradle.kotlin.dsl.assign
@@ -39,22 +42,41 @@ public class ProjectInfoExtension(override val project: Project) : HasProject {
 
     public val organizationName: Property<String> = property()
 
+    public val developers: ListProperty<(MavenPomDeveloper) -> Unit> = listProperty()
+
     @Nested
     public val repository: RepositoryInfo = RepositoryInfo(project)
 
     @Nested
     public val license: LicenseInfoExtension = LicenseInfoExtension(project)
 
-    // fun applyAxionRelease() {
-    //     scmVersion {
-    //         tag {
-    //             prefix = project.name
-    //             versionSeparator = "-"
-    //         }
-    //     }
-    //
-    //     project.version = scmVersion.version
-    // }
+    public fun name(name: String) {
+        this.name = name
+    }
+
+    public fun group(group: String) {
+        this.group = group
+    }
+
+    public fun module(module: String) {
+        this.module = module
+    }
+
+    public fun description(description: String) {
+        this.description = description
+    }
+
+    public fun organizationUrl(organizationUrl: String) {
+        this.organizationUrl = organizationUrl
+    }
+
+    public fun organizationName(organizationName: String) {
+        this.organizationName = organizationName
+    }
+
+    public fun developer(developer: (MavenPomDeveloper) -> Unit) {
+        this.developers.add(developer)
+    }
 
     public fun repository(action: Action<RepositoryInfo>) {
         action.execute(repository)

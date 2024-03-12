@@ -2,7 +2,7 @@ package ca.solostudios.nyx.ext
 
 import ca.solostudios.nyx.api.ConfiguresProject
 import ca.solostudios.nyx.api.HasProject
-import ca.solostudios.nyx.util.getOrEmpty
+import ca.solostudios.nyx.util.orEmpty
 import ca.solostudios.nyx.util.property
 import ca.solostudios.nyx.util.publishing
 import org.gradle.api.Project
@@ -53,11 +53,11 @@ public open class PublishingExtension(
     }
 
     internal fun MavenPublication.configurePublication(applyArtifactId: Boolean = true) {
-        groupId = projectInfo.group.getOrEmpty()
-        // This will break on kotlin/multiplatform. Fix this.
+        groupId = projectInfo.group.orEmpty()
+        // Only apply artifact if needed (ie. when not multiplatform)
         if (applyArtifactId)
-            artifactId = projectInfo.module.getOrEmpty()
-        version = projectInfo.version.getOrEmpty()
+            artifactId = projectInfo.module.orEmpty()
+        version = projectInfo.version.orEmpty()
 
         pom {
             name = projectInfo.name
@@ -68,6 +68,13 @@ public open class PublishingExtension(
             organization {
                 name = projectInfo.organizationName
                 url = projectInfo.organizationUrl
+            }
+
+            developers {
+                // Add all configured developers
+                for (developerCallback in projectInfo.developers.get()) {
+                    developer(developerCallback)
+                }
             }
 
             // we assume there is only ever a single license
