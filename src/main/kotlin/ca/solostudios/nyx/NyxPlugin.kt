@@ -27,30 +27,13 @@
 
 package ca.solostudios.nyx
 
-import ca.solostudios.nyx.ext.NyxExtension
-import net.fabricmc.loom.api.LoomGradleExtensionAPI
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.kotlin.dsl.configure
 
 public class NyxPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         val extension = NyxExtension.create(project)
-
-        project.pluginManager.withPlugin("fabric-loom") {
-            // project.loom {}
-            project.configure<LoomGradleExtensionAPI> {
-
-            }
-
-        }
-
-        project.pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
-            // println("Has kotlin gradle plugin")
-            // project.plugins.withType<KotlinMultiplatformPluginWrapper> {
-            //
-            // }
-        }
+        extension.onLoad()
 
         configureBuild(extension, project)
     }

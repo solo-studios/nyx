@@ -27,7 +27,11 @@
 
 plugins {
     `kotlin-dsl`
-    `java-gradle-plugin`
+
+    // `java-gradle-plugin`
+
+    // alias(libs.plugins.gradle.plugin.java)
+    alias(libs.plugins.gradle.plugin.development)
 
     alias(libs.plugins.dokka)
     alias(libs.plugins.axion.release)
@@ -54,6 +58,7 @@ repositories {
 
 dependencies {
     compileOnly(gradleApi())
+    // compileOnly(gradleApi("8.6"))
 
     api(libs.apache.commons)
 
@@ -68,6 +73,10 @@ dependencies {
     // compileOnly(libs.quilt.loom)
     compileOnly(libs.architectury)
     // compileOnly(libs.architectury.loom)
+
+    implementation(libs.bundles.maven)
+
+    implementation(libs.fuel)
 }
 
 kotlin {
@@ -81,6 +90,11 @@ gradlePlugin {
         create("nyx") {
             id = "ca.solo-studios.nyx"
             implementationClass = "ca.solostudios.nyx.NyxPlugin"
+        }
+
+        create("sonatype-publish") {
+            id = "ca.solo-studios.sonatype-publish"
+            implementationClass = "ca.solostudios.nyx.sonatype.SonatypePublishPlugin"
         }
     }
 }

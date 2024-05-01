@@ -1,6 +1,7 @@
 package ca.solostudios.nyx.util
 
 import ca.solostudios.nyx.api.HasProject
+import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.MapProperty
@@ -14,6 +15,7 @@ import org.gradle.kotlin.dsl.setProperty
 internal fun <T> Property<T>.convention(project: Project, provider: () -> T): Property<T> = convention(project.provider(provider))
 
 internal inline fun <reified T> HasProject.property(): Property<T> = project.objects.property()
+internal inline fun <reified T> DefaultTask.property(): Property<T> = project.objects.property()
 
 internal inline fun <reified T> HasProject.setProperty(): SetProperty<T> = project.objects.setProperty()
 

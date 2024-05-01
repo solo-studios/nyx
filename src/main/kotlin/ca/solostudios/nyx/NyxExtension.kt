@@ -25,30 +25,31 @@
  * SOFTWARE.
  */
 
-package ca.solostudios.nyx.ext
+package ca.solostudios.nyx
 
 import ca.solostudios.nyx.api.ConfiguresProject
+import ca.solostudios.nyx.ext.PublishingExtension
 import ca.solostudios.nyx.ext.code.CompileExtension
 import ca.solostudios.nyx.ext.mc.LoomExtension
+import ca.solostudios.nyx.ext.project.ProjectInfoExtension
 import ca.solostudios.nyx.util.create
 import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.tasks.Nested
-import org.gradle.kotlin.dsl.getByType
 
-public open class NyxExtension(project: Project) : ConfiguresProject {
-
-    @Nested
-    public val project: ProjectInfoExtension = ProjectInfoExtension(project)
+public open class NyxExtension(private val gradleProject: Project) : ConfiguresProject {
 
     @Nested
-    public val publishing: PublishingExtension = PublishingExtension(project, this.project)
+    public val project: ProjectInfoExtension = ProjectInfoExtension(gradleProject)
 
     @Nested
-    public val compile: CompileExtension = CompileExtension(project)
+    public val publishing: PublishingExtension = PublishingExtension(gradleProject, this.project)
 
     @Nested
-    public val loom: LoomExtension = LoomExtension(project)
+    public val compile: CompileExtension = CompileExtension(gradleProject)
+
+    @Nested
+    public val loom: LoomExtension = LoomExtension(gradleProject)
 
     public fun project(action: Action<ProjectInfoExtension>) {
         action.execute(project)
@@ -82,6 +83,13 @@ public open class NyxExtension(project: Project) : ConfiguresProject {
         loom.apply(action)
     }
 
+    override fun onLoad() {
+        project.onLoad()
+        compile.onLoad()
+        publishing.onLoad()
+        loom.onLoad()
+    }
+
     override fun configureProject() {
         project.configureProject()
         compile.configureProject()
@@ -92,9 +100,6 @@ public open class NyxExtension(project: Project) : ConfiguresProject {
     public companion object {
         public const val NAME: String = "nyx"
 
-        public operator fun get(project: Project): NyxExtension = project.extensions.getByType<NyxExtension>()
-
-        // public fun create(project: Project): NyxExtension = project.extensions.create<NyxExtension>(NAME, project)
         public fun create(project: Project): NyxExtension = project.create<NyxExtension>(NAME, project)
     }
 }

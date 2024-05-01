@@ -1,4 +1,4 @@
-package ca.solostudios.nyx.ext
+package ca.solostudios.nyx.ext.project
 
 import ca.solostudios.nyx.api.HasProject
 import ca.solostudios.nyx.util.property

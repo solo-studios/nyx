@@ -1,4 +1,4 @@
-package ca.solostudios.nyx.ext
+package ca.solostudios.nyx.ext.project
 
 import ca.solostudios.nyx.api.HasProject
 import ca.solostudios.nyx.util.property
@@ -66,14 +66,43 @@ public open class RepositoryInfo(override val project: Project) : HasProject {
      */
     public val projectUrl: Property<String> = property<String>().convention(projectBaseUri.map { baseUri -> "https://$baseUri" })
 
+    /**
+     * The url for the issue management system.
+     */
     public val projectIssues: Property<String> = property<String>()
 
+    /**
+     * Configures the repository info to use a github url.
+     *
+     * @param user The user/organization the repository exists under
+     * @param repo The name of the repository
+     */
     public fun fromGithub(user: String, repo: String): Unit = fromGitHostWithIssues(user, repo, "github.com", "Github")
 
+    /**
+     * Configures the repository info to use a gitlab url.
+     *
+     * @param user The user/organization the repository exists under
+     * @param repo The name of the repository
+     */
     public fun fromGitlab(user: String, repo: String): Unit = fromGitHostWithIssues(user, repo, "gitlab.com", "Gitlab")
 
+    /**
+     * Configures the repository info to use a codeberg url.
+     *
+     * @param user The user/organization the repository exists under
+     * @param repo The name of the repository
+     */
     public fun fromCodeberg(user: String, repo: String): Unit = fromGitHostWithIssues(user, repo, "codeberg.org", "Codeberg")
 
+    /**
+     * Configures the repository info to use a generic git host that supports issue management.
+     *
+     * @param user The user/organization the repository exists under
+     * @param repo The name of the repository
+     * @param host The host/domain of the git repository (eg. `github.com`, `gitlab.com`, `gitlab.my-domain.com`, etc.)
+     * @param name The name of the git host (eg. "GitHub", "Gitlab", "Codeberg", etc.)
+     */
     public fun fromGitHostWithIssues(user: String, repo: String, host: String, name: String) {
         fromGitHost(user, repo, host)
         issueManagement.set(name)
@@ -81,6 +110,13 @@ public open class RepositoryInfo(override val project: Project) : HasProject {
         projectIssues.set(projectUrl.map { url -> "$url/issues" })
     }
 
+    /**
+     * Configures the repository info to use a generic git host that *does not* support issue management.
+     *
+     * @param user The user/organization the repository exists under
+     * @param repo The name of the repository
+     * @param host The host/domain of the git repository (eg. `github.com`, `gitlab.com`, `gitlab.my-domain.com`, etc.)
+     */
     public fun fromGitHost(user: String, repo: String, host: String) {
         projectHost.set(host)
         projectPath.set("$user/$repo")

@@ -20,6 +20,12 @@ fabric-loom = "1.5.7"
 architectury = "3.4.151"
 architectury-loom = "1.5.388"
 
+gradleplugins = "1.6.11"
+
+maven = "3.9.6"
+
+fuel = "2.3.1"
+
 [plugins]
 ## Kotlin Plugins
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
@@ -28,6 +34,9 @@ dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 ## Axion release plugin
 ### Gradle release and version management plugin.
 axion-release = { id = "pl.allegro.tech.build.axion-release", version.ref = "axion-release" }
+
+gradle-plugin-java = { id = "dev.gradleplugins.java-gradle-plugin", version.ref = "gradleplugins" }
+gradle-plugin-development = { id = "dev.gradleplugins.gradle-plugin-development", version.ref = "gradleplugins" }
 
 
 [libraries]
@@ -55,3 +64,14 @@ architectury = { group = "architectury-plugin", name = "architectury-plugin.grad
 architectury-loom = { group = "dev.architectury.loom", name = "dev.architectury.loom.gradle.plugin", version.ref = "architectury-loom" }
 
 dokka = { group = "org.jetbrains.dokka", name = "org.jetbrains.dokka.gradle.plugin", version.ref = "dokka" }
+
+maven-artifact = { group = "org.apache.maven", name = "maven-artifact", version.ref = "maven" }
+maven-repository-metadata = { group = "org.apache.maven", name = "maven-repository-metadata", version.ref = "maven" }
+
+fuel = { group = "com.github.kittinunf.fuel", name = "fuel", version.ref = "fuel" }
+
+[bundles]
+maven = [
+    "maven-artifact",
+    "maven-repository-metadata",
+]

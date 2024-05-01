@@ -30,7 +30,8 @@ pluginManagement {
     repositories {
         mavenCentral()
         gradlePluginPortal()
+        maven("https://repo.nokee.dev/release")
     }
 }
 
-rootProject.name = "gradle-conventions-plugin"
+rootProject.name = "nyx"

@@ -11,24 +11,27 @@ import ca.solostudios.nyx.util.publishing
 import ca.solostudios.nyx.util.tasks
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaBasePlugin
+import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.jvm.tasks.Jar
-import org.gradle.kotlin.dsl.apply
+import org.gradle.jvm.toolchain.JavaToolchainSpec
 import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.getValue
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
-import org.jetbrains.dokka.gradle.DokkaPlugin
 import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode
+import org.jetbrains.kotlin.gradle.dsl.KotlinCommonCompilerOptions
+import org.jetbrains.kotlin.gradle.dsl.KotlinCommonOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.dsl.KotlinTopLevelExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
 import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
@@ -46,21 +49,94 @@ public open class KotlinExtension(
 ) : ConfiguresProject, HasProject {
     private val logger by getLogger()
 
+    /**
+     * Sets the kotlin api version used
+     *
+     * @see KotlinCommonOptions.apiVersion
+     */
     public val apiVersion: Property<String> = property()
+
+    /**
+     * Sets the kotlin language version used
+     *
+     * @see KotlinCommonOptions.languageVersion
+     */
     public val languageVersion: Property<String> = property()
+
+    /**
+     * Enables the following opt-in annotations
+     *
+     * @see KotlinCommonCompilerOptions.optIn
+     */
     public val optIn: ListProperty<String> = listProperty()
+
+    /**
+     * Enables all compilers to output warnings as errors.
+     *
+     * @see CompileExtension.warningsAsErrors
+     */
     public val warningsAsErrors: Property<Boolean> = property<Boolean>().convention(warningsAsErrors)
+
+    /**
+     * The explicit api mode
+     *
+     * @see KotlinTopLevelExtension.explicitApi
+     */
     public val explicitApi: Property<ExplicitApiMode> = property()
+
+    /**
+     * Suppresses all warnings
+     *
+     * @see CompileExtension.suppressWarnings
+     */
     public val suppressWarnings: Property<Boolean> = property<Boolean>().convention(suppressWarnings)
+
+    /**
+     * The jvm toolchain release to use.
+     *
+     * @see JavaToolchainSpec.getLanguageVersion
+     * @see CompileExtension.jvmToolchain
+     */
     public val jvmToolchain: Property<Int> = property<Int>().convention(jvmToolchain)
+
+    /**
+     * The jvm target to use.
+     *
+     * @see JavaPluginExtension.setTargetCompatibility
+     * @see CompileExtension.jvmTarget
+     */
     public val jvmTarget: Property<Int> = property<Int>().convention(jvmTarget)
+
+    /**
+     * Enables sources jar
+     *
+     * @see JavaPluginExtension.withSourcesJar
+     * @see CompileExtension.withSourcesJar
+     */
     public val withSourcesJar: Property<Boolean> = property<Boolean>().convention(withSourcesJar)
+
+    /**
+     * Enables javadoc jar
+     *
+     * @see JavaPluginExtension.withJavadocJar
+     * @see CompileExtension.withJavadocJar
+     */
     public val withJavadocJar: Property<Boolean> = property<Boolean>().convention(withJavadocJar)
 
+    /**
+     * Enables the strict explicit api mode
+     *
+     * @see KotlinTopLevelExtension.explicitApi
+     */
     public fun explicitApi() {
         explicitApi = ExplicitApiMode.Strict
     }
 
+    /**
+     * Enables the warning explicit api mode
+     *
+     * @see KotlinTopLevelExtension.explicitApiWarning
+     */
     public fun explicitApiWarning() {
         explicitApi = ExplicitApiMode.Warning
     }
@@ -70,6 +146,9 @@ public open class KotlinExtension(
             addDokkaJavadocJarTask()
 
         kotlin {
+            if (this@KotlinExtension.explicitApi.isPresent)
+                explicitApi = this@KotlinExtension.explicitApi.get()
+
             if (jvmToolchain.isPresent)
                 jvmToolchain(jvmToolchain.get())
 
@@ -128,7 +207,7 @@ public open class KotlinExtension(
         }
 
         // Ensure dokka is applied
-        project.apply<DokkaPlugin>()
+        // project.apply<DokkaPlugin>()
 
         tasks {
             val dokkaHtml by named<DokkaTask>("dokkaHtml")
@@ -169,8 +248,6 @@ public open class KotlinExtension(
 
     internal fun configureCommonCompilations(target: KotlinTarget) {
         target.compilations.configureEach {
-            kotlinOptions
-
             if (apiVersion.isPresent)
                 kotlinOptions.apiVersion = apiVersion.get()
 
