@@ -2,12 +2,16 @@ package ca.solostudios.nyx.ext.mc
 
 import ca.solostudios.nyx.api.ConfiguresProject
 import ca.solostudios.nyx.api.HasProject
+import ca.solostudios.nyx.util.capitalizeWord
 import ca.solostudios.nyx.util.configurations
 import ca.solostudios.nyx.util.loom
 import ca.solostudios.nyx.util.sourceSets
 import org.gradle.api.Project
+import org.gradle.api.artifacts.Configuration
+import org.gradle.api.artifacts.ConfigurationContainer
 import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.get
+import org.gradle.kotlin.dsl.getValue
 import org.gradle.kotlin.dsl.provideDelegate
 import org.jetbrains.annotations.ApiStatus
 import org.slf4j.kotlin.getLogger
@@ -76,7 +80,31 @@ public class LoomExtension(override val project: Project) : ConfiguresProject, H
 
     override fun onLoad() {
         configurations {
+            val include by named("include")
 
+            addInclusionConfigurations(include, "include")
+
+            if (findByName("shadow") != null) {
+                val shadow by named("shadow")
+
+                addInclusionConfigurations(shadow, "shadow")
+            }
+        }
+    }
+
+    private fun ConfigurationContainer.addInclusionConfigurations(inclusionConfiguration: Configuration, nameAddition: String) {
+        // generate configurations such as
+        // apiInclude
+        // implementationInclude
+        // modApiInclude
+        // modImplementationInclude
+        matching { it.name.contains("implementation", ignoreCase = true) || it.name.contains("api", ignoreCase = true) }.all {
+            val baseConfiguration = this
+            val shadowConfigurationName = name + nameAddition.capitalizeWord()
+            val shadowConfiguration by register(shadowConfigurationName) {
+                inclusionConfiguration.extendsFrom(this)
+                baseConfiguration.extendsFrom(this)
+            }
         }
     }
 

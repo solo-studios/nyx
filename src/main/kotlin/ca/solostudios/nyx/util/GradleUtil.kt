@@ -49,6 +49,9 @@ internal fun HasProject.sourceSets(block: SourceSetContainer.() -> Unit) = proje
 
 internal fun HasProject.configurations(block: ConfigurationContainer.() -> Unit) = project.configurations.apply(block)
 
+internal val HasProject.configurations: ConfigurationContainer
+    get() = project.configurations
+
 internal val HasProject.sourceSets: SourceSetContainer
     get() = project.the<SourceSetContainer>()
 
