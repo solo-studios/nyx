@@ -5,15 +5,18 @@ import ca.solostudios.nyx.api.HasProject
 import ca.solostudios.nyx.util.capitalizeWord
 import ca.solostudios.nyx.util.configurations
 import ca.solostudios.nyx.util.loom
+import ca.solostudios.nyx.util.property
 import ca.solostudios.nyx.util.sourceSets
+import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ConfigurationContainer
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Nested
 import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.getValue
 import org.gradle.kotlin.dsl.provideDelegate
-import org.jetbrains.annotations.ApiStatus
 import org.slf4j.kotlin.getLogger
 import org.slf4j.kotlin.warn
 import kotlin.io.path.createDirectories
@@ -23,6 +26,11 @@ import kotlin.io.path.writeText
 
 public class LoomExtension(override val project: Project) : ConfiguresProject, HasProject {
     private val logger by getLogger()
+
+    public val allocatedMemory: Property<Int> = property<Int>().convention(2)
+
+    @Nested
+    public val mixin: MixinExtension = MixinExtension(project)
 
     /**
      * Adds an access widener at `src/main/resources/`[name]`.accesswidener`.
@@ -41,11 +49,11 @@ public class LoomExtension(override val project: Project) : ConfiguresProject, H
 
                 logger.warn {
                     """
-                    Can't find an access widener in any resource directory named '$name.accesswidener'.
-                    Created one at $firstAccessWidener for you.
+                        Can't find an access widener in any resource directory named '$name.accesswidener'.
+                        Created one at $firstAccessWidener for you.
 
-                    If this is not desired, please either remove the file and create it in another resource directory, or remove loom.accessWidener() from your buildscript.
-                """.trimIndent()
+                        If this is not desired, please either remove the file and create it in another resource directory, or remove loom.accessWidener() from your buildscript.
+                    """.trimIndent()
                 }
 
                 firstAccessWidener.parent.createDirectories()
@@ -63,22 +71,9 @@ public class LoomExtension(override val project: Project) : ConfiguresProject, H
         }
     }
 
-    /**
-     * Sets the mixin default refmap name to `mixins/`[name]`/refmap.json`.
-     *
-     * @param name The directory used for the refmap, defaults to `project.name`.
-     */
-    @ApiStatus.Experimental
-    public fun mixinRefmapName(name: String = project.name) {
-        loom {
-            @Suppress("UnstableApiUsage")
-            mixin {
-                defaultRefmapName = "mixins/$name/refmap.json"
-            }
-        }
-    }
-
     override fun onLoad() {
+        mixin.onLoad()
+
         configurations {
             val include by named("include")
 
@@ -90,6 +85,20 @@ public class LoomExtension(override val project: Project) : ConfiguresProject, H
                 addInclusionConfigurations(shadow, "shadow")
             }
         }
+    }
+
+    /**
+     * Configures the java compiler
+     */
+    public fun mixin(action: Action<MixinExtension>) {
+        action.execute(mixin)
+    }
+
+    /**
+     * Configures the java compiler
+     */
+    public fun mixin(action: (MixinExtension).() -> Unit) {
+        mixin.apply(action)
     }
 
     private fun ConfigurationContainer.addInclusionConfigurations(inclusionConfiguration: Configuration, nameAddition: String) {
@@ -109,6 +118,6 @@ public class LoomExtension(override val project: Project) : ConfiguresProject, H
     }
 
     override fun configureProject() {
-
+        mixin.configureProject()
     }
 }

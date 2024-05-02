@@ -26,7 +26,7 @@ internal inline fun <reified K, reified V> HasProject.mapProperty(): MapProperty
 internal fun Property<String>.orEmpty(): String = getOrElse("")
 
 internal val Property<Boolean>.isTrue: Boolean
-    get() = getOrElse(false)
+    get() = isPresent && getOrElse(false)
 
 internal val Property<Boolean>.isFalse: Boolean
-    get() = getOrElse(true)
+    get() = isPresent && getOrElse(true)
