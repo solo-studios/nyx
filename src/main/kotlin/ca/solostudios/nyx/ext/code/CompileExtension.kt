@@ -12,6 +12,7 @@ import org.gradle.api.Task
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Nested
+import org.gradle.api.tasks.bundling.AbstractArchiveTask
 import org.gradle.api.tasks.bundling.Zip
 import org.gradle.jvm.tasks.Jar
 import org.gradle.jvm.toolchain.JavaToolchainSpec
@@ -106,6 +107,13 @@ public class CompileExtension(override val project: Project) : ConfiguresProject
      */
     public val withJavadocJar: Property<Boolean> = property()
 
+    /**
+     * Enables reproducible builds.
+     *
+     * See: [Gradle Reproducible Builds](https://docs.gradle.org/current/userguide/working_with_files.html#sec:reproducible_archives)
+     */
+    public val reproducibleBuilds: Property<Boolean> = property<Boolean>().convention(true)
+
     @Nested
     public val kotlin: KotlinExtension = KotlinExtension(
         project,
@@ -196,7 +204,7 @@ public class CompileExtension(override val project: Project) : ConfiguresProject
         }
 
         tasks {
-            if (distributeLicense.isTrue)
+            if (distributeLicense.isTrue) {
                 withType<Jar>().configureEach {
                     val license = project.findLicenseFile()
                     if (license != null)
@@ -204,15 +212,24 @@ public class CompileExtension(override val project: Project) : ConfiguresProject
                             rename { "${it}_${project.rootProject.name}" }
                         }
                 }
+            }
 
-            if (buildDependsOnJar.isTrue)
+            if (buildDependsOnJar.isTrue) {
                 named<Task>("build") {
                     dependsOn(withType<Jar>())
                 }
+            }
 
             if (zip64.isTrue) {
                 withType<Zip>().configureEach {
                     isZip64 = true
+                }
+            }
+
+            if (reproducibleBuilds.isTrue) {
+                withType<AbstractArchiveTask>().configureEach {
+                    isPreserveFileTimestamps = false
+                    isReproducibleFileOrder = true
                 }
             }
         }
