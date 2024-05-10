@@ -137,13 +137,20 @@ public open class PublishingExtension(
 
         pom {
             name = projectInfo.name
-            description = projectInfo.description
-            url = projectInfo.repository.projectUrl
+
+            if (projectInfo.description.isPresent)
+                description = projectInfo.description
+            if (projectInfo.repository.projectUrl.isPresent)
+                url = projectInfo.repository.projectUrl
 
             // inceptionYear = projectInfo.inceptionYear
-            organization {
-                name = projectInfo.organizationName
-                url = projectInfo.organizationUrl
+            if (projectInfo.organizationName.isPresent || projectInfo.organizationUrl.isPresent) {
+                organization {
+                    if (projectInfo.organizationName.isPresent)
+                        name = projectInfo.organizationName
+                    if (projectInfo.organizationUrl.isPresent)
+                        url = projectInfo.organizationUrl
+                }
             }
 
             developers {
@@ -154,22 +161,31 @@ public open class PublishingExtension(
             }
 
             // we assume there is only ever a single license
-            licenses {
-                license {
-                    name = projectInfo.license.name
-                    url = projectInfo.license.url
+            if (projectInfo.license.name.isPresent || projectInfo.license.url.isPresent) {
+                licenses {
+                    license {
+                        if (projectInfo.license.name.isPresent)
+                            name = projectInfo.license.name
+                        if (projectInfo.license.url.isPresent)
+                            url = projectInfo.license.url
+                    }
                 }
             }
 
             issueManagement {
-                system = projectInfo.repository.issueManagement
-                url = projectInfo.repository.projectIssues
+                if (projectInfo.repository.issueManagement.isPresent)
+                    system = projectInfo.repository.issueManagement
+                if (projectInfo.repository.projectIssues.isPresent)
+                    url = projectInfo.repository.projectIssues
             }
 
             scm {
-                connection = projectInfo.repository.projectCloneBaseUri.map { "scm:git:https://$it" }
-                developerConnection = projectInfo.repository.projectCloneBaseUri.map { "scm:git:ssh://$it" }
-                url = projectInfo.repository.projectUrl
+                if (projectInfo.repository.projectCloneScmUri.isPresent)
+                    connection = projectInfo.repository.projectCloneScmUri
+                if (projectInfo.repository.projectCloneDeveloperUri.isPresent)
+                    developerConnection = projectInfo.repository.projectCloneDeveloperUri
+                if (projectInfo.repository.projectUrl.isPresent)
+                    url = projectInfo.repository.projectUrl
             }
         }
     }

@@ -2,6 +2,7 @@ package ca.solostudios.nyx.ext.mc
 
 import ca.solostudios.nyx.api.ConfiguresProject
 import ca.solostudios.nyx.api.HasProject
+import ca.solostudios.nyx.ext.project.ProjectInfoExtension
 import ca.solostudios.nyx.util.capitalizeWord
 import ca.solostudios.nyx.util.configurations
 import ca.solostudios.nyx.util.loom
@@ -24,13 +25,19 @@ import kotlin.io.path.createFile
 import kotlin.io.path.exists
 import kotlin.io.path.writeText
 
-public class LoomExtension(override val project: Project) : ConfiguresProject, HasProject {
+public class MinecraftExtension(
+    override val project: Project,
+    projectInfo: ProjectInfoExtension,
+) : ConfiguresProject, HasProject {
     private val logger by getLogger()
 
     public val allocatedMemory: Property<Int> = property<Int>().convention(2)
 
     @Nested
     public val mixin: MixinExtension = MixinExtension(project)
+
+    @Nested
+    public val minotaur: MinotaurExtension = MinotaurExtension(project, projectInfo)
 
     /**
      * Adds an access widener at `src/main/resources/`[name]`.accesswidener`.
@@ -73,6 +80,9 @@ public class LoomExtension(override val project: Project) : ConfiguresProject, H
 
     override fun onLoad() {
         mixin.onLoad()
+        project.plugins.withId("com.modrinth.minotaur") {
+            minotaur.onLoad()
+        }
 
         configurations {
             val include by named("include")
@@ -88,17 +98,31 @@ public class LoomExtension(override val project: Project) : ConfiguresProject, H
     }
 
     /**
-     * Configures the java compiler
+     * Configures mixins
      */
     public fun mixin(action: Action<MixinExtension>) {
         action.execute(mixin)
     }
 
     /**
-     * Configures the java compiler
+     * Configures mixins
      */
     public fun mixin(action: (MixinExtension).() -> Unit) {
         mixin.apply(action)
+    }
+
+    /**
+     * Configures mixins
+     */
+    public fun minotaur(action: Action<MinotaurExtension>) {
+        action.execute(minotaur)
+    }
+
+    /**
+     * Configures mixins
+     */
+    public fun minotaur(action: (MinotaurExtension).() -> Unit) {
+        minotaur.apply(action)
     }
 
     private fun ConfigurationContainer.addInclusionConfigurations(inclusionConfiguration: Configuration, nameAddition: String) {
@@ -119,5 +143,9 @@ public class LoomExtension(override val project: Project) : ConfiguresProject, H
 
     override fun configureProject() {
         mixin.configureProject()
+
+        project.plugins.withId("com.modrinth.minotaur") {
+            minotaur.configureProject()
+        }
     }
 }

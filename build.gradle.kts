@@ -64,19 +64,22 @@ dependencies {
 
     implementation(libs.slf4k)
 
+    implementation(libs.bundles.maven)
+
+    implementation(libs.fuel)
+
     // Kotlin stuff
     compileOnly(libs.kotlin.plugin)
     compileOnly(libs.dokka)
 
     // Minecraft plugins
     compileOnly(libs.fabric.loom)
-    // compileOnly(libs.quilt.loom)
+    compileOnly(libs.quilt.loom)
     compileOnly(libs.architectury)
-    // compileOnly(libs.architectury.loom)
+    compileOnly(libs.architectury.loom)
 
-    implementation(libs.bundles.maven)
-
-    implementation(libs.fuel)
+    compileOnly(libs.github.release)
+    compileOnly(libs.modrinth.minotaur)
 }
 
 kotlin {

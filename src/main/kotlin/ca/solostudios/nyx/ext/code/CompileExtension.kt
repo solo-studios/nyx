@@ -2,7 +2,6 @@ package ca.solostudios.nyx.ext.code
 
 import ca.solostudios.nyx.api.ConfiguresProject
 import ca.solostudios.nyx.api.HasProject
-import ca.solostudios.nyx.util.findLicenseFile
 import ca.solostudios.nyx.util.isTrue
 import ca.solostudios.nyx.util.property
 import ca.solostudios.nyx.util.tasks
@@ -20,6 +19,7 @@ import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
+import java.io.File
 
 public class CompileExtension(override val project: Project) : ConfiguresProject, HasProject {
     /**
@@ -194,6 +194,14 @@ public class CompileExtension(override val project: Project) : ConfiguresProject
         java.apply(action)
     }
 
+    override fun onLoad() {
+        java.onLoad()
+
+        project.plugins.withType<KotlinBasePlugin> {
+            kotlin.onLoad()
+        }
+    }
+
     override fun configureProject() {
         project.plugins.withId("java") {
             java.configureProject()
@@ -205,12 +213,14 @@ public class CompileExtension(override val project: Project) : ConfiguresProject
 
         tasks {
             if (distributeLicense.isTrue) {
-                withType<Jar>().configureEach {
-                    val license = project.findLicenseFile()
-                    if (license != null)
+                val license = project.findNearestLicense()
+
+                if (license != null) {
+                    withType<Jar>().configureEach {
                         from(license) {
                             rename { "${it}_${project.rootProject.name}" }
                         }
+                    }
                 }
             }
 
@@ -233,5 +243,22 @@ public class CompileExtension(override val project: Project) : ConfiguresProject
                 }
             }
         }
+    }
+
+    internal fun Project.findNearestLicense(): File? {
+        var project: Project? = this
+        while (project != null) {
+            // Sort for consistent ordering (order is not guaranteed)
+            val licenseFile = project.projectDir.listFiles()?.sortedBy { it.name }?.firstOrNull {
+                it.nameWithoutExtension == "LICENSE" && it.exists()
+            }
+
+            if (licenseFile != null)
+                return licenseFile
+
+            project = project.parent
+        }
+
+        return null
     }
 }

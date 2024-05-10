@@ -1,9 +1,9 @@
 package ca.solostudios.nyx.util
 
 import ca.solostudios.nyx.api.HasProject
+import com.modrinth.minotaur.ModrinthExtension
 import net.fabricmc.loom.api.LoomGradleExtensionAPI
 import org.gradle.api.Named
-import org.gradle.api.Project
 import org.gradle.api.artifacts.ConfigurationContainer
 import org.gradle.api.artifacts.dsl.ArtifactHandler
 import org.gradle.api.plugins.ExtensionAware
@@ -17,7 +17,6 @@ import org.gradle.kotlin.dsl.newInstance
 import org.gradle.kotlin.dsl.the
 import org.gradle.plugins.signing.SigningExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
-import java.io.File
 
 internal inline fun <reified T> Any.create(name: String, vararg args: Any): T {
     return (this as ExtensionAware).extensions.create(name, T::class.java, *args)
@@ -49,6 +48,11 @@ internal fun HasProject.sourceSets(block: SourceSetContainer.() -> Unit) = proje
 
 internal fun HasProject.configurations(block: ConfigurationContainer.() -> Unit) = project.configurations.apply(block)
 
+internal fun HasProject.modrinth(configure: ModrinthExtension.() -> Unit) = project.configure(configure)
+
+internal val HasProject.modrinth: ModrinthExtension
+    get() = project.the<ModrinthExtension>()
+
 internal val HasProject.configurations: ConfigurationContainer
     get() = project.configurations
 
@@ -56,16 +60,3 @@ internal val HasProject.sourceSets: SourceSetContainer
     get() = project.the<SourceSetContainer>()
 
 internal inline fun <reified T> HasProject.newInstance(vararg parameters: Any): T = project.objects.newInstance(*parameters)
-
-internal fun Project.findLicenseFile(): File? {
-    var project: Project? = this
-    while (project != null) {
-        val licenseFile = project.file("LICENSE")
-        if (licenseFile.exists())
-            return licenseFile
-
-        project = project.parent
-    }
-
-    return null
-}

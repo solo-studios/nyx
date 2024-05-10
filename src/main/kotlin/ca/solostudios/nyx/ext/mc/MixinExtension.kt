@@ -10,7 +10,6 @@ import org.gradle.api.Project
 import org.gradle.api.provider.Property
 import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.getValue
-import org.jetbrains.annotations.ApiStatus
 
 public class MixinExtension(override val project: Project) : ConfiguresProject, HasProject {
     public val hotswapMixins: Property<Boolean> = property<Boolean>().convention(true)
@@ -24,10 +23,9 @@ public class MixinExtension(override val project: Project) : ConfiguresProject, 
      *
      * @param name The directory used for the refmap, defaults to `project.name`.
      */
-    @ApiStatus.Experimental
+    @Suppress("UnstableApiUsage")
     public fun mixinRefmapName(name: String = project.name) {
         loom {
-            @Suppress("UnstableApiUsage")
             mixin {
                 defaultRefmapName = "mixins/$name/refmap.json"
             }
@@ -63,6 +61,5 @@ public class MixinExtension(override val project: Project) : ConfiguresProject, 
                 }
             }
         }
-
     }
 }

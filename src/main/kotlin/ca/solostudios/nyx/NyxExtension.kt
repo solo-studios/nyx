@@ -30,12 +30,14 @@ package ca.solostudios.nyx
 import ca.solostudios.nyx.api.ConfiguresProject
 import ca.solostudios.nyx.ext.PublishingExtension
 import ca.solostudios.nyx.ext.code.CompileExtension
-import ca.solostudios.nyx.ext.mc.LoomExtension
+import ca.solostudios.nyx.ext.mc.MinecraftExtension
 import ca.solostudios.nyx.ext.project.ProjectInfoExtension
 import ca.solostudios.nyx.util.create
+import net.fabricmc.loom.bootstrap.LoomGradlePluginBootstrap
 import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.tasks.Nested
+import org.gradle.kotlin.dsl.withType
 
 public open class NyxExtension(private val gradleProject: Project) : ConfiguresProject {
 
@@ -43,13 +45,13 @@ public open class NyxExtension(private val gradleProject: Project) : ConfiguresP
     public val project: ProjectInfoExtension = ProjectInfoExtension(gradleProject)
 
     @Nested
-    public val publishing: PublishingExtension = PublishingExtension(gradleProject, this.project)
+    public val publishing: PublishingExtension = PublishingExtension(gradleProject, project)
 
     @Nested
     public val compile: CompileExtension = CompileExtension(gradleProject)
 
     @Nested
-    public val loom: LoomExtension = LoomExtension(gradleProject)
+    public val minecraft: MinecraftExtension = MinecraftExtension(gradleProject, project)
 
     public fun project(action: Action<ProjectInfoExtension>) {
         action.execute(project)
@@ -75,26 +77,41 @@ public open class NyxExtension(private val gradleProject: Project) : ConfiguresP
         compile.apply(action)
     }
 
-    public fun loom(action: Action<LoomExtension>) {
-        action.execute(loom)
+    public fun minecraft(action: Action<MinecraftExtension>) {
+        action.execute(minecraft)
     }
 
-    public fun loom(action: (LoomExtension).() -> Unit) {
-        loom.apply(action)
+    public fun minecraft(action: (MinecraftExtension).() -> Unit) {
+        minecraft.apply(action)
     }
 
     override fun onLoad() {
         project.onLoad()
         compile.onLoad()
         publishing.onLoad()
-        loom.onLoad()
+
+        try {
+            gradleProject.plugins.withType(LoomGradlePluginBootstrap::class) {
+                minecraft.onLoad()
+            }
+        } catch (_: ClassNotFoundException) {
+            // ignore
+        }
     }
 
     override fun configureProject() {
         project.configureProject()
         compile.configureProject()
         publishing.configureProject()
-        loom.configureProject()
+
+        try {
+            // can't do withId, because loom could have several different ids (fabric-loom, quilt-loom, architectury-loom, etc.)
+            gradleProject.plugins.withType(LoomGradlePluginBootstrap::class) {
+                minecraft.configureProject()
+            }
+        } catch (_: ClassNotFoundException) {
+            // ignore
+        }
     }
 
     public companion object {

@@ -20,6 +20,10 @@ fabric-loom = "1.5.7"
 architectury = "3.4.151"
 architectury-loom = "1.5.388"
 
+github-release = "2.4.1"
+
+modrinth-minotaur = "2.8.7"
+
 gradleplugins = "1.6.11"
 
 maven = "3.9.6"
@@ -62,6 +66,10 @@ quilt-loom = { group = "org.quiltmc.loom", name = "org.quiltmc.loom.gradle.plugi
 
 architectury = { group = "architectury-plugin", name = "architectury-plugin.gradle.plugin", version.ref = "architectury" }
 architectury-loom = { group = "dev.architectury.loom", name = "dev.architectury.loom.gradle.plugin", version.ref = "architectury-loom" }
+
+github-release = { group = "com.github.breadmoirai", name = "github-release", version.ref = "github-release" }
+
+modrinth-minotaur = { group = "com.modrinth.minotaur", name = "Minotaur", version.ref = "modrinth-minotaur" }
 
 dokka = { group = "org.jetbrains.dokka", name = "org.jetbrains.dokka.gradle.plugin", version.ref = "dokka" }
 
