@@ -3,11 +3,11 @@ package ca.solostudios.nyx.ext.mc
 import ca.solostudios.nyx.api.ConfiguresProject
 import ca.solostudios.nyx.api.HasProject
 import ca.solostudios.nyx.ext.project.ProjectInfoExtension
+import ca.solostudios.nyx.util.listProperty
 import ca.solostudios.nyx.util.modrinth
 import ca.solostudios.nyx.util.property
 import ca.solostudios.nyx.util.tasks
 import com.modrinth.minotaur.TaskModrinthUpload
-import com.modrinth.minotaur.dependencies.Dependency
 import com.modrinth.minotaur.dependencies.container.NamedDependencyContainer
 import masecla.modrinth4j.model.version.ProjectVersion
 import org.gradle.api.Project
@@ -27,27 +27,25 @@ public class MinotaurExtension(
     /**
      * The modrinth project id.
      */
-    public val projectId: Property<String> = modrinth.projectId
+    public val projectId: Property<String> = property()
 
     /**
      * The changelog for this release.
      */
-    public val changelog: Property<String> = modrinth.changelog
+    public val changelog: Property<String> = property()
 
     /**
      * The project version type
      */
     public val versionType: Property<ProjectVersion.VersionType> = property()
 
-    public val gameVersions: ListProperty<String> = modrinth.gameVersions
+    public val gameVersions: ListProperty<String> = listProperty()
 
-    public val dependencies: ListProperty<Dependency> = modrinth.dependencies
+    public val failSilently: Property<Boolean> = property()
 
-    public val failSilently: Property<Boolean> = modrinth.failSilently
+    public val detectLoaders: Property<Boolean> = property()
 
-    public val detectLoaders: Property<Boolean> = modrinth.detectLoaders
-
-    public val autoAddDependsOn: Property<Boolean> = modrinth.autoAddDependsOn
+    public val autoAddDependsOn: Property<Boolean> = property()
 
     public fun dependencies(dsl: DependenciesDsl.() -> Unit) {
         DependenciesDsl(project).apply(dsl)
@@ -60,11 +58,29 @@ public class MinotaurExtension(
         else
             modrinth.token = System.getenv("MODRINTH_TOKEN")
 
+        if (projectId.isPresent)
+            modrinth.projectId = projectId
+
         if (projectInfo.version.isPresent)
             modrinth.versionNumber.convention(projectInfo.version)
 
         if (versionType.isPresent)
             modrinth.versionType = versionType.map { it.name }
+
+        if (changelog.isPresent)
+            modrinth.changelog = changelog
+
+        if (gameVersions.isPresent)
+            modrinth.gameVersions = gameVersions
+
+        if (failSilently.isPresent)
+            modrinth.failSilently = failSilently
+
+        if (detectLoaders.isPresent)
+            modrinth.detectLoaders = detectLoaders
+
+        if (autoAddDependsOn.isPresent)
+            modrinth.autoAddDependsOn = autoAddDependsOn
 
         // currently only support loom
         // TODO: support neoforge (normal forge can suck my balls)

@@ -94,7 +94,7 @@ public open class NyxExtension(private val gradleProject: Project) : ConfiguresP
             gradleProject.plugins.withType(LoomGradlePluginBootstrap::class) {
                 minecraft.onLoad()
             }
-        } catch (_: ClassNotFoundException) {
+        } catch (_: NoClassDefFoundError) {
             // ignore
         }
     }
@@ -109,7 +109,7 @@ public open class NyxExtension(private val gradleProject: Project) : ConfiguresP
             gradleProject.plugins.withType(LoomGradlePluginBootstrap::class) {
                 minecraft.configureProject()
             }
-        } catch (_: ClassNotFoundException) {
+        } catch (_: NoClassDefFoundError) {
             // ignore
         }
     }

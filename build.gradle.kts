@@ -90,12 +90,12 @@ kotlin {
 
 gradlePlugin {
     plugins {
-        create("nyx") {
+        create("Nyx") {
             id = "ca.solo-studios.nyx"
             implementationClass = "ca.solostudios.nyx.NyxPlugin"
         }
 
-        create("sonatype-publish") {
+        create("SonatypePublish") {
             id = "ca.solo-studios.sonatype-publish"
             implementationClass = "ca.solostudios.nyx.sonatype.SonatypePublishPlugin"
         }
