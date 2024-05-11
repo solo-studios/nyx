@@ -28,6 +28,7 @@
 
 pluginManagement {
     repositories {
+        maven("https://maven.solo-studios.ca/releases/")
         mavenCentral()
         gradlePluginPortal()
         maven("https://repo.nokee.dev/release")
