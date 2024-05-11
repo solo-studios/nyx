@@ -32,19 +32,21 @@ public class MixinExtension(override val project: Project) : ConfiguresProject, 
         }
     }
 
+    override fun onLoad() {}
+
     override fun configureProject() {
         loom {
             runs {
                 configureEach {
-                    if (debug.isTrue)
-                        property("mixin.debug", "true")
+                    if (debug.isPresent)
+                        property("mixin.debug", debug.get().toString())
                     if (verbose.isTrue)
-                        property("mixin.debug.verbose", "true")
+                        property("mixin.debug.verbose", verbose.get().toString())
                     if (dumpTargetOnFailure.isTrue)
-                        property("mixin.dumpTargetOnFailure", "true")
+                        property("mixin.dumpTargetOnFailure", dumpTargetOnFailure.get().toString())
                     // makes silent failures into hard-failures
                     if (checks.isTrue)
-                        property("mixin.checks", "true")
+                        property("mixin.checks", checks.get().toString())
 
 
                     if (hotswapMixins.isTrue) {

@@ -5,11 +5,13 @@ import ca.solostudios.nyx.api.HasProject
 import ca.solostudios.nyx.ext.project.ProjectInfoExtension
 import ca.solostudios.nyx.util.listProperty
 import ca.solostudios.nyx.util.modrinth
+import ca.solostudios.nyx.util.nyx
 import ca.solostudios.nyx.util.property
 import ca.solostudios.nyx.util.tasks
 import com.modrinth.minotaur.TaskModrinthUpload
 import com.modrinth.minotaur.dependencies.container.NamedDependencyContainer
 import masecla.modrinth4j.model.version.ProjectVersion
+import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
@@ -20,10 +22,10 @@ import org.gradle.kotlin.dsl.getValue
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.withType
 
-public class MinotaurExtension(
-    override val project: Project,
-    private val projectInfo: ProjectInfoExtension,
-) : ConfiguresProject, HasProject {
+public class MinotaurExtension(override val project: Project) : ConfiguresProject, HasProject {
+    private val projectInfo: ProjectInfoExtension
+        get() = nyx.project
+
     /**
      * The modrinth project id.
      */
@@ -47,9 +49,15 @@ public class MinotaurExtension(
 
     public val autoAddDependsOn: Property<Boolean> = property()
 
+    public fun dependencies(action: Action<DependenciesDsl>) {
+        dependencies { action.execute(this) }
+    }
+
     public fun dependencies(dsl: DependenciesDsl.() -> Unit) {
         DependenciesDsl(project).apply(dsl)
     }
+
+    override fun onLoad() {}
 
     override fun configureProject() {
         val tokenProperty = project.providers.gradleProperty(MODRINTH_TOKEN_GRADLE_PROPERTY)

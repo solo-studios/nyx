@@ -2,21 +2,24 @@ package ca.solostudios.nyx.ext.mc
 
 import ca.solostudios.nyx.api.ConfiguresProject
 import ca.solostudios.nyx.api.HasProject
-import ca.solostudios.nyx.ext.project.ProjectInfoExtension
 import ca.solostudios.nyx.util.capitalizeWord
 import ca.solostudios.nyx.util.configurations
 import ca.solostudios.nyx.util.loom
+import ca.solostudios.nyx.util.nyx
 import ca.solostudios.nyx.util.property
 import ca.solostudios.nyx.util.sourceSets
+import ca.solostudios.nyx.util.tasks
 import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ConfigurationContainer
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Nested
+import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.getValue
+import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.provideDelegate
 import org.slf4j.kotlin.getLogger
 import org.slf4j.kotlin.warn
@@ -25,10 +28,7 @@ import kotlin.io.path.createFile
 import kotlin.io.path.exists
 import kotlin.io.path.writeText
 
-public class MinecraftExtension(
-    override val project: Project,
-    projectInfo: ProjectInfoExtension,
-) : ConfiguresProject, HasProject {
+public class MinecraftExtension(override val project: Project) : ConfiguresProject, HasProject {
     private val logger by getLogger()
 
     public val allocatedMemory: Property<Int> = property<Int>().convention(2)
@@ -37,7 +37,35 @@ public class MinecraftExtension(
     public val mixin: MixinExtension = MixinExtension(project)
 
     @Nested
-    public val minotaur: MinotaurExtension = MinotaurExtension(project, projectInfo)
+    public val minotaur: MinotaurExtension = MinotaurExtension(project)
+
+    /**
+     * Configures mixins
+     */
+    public fun mixin(action: Action<MixinExtension>) {
+        action.execute(mixin)
+    }
+
+    /**
+     * Configures mixins
+     */
+    public fun mixin(action: (MixinExtension).() -> Unit) {
+        mixin.apply(action)
+    }
+
+    /**
+     * Configures minotaur
+     */
+    public fun minotaur(action: Action<MinotaurExtension>) {
+        action.execute(minotaur)
+    }
+
+    /**
+     * Configures minotaur
+     */
+    public fun minotaur(action: (MinotaurExtension).() -> Unit) {
+        minotaur.apply(action)
+    }
 
     /**
      * Adds an access widener at `src/main/resources/`[name]`.accesswidener`.
@@ -97,34 +125,6 @@ public class MinecraftExtension(
         }
     }
 
-    /**
-     * Configures mixins
-     */
-    public fun mixin(action: Action<MixinExtension>) {
-        action.execute(mixin)
-    }
-
-    /**
-     * Configures mixins
-     */
-    public fun mixin(action: (MixinExtension).() -> Unit) {
-        mixin.apply(action)
-    }
-
-    /**
-     * Configures mixins
-     */
-    public fun minotaur(action: Action<MinotaurExtension>) {
-        action.execute(minotaur)
-    }
-
-    /**
-     * Configures mixins
-     */
-    public fun minotaur(action: (MinotaurExtension).() -> Unit) {
-        minotaur.apply(action)
-    }
-
     private fun ConfigurationContainer.addInclusionConfigurations(inclusionConfiguration: Configuration, nameAddition: String) {
         // generate configurations such as
         // apiInclude
@@ -147,5 +147,9 @@ public class MinecraftExtension(
         project.plugins.withId("com.modrinth.minotaur") {
             minotaur.configureProject()
         }
+
+        val remapJar by tasks.named<Jar>("remapJar")
+
+        nyx.publishing.github.releaseAssets.from(remapJar)
     }
 }

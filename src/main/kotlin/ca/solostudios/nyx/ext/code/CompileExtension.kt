@@ -195,7 +195,9 @@ public class CompileExtension(override val project: Project) : ConfiguresProject
     }
 
     override fun onLoad() {
-        java.onLoad()
+        project.plugins.withId("java") {
+            java.onLoad()
+        }
 
         project.plugins.withType<KotlinBasePlugin> {
             kotlin.onLoad()

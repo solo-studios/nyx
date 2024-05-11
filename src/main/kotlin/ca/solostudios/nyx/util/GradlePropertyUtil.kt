@@ -3,6 +3,7 @@ package ca.solostudios.nyx.util
 import ca.solostudios.nyx.api.HasProject
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
+import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
@@ -22,6 +23,8 @@ internal inline fun <reified T> HasProject.setProperty(): SetProperty<T> = proje
 internal inline fun <reified T> HasProject.listProperty(): ListProperty<T> = project.objects.listProperty()
 
 internal inline fun <reified K, reified V> HasProject.mapProperty(): MapProperty<K, V> = project.objects.mapProperty()
+
+internal fun HasProject.fileCollection(): ConfigurableFileCollection = project.objects.fileCollection()
 
 internal fun Property<String>.orEmpty(): String = getOrElse("")
 

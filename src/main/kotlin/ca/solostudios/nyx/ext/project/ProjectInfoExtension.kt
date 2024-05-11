@@ -100,60 +100,6 @@ public class ProjectInfoExtension(override val project: Project) : ConfiguresPro
     public val license: LicenseInfoExtension = LicenseInfoExtension(project)
 
     /**
-     * Configures the name to be used when publishing.
-     *
-     * @param name The name to be used when publishing.
-     */
-    public fun name(name: String) {
-        this.name = name
-    }
-
-    /**
-     * Configures the group to be used when publishing.
-     *
-     * @param group The group to be used when publishing.
-     */
-    public fun group(group: String) {
-        this.group = group
-    }
-
-    /**
-     * Configures the module name to be used when publishing.
-     *
-     * @param module The module name to be used when publishing.
-     */
-    public fun module(module: String) {
-        this.module = module
-    }
-
-    /**
-     * Configures the description to be used when publishing.
-     *
-     * @param description The description to be used when publishing.
-     */
-    public fun description(description: String) {
-        this.description = description
-    }
-
-    /**
-     * Configures the organization url to be used when publishing.
-     *
-     * @param organizationUrl The organization url to be used when publishing.
-     */
-    public fun organizationUrl(organizationUrl: String) {
-        this.organizationUrl = organizationUrl
-    }
-
-    /**
-     * Configures the organization name to be used when publishing.
-     *
-     * @param organizationName The organization name to be used when publishing.
-     */
-    public fun organizationName(organizationName: String) {
-        this.organizationName = organizationName
-    }
-
-    /**
      * Adds a developer to the publishing information
      *
      * @param developer Configuration for the developer that is added
@@ -199,6 +145,8 @@ public class ProjectInfoExtension(override val project: Project) : ConfiguresPro
     public fun license(action: (LicenseInfoExtension).() -> Unit) {
         license.apply(action)
     }
+
+    override fun onLoad() {}
 
     override fun configureProject() {
         tasks {

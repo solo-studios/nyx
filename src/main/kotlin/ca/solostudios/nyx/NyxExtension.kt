@@ -45,13 +45,13 @@ public open class NyxExtension(private val gradleProject: Project) : ConfiguresP
     public val project: ProjectInfoExtension = ProjectInfoExtension(gradleProject)
 
     @Nested
-    public val publishing: PublishingExtension = PublishingExtension(gradleProject, project)
+    public val publishing: PublishingExtension = PublishingExtension(gradleProject)
 
     @Nested
     public val compile: CompileExtension = CompileExtension(gradleProject)
 
     @Nested
-    public val minecraft: MinecraftExtension = MinecraftExtension(gradleProject, project)
+    public val minecraft: MinecraftExtension = MinecraftExtension(gradleProject)
 
     public fun project(action: Action<ProjectInfoExtension>) {
         action.execute(project)

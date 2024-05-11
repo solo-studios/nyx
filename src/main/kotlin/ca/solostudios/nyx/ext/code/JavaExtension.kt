@@ -117,6 +117,8 @@ public open class JavaExtension(
         }
     }
 
+    override fun onLoad() {}
+
     override fun configureProject() {
         java {
             if (jvmToolchain.isPresent) {

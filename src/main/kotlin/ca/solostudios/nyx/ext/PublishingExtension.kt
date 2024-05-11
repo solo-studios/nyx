@@ -3,18 +3,22 @@ package ca.solostudios.nyx.ext
 import ca.solostudios.nyx.api.ConfiguresProject
 import ca.solostudios.nyx.api.HasProject
 import ca.solostudios.nyx.ext.project.ProjectInfoExtension
+import ca.solostudios.nyx.ext.release.GithubReleaseExtension
 import ca.solostudios.nyx.util.isTrue
+import ca.solostudios.nyx.util.nyx
 import ca.solostudios.nyx.util.orEmpty
 import ca.solostudios.nyx.util.property
 import ca.solostudios.nyx.util.publishing
 import ca.solostudios.nyx.util.signing
 import ca.solostudios.nyx.util.tasks
+import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.artifacts.dsl.RepositoryHandler
 import org.gradle.api.provider.Property
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.publish.maven.plugins.MavenPublishPlugin
 import org.gradle.api.publish.maven.tasks.AbstractPublishToMaven
+import org.gradle.api.tasks.Nested
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.create
@@ -26,10 +30,10 @@ import org.gradle.plugins.signing.Sign
 import org.gradle.plugins.signing.SigningPlugin
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinMultiplatformPlugin
 
-public open class PublishingExtension(
-    override val project: Project,
-    private val projectInfo: ProjectInfoExtension,
-) : ConfiguresProject, HasProject {
+public class PublishingExtension(override val project: Project) : ConfiguresProject, HasProject {
+    private val projectInfo: ProjectInfoExtension
+        get() = nyx.project
+
     /**
      * Enables publishing
      */
@@ -45,8 +49,29 @@ public open class PublishingExtension(
      * - `signingKey`
      * - `signingKeyId`
      * - `signingPassword`
+     *
+     * You can set these globally by adding
+     * ```properties
+     * signingKey=[key]
+     * signingKeyId=[id]
+     * signingPassword=[key password]
+     * ```
+     * in [the `gradle.properties` located in your `$GRADLE_USER_HOME`](https://docs.gradle.org/current/userguide/build_environment.html#sec:gradle_environment_variables).
+     * By default, this is located at `~/.gradle/gradle.properties` on Linux/MacOS,
+     * and `%USERPROFILE%\.gradle\gradle.properties` on Windows.
      */
     public val allowInMemoryPgpKeys: Property<Boolean> = property<Boolean>().convention(true)
+
+    @Nested
+    public val github: GithubReleaseExtension = GithubReleaseExtension(project)
+
+    public fun github(action: Action<GithubReleaseExtension>) {
+        action.execute(github)
+    }
+
+    public fun github(action: (GithubReleaseExtension).() -> Unit) {
+        github.apply(action)
+    }
 
     /**
      * - Makes publish tasks depend on the signing task
@@ -68,7 +93,17 @@ public open class PublishingExtension(
         }
     }
 
+    override fun onLoad() {
+        project.plugins.withId("com.github.breadmoirai.github-release") {
+            github.onLoad()
+        }
+    }
+
     override fun configureProject() {
+        project.plugins.withId("com.github.breadmoirai.github-release") {
+            github.configureProject()
+        }
+
         if (!publish.isTrue)
             return
 

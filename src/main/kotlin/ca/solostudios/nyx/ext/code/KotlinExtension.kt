@@ -141,6 +141,8 @@ public open class KotlinExtension(
         explicitApi = ExplicitApiMode.Warning
     }
 
+    override fun onLoad() {}
+
     override fun configureProject() {
         if (withJavadocJar.isTrue)
             addDokkaJavadocJarTask()

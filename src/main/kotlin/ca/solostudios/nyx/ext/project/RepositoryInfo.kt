@@ -4,10 +4,33 @@ import ca.solostudios.nyx.api.HasProject
 import ca.solostudios.nyx.util.property
 import org.gradle.api.Project
 import org.gradle.api.provider.Property
+import org.gradle.kotlin.dsl.assign
 
 public open class RepositoryInfo(override val project: Project) : HasProject {
+    /**
+     * The domain name of the website hosting the git repository.
+     */
     public val projectHost: Property<String> = property()
 
+    /**
+     * The owner of the repository, if applicable.
+     *
+     * eg. The github organization, or github user.
+     */
+    public val projectOwner: Property<String> = property()
+
+    /**
+     * The name of the repository, if applicable.
+     *
+     * eg. The name of the github repository.
+     */
+    public val projectRepo: Property<String> = property()
+
+    /**
+     * The path of the project on the git host.
+     *
+     * For example: ``[user][projectOwner]`/`[repo][projectRepo]
+     */
     public val projectPath: Property<String> = property()
 
     /**
@@ -74,51 +97,53 @@ public open class RepositoryInfo(override val project: Project) : HasProject {
     /**
      * Configures the repository info to use a github url.
      *
-     * @param user The user/organization the repository exists under
+     * @param owner The user/organization the repository exists under
      * @param repo The name of the repository
      */
-    public fun fromGithub(user: String, repo: String): Unit = fromGitHostWithIssues(user, repo, "github.com", "Github")
+    public fun fromGithub(owner: String, repo: String): Unit = fromGitHostWithIssues(owner, repo, "github.com", "Github")
 
     /**
      * Configures the repository info to use a gitlab url.
      *
-     * @param user The user/organization the repository exists under
+     * @param owner The user/organization the repository exists under
      * @param repo The name of the repository
      */
-    public fun fromGitlab(user: String, repo: String): Unit = fromGitHostWithIssues(user, repo, "gitlab.com", "Gitlab")
+    public fun fromGitlab(owner: String, repo: String): Unit = fromGitHostWithIssues(owner, repo, "gitlab.com", "Gitlab")
 
     /**
      * Configures the repository info to use a codeberg url.
      *
-     * @param user The user/organization the repository exists under
+     * @param owner The user/organization the repository exists under
      * @param repo The name of the repository
      */
-    public fun fromCodeberg(user: String, repo: String): Unit = fromGitHostWithIssues(user, repo, "codeberg.org", "Codeberg")
+    public fun fromCodeberg(owner: String, repo: String): Unit = fromGitHostWithIssues(owner, repo, "codeberg.org", "Codeberg")
 
     /**
      * Configures the repository info to use a generic git host that supports issue management.
      *
-     * @param user The user/organization the repository exists under
+     * @param owner The user/organization the repository exists under
      * @param repo The name of the repository
      * @param host The host/domain of the git repository (eg. `github.com`, `gitlab.com`, `gitlab.my-domain.com`, etc.)
      * @param name The name of the git host (eg. "GitHub", "Gitlab", "Codeberg", etc.)
      */
-    public fun fromGitHostWithIssues(user: String, repo: String, host: String, name: String) {
-        fromGitHost(user, repo, host)
-        issueManagement.set(name)
+    public fun fromGitHostWithIssues(owner: String, repo: String, host: String, name: String) {
+        fromGitHost(owner, repo, host)
+        issueManagement = name
         // most major git hosts use /issues
-        projectIssues.set(projectUrl.map { url -> "$url/issues" })
+        projectIssues = projectUrl.map { url -> "$url/issues" }
     }
 
     /**
      * Configures the repository info to use a generic git host that *does not* support issue management.
      *
-     * @param user The user/organization the repository exists under
+     * @param owner The user/organization the repository exists under
      * @param repo The name of the repository
      * @param host The host/domain of the git repository (eg. `github.com`, `gitlab.com`, `gitlab.my-domain.com`, etc.)
      */
-    public fun fromGitHost(user: String, repo: String, host: String) {
-        projectHost.set(host)
-        projectPath.set("$user/$repo")
+    public fun fromGitHost(owner: String, repo: String, host: String) {
+        projectHost = host
+        projectPath = "$owner/$repo"
+        projectOwner = owner
+        projectRepo = repo
     }
 }
