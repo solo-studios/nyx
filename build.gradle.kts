@@ -28,32 +28,65 @@
 plugins {
     `kotlin-dsl`
 
-    // `java-gradle-plugin`
+    `java-gradle-plugin`
 
-    // alias(libs.plugins.gradle.plugin.java)
     alias(libs.plugins.gradle.plugin.development)
 
     alias(libs.plugins.dokka)
     alias(libs.plugins.axion.release)
 
+    alias(libs.plugins.nyx)
+
     `maven-publish`
 }
 
-group = "ca.solo-studios"
-version = "1.0.0-SNAPSHOT"
+nyx {
+    compile {
+        withJavadocJar()
+        withSourcesJar()
 
-repositories {
-    mavenCentral()
+        allWarnings = true
+        warningsAsErrors = true
+        distributeLicense = true
+        buildDependsOnJar = true
+        jvmTarget = 8
+        reproducibleBuilds = true
+
+        kotlin.explicitApi()
+    }
+
+    project {
+        name = "Nyx"
+        group = "ca.solo-studios"
+        module = "nyx"
+        version = scmVersion.version
+        description = """
+            Nyx is a gradle plugin intended to simplify gradle buildscripts using common conventions.
+        """.trimIndent()
+
+        organizationUrl = "https://solo-studios.ca/"
+        organizationName = "Solo Studios"
+
+        developer {
+            id = "solonovamax"
+            name = "solonovamax"
+            email = "solonovamax@12oclockpoint.com"
+            url = "https://solonovamax.gay"
+        }
+
+        repository.fromGithub("solo-studios", "nyx")
+        license.useMIT()
+    }
 }
 
 repositories {
     maven("https://maven.solo-studios.ca/releases/")
-    maven("https://maven.fabricmc.net/")
-    // maven("https://maven.quiltmc.org/repository/release")
-    maven("https://maven.architectury.dev/")
-    maven("https://maven.minecraftforge.net/")
     gradlePluginPortal()
     mavenCentral()
+    maven("https://maven.fabricmc.net/")
+    maven("https://maven.quiltmc.org/repository/release")
+    maven("https://maven.architectury.dev/")
+    maven("https://maven.minecraftforge.net/")
 }
 
 dependencies {
@@ -82,12 +115,6 @@ dependencies {
     compileOnly(libs.modrinth.minotaur)
 }
 
-kotlin {
-    jvmToolchain(8)
-
-    explicitApi()
-}
-
 gradlePlugin {
     plugins {
         create("Nyx") {
@@ -101,3 +128,39 @@ gradlePlugin {
         }
     }
 }
+
+nyx {
+    publishing {
+        configurePublications()
+
+        repositories {
+            maven {
+                name = "Sonatype"
+
+                val repositoryId: String? by project
+                url = when {
+                    isSnapshot           -> uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+                    repositoryId != null -> uri("https://s01.oss.sonatype.org/service/local/staging/deployByRepositoryId/$repositoryId/")
+                    else                 -> uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+                }
+
+                credentials(PasswordCredentials::class)
+            }
+            maven {
+                name = "SoloStudios"
+
+                val releasesUrl = uri("https://maven.solo-studios.ca/releases/")
+                val snapshotUrl = uri("https://maven.solo-studios.ca/snapshots/")
+                url = if (isSnapshot) snapshotUrl else releasesUrl
+
+                credentials(PasswordCredentials::class)
+                authentication { // publishing doesn't work without this for some reason
+                    create<BasicAuthentication>("basic")
+                }
+            }
+        }
+    }
+}
+
+val Project.isSnapshot: Boolean
+    get() = version.toString().endsWith("-SNAPSHOT")
