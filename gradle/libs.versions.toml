@@ -8,6 +8,8 @@ axion-release = "1.15.5"
 
 nyx = "0.1.0"
 
+gradle-publish = "1.2.1"
+
 apache-commons = "1.11.0"
 
 guava = "32.1.3-jre"
@@ -46,6 +48,7 @@ gradle-plugin-development = { id = "dev.gradleplugins.gradle-plugin-development"
 
 nyx = { id = "ca.solo-studios.nyx", version.ref = "nyx" }
 
+gradle-publish = { id = "com.gradle.plugin-publish", version.ref = "gradle-publish" }
 
 [libraries]
 ## Kotlin stdlib

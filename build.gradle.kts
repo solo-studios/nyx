@@ -28,6 +28,8 @@
 plugins {
     `kotlin-dsl`
 
+    `maven-publish`
+
     `java-gradle-plugin`
 
     alias(libs.plugins.gradle.plugin.development)
@@ -37,7 +39,7 @@ plugins {
 
     alias(libs.plugins.nyx)
 
-    `maven-publish`
+    alias(libs.plugins.gradle.publish)
 }
 
 nyx {
@@ -116,15 +118,27 @@ dependencies {
 }
 
 gradlePlugin {
+    website = nyx.project.repository.projectUrl
+    vcsUrl = nyx.project.repository.projectUrl
+
     plugins {
         create("Nyx") {
+            displayName = "Nyx"
             id = "ca.solo-studios.nyx"
             implementationClass = "ca.solostudios.nyx.NyxPlugin"
+            description = nyx.project.description.get()
+
+            tags = listOf("kotlin", "publishing", "convention")
         }
 
         create("SonatypePublish") {
+            displayName = "Sonatype Publish"
             id = "ca.solo-studios.sonatype-publish"
             implementationClass = "ca.solostudios.nyx.sonatype.SonatypePublishPlugin"
+            description = """
+                Sonatype Publish is a gradle plugin for publishing to the new Sonatype Central repository.
+            """.trimIndent()
+            tags = listOf("publishing", "sonatype", "maven", "maven-central")
         }
     }
 }
