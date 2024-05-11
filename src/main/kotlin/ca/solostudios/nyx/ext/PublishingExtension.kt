@@ -153,7 +153,7 @@ public class PublishingExtension(override val project: Project) : ConfiguresProj
 
                     project.plugins.hasPlugin(JavaGradlePluginPlugin::class) -> {
                         withType<MavenPublication>().configureEach {
-                            configurePublication(applyArtifactId = false)
+                            configurePublication(applyArtifactId = false, applyGroupId = false)
                         }
                     }
 
@@ -171,8 +171,9 @@ public class PublishingExtension(override val project: Project) : ConfiguresProj
         }
     }
 
-    internal fun MavenPublication.configurePublication(applyArtifactId: Boolean = true) {
-        groupId = projectInfo.group.orEmpty()
+    internal fun MavenPublication.configurePublication(applyArtifactId: Boolean = true, applyGroupId: Boolean = true) {
+        if (applyGroupId)
+            groupId = projectInfo.group.orEmpty()
 
         // Only apply artifact if needed (ie. when not multiplatform)
         if (applyArtifactId)
