@@ -26,6 +26,7 @@ import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.hasPlugin
 import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.withType
+import org.gradle.plugin.devel.plugins.JavaGradlePluginPlugin
 import org.gradle.plugins.signing.Sign
 import org.gradle.plugins.signing.SigningPlugin
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinMultiplatformPlugin
@@ -79,8 +80,8 @@ public class PublishingExtension(override val project: Project) : ConfiguresProj
      * - Enables publishing
      */
     public fun configurePublications() {
-        publishDependsOnSign = true
         publish = true
+        publishDependsOnSign = true
         allowInMemoryPgpKeys = true
     }
 
@@ -107,6 +108,9 @@ public class PublishingExtension(override val project: Project) : ConfiguresProj
         if (!publish.isTrue)
             return
 
+        project.apply<MavenPublishPlugin>()
+        project.apply<SigningPlugin>()
+
         if (allowInMemoryPgpKeys.isTrue) {
             signing {
                 // Allow specifying the key, key id, and password via environment variables.
@@ -130,9 +134,6 @@ public class PublishingExtension(override val project: Project) : ConfiguresProj
 
         }
 
-        project.apply<MavenPublishPlugin>()
-        project.apply<SigningPlugin>()
-
         publishing {
             if (publishDependsOnSign.isTrue) {
                 tasks.withType<AbstractPublishToMaven>().configureEach {
@@ -141,19 +142,28 @@ public class PublishingExtension(override val project: Project) : ConfiguresProj
             }
 
             publications {
+
                 when {
                     project.plugins.hasPlugin(KotlinMultiplatformPlugin::class) -> {
                         // when using kotlin multiplatform, publications will be created for you
                         withType<MavenPublication>().configureEach {
-                            configurePublication(false)
+                            configurePublication(applyArtifactId = false)
+                        }
+                    }
+
+                    project.plugins.hasPlugin(JavaGradlePluginPlugin::class) -> {
+                        withType<MavenPublication>().configureEach {
+                            configurePublication(applyArtifactId = false)
                         }
                     }
 
                     else -> {
-                        create<MavenPublication>("test") {
-                            from(project.components["java"])
+                        if (withType<MavenPublication>().isEmpty()) {
+                            create<MavenPublication>(nyx.project.module.get()) {
+                                from(project.components["java"])
 
-                            configurePublication()
+                                configurePublication()
+                            }
                         }
                     }
                 }

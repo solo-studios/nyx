@@ -23,19 +23,19 @@ import java.io.File
 
 public class CompileExtension(override val project: Project) : ConfiguresProject, HasProject {
     /**
+     * Enables all warnings
+     *
+     * @see JavaExtension.allWarnings
+     */
+    public val allWarnings: Property<Boolean> = property<Boolean>().convention(false)
+
+    /**
      * Enables all compilers to output warnings as errors.
      *
      * @see JavaExtension.warningsAsErrors
      * @see KotlinExtension.warningsAsErrors
      */
     public val warningsAsErrors: Property<Boolean> = property<Boolean>().convention(false)
-
-    /**
-     * Enables all warnings
-     *
-     * @see JavaExtension.allWarnings
-     */
-    public val allWarnings: Property<Boolean> = property<Boolean>().convention(false)
 
     /**
      * Distributes the `LICENSE` file in the jar.
@@ -206,10 +206,12 @@ public class CompileExtension(override val project: Project) : ConfiguresProject
 
     override fun configureProject() {
         project.plugins.withId("java") {
+            println("configure java")
             java.configureProject()
         }
 
         project.plugins.withType<KotlinBasePlugin> {
+            println("configure kotlin")
             kotlin.configureProject()
         }
 

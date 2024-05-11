@@ -284,6 +284,7 @@ internal class SonatypeMavenRemotePublisher(
             uploadSonatypeZip(outputFile)
         }
 
+        @Suppress("UNUSED_VARIABLE")
         private fun uploadSonatypeZip(zipFile: File) {
             val uploadParameters = listOf(
                 "publishingType" to publishExtension.publishingType.get().name,

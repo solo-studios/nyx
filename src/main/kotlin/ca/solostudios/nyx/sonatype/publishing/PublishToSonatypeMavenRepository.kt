@@ -159,6 +159,7 @@ public abstract class PublishToSonatypeMavenRepository : AbstractPublishToMaven(
         class CredentialsSpec private constructor(val identity: String, val type: Class<out Credentials>) {
             companion object {
                 fun of(identity: String, credentials: Credentials?): CredentialsSpec {
+                    @Suppress("UNCHECKED_CAST")
                     return CredentialsSpec(
                         identity, GeneratedSubclasses.unpackType(
                             credentials!!

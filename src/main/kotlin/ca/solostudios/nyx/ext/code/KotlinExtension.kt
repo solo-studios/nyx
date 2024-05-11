@@ -214,7 +214,8 @@ public open class KotlinExtension(
         tasks {
             val dokkaHtml by named<DokkaTask>("dokkaHtml")
             // configure the javadoc jar task without creating it (either get an existing task or create a new task)
-            val javadocJar by if (findByName("javadocJar") != null) named<Jar>("javadocJar") {
+            val hasJavadocJarTask = findByName("javadocJar") != null
+            val javadocJar by if (hasJavadocJarTask) named<Jar>("javadocJar") {
                 configureJavadocJar(dokkaHtml)
             } else register<Jar>("javadocJar") {
                 configureJavadocJar(dokkaHtml)
@@ -224,7 +225,7 @@ public open class KotlinExtension(
                 add("archives", javadocJar)
             }
 
-            if (project.plugins.hasPlugin("publishing")) {
+            if (project.plugins.hasPlugin("publishing") && !hasJavadocJarTask) {
                 // Add javadoc jar to maven publications (is this the best way to do it?)
                 publishing {
                     publications.withType<MavenPublication>().configureEach {
@@ -265,6 +266,5 @@ public open class KotlinExtension(
             if (suppressWarnings.isPresent)
                 kotlinOptions.suppressWarnings = suppressWarnings.get()
         }
-
     }
 }

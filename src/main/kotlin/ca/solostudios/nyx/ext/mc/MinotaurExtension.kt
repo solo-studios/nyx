@@ -39,7 +39,7 @@ public class MinotaurExtension(override val project: Project) : ConfiguresProjec
     /**
      * The project version type
      */
-    public val versionType: Property<ProjectVersion.VersionType> = property()
+    public val versionType: Property<VersionType> = property()
 
     public val gameVersions: ListProperty<String> = listProperty()
 
@@ -73,7 +73,7 @@ public class MinotaurExtension(override val project: Project) : ConfiguresProjec
             modrinth.versionNumber.convention(projectInfo.version)
 
         if (versionType.isPresent)
-            modrinth.versionType = versionType.map { it.name }
+            modrinth.versionType = versionType.map { it.channelName }
 
         if (changelog.isPresent)
             modrinth.changelog = changelog
@@ -136,5 +136,29 @@ public class MinotaurExtension(override val project: Project) : ConfiguresProjec
 
     public companion object {
         public const val MODRINTH_TOKEN_GRADLE_PROPERTY: String = "modrinth.token"
+    }
+
+    /**
+     * The name of the version channel.
+     *
+     * @see ProjectVersion.VersionType
+     */
+    public enum class VersionType(
+        public val channelName: String,
+    ) {
+        /**
+         * If this version was released on the "release" channel
+         */
+        RELEASE("release"),
+
+        /**
+         *  If this version was released on the "beta" channel
+         */
+        BETA("beta"),
+
+        /**
+         * If this version was released on the "alpha" channel
+         */
+        ALPHA("alpha")
     }
 }
