@@ -4,6 +4,7 @@ import ca.solostudios.nyx.api.ConfiguresProject
 import ca.solostudios.nyx.api.HasProject
 import ca.solostudios.nyx.util.capitalizeWord
 import ca.solostudios.nyx.util.configurations
+import ca.solostudios.nyx.util.listProperty
 import ca.solostudios.nyx.util.loom
 import ca.solostudios.nyx.util.nyx
 import ca.solostudios.nyx.util.property
@@ -13,6 +14,7 @@ import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ConfigurationContainer
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Nested
 import org.gradle.jvm.tasks.Jar
@@ -32,6 +34,9 @@ public class MinecraftExtension(override val project: Project) : ConfiguresProje
     private val logger by getLogger()
 
     public val allocatedMemory: Property<Int> = property<Int>().convention(2)
+
+    public val additionalJvmArgs: ListProperty<String> = listProperty<String>()
+        .convention(listOf("-XX:+UseZGC", "-XX:+ZGenerational"))
 
     @Nested
     public val mixin: MixinExtension = MixinExtension(project)
@@ -107,11 +112,6 @@ public class MinecraftExtension(override val project: Project) : ConfiguresProje
     }
 
     override fun onLoad() {
-        mixin.onLoad()
-        project.plugins.withId("com.modrinth.minotaur") {
-            minotaur.onLoad()
-        }
-
         configurations {
             val include by named("include")
 
@@ -122,6 +122,20 @@ public class MinecraftExtension(override val project: Project) : ConfiguresProje
 
                 addInclusionConfigurations(shadow, "shadow")
             }
+        }
+
+        loom {
+            runs {
+                configureEach {
+                    vmArg("-Xmx${allocatedMemory.get()}G")
+                    vmArgs(additionalJvmArgs.get())
+                }
+            }
+        }
+
+        mixin.onLoad()
+        project.plugins.withId("com.modrinth.minotaur") {
+            minotaur.onLoad()
         }
     }
 
