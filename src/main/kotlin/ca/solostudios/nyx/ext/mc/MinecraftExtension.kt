@@ -132,6 +132,9 @@ public class MinecraftExtension(override val project: Project) : ConfiguresProje
         // modApiInclude
         // modImplementationInclude
         matching { it.name.contains("implementation", ignoreCase = true) || it.name.contains("api", ignoreCase = true) }.all {
+            if (this.name.contains(nameAddition, ignoreCase = true))
+                return@all
+
             val baseConfiguration = this
             val shadowConfigurationName = name + nameAddition.capitalizeWord()
             val shadowConfiguration by register(shadowConfigurationName) {
