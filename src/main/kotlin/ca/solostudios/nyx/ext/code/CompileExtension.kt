@@ -206,12 +206,10 @@ public class CompileExtension(override val project: Project) : ConfiguresProject
 
     override fun configureProject() {
         project.plugins.withId("java") {
-            println("configure java")
             java.configureProject()
         }
 
         project.plugins.withType<KotlinBasePlugin> {
-            println("configure kotlin")
             kotlin.configureProject()
         }
 
