@@ -36,7 +36,7 @@ public class MinecraftExtension(override val project: Project) : ConfiguresProje
     public val allocatedMemory: Property<Int> = property<Int>().convention(2)
 
     public val additionalJvmArgs: ListProperty<String> = listProperty<String>()
-        .convention(listOf("-XX:+UseZGC", "-XX:+ZGenerational"))
+        .convention(listOf("-XX:+UseZGC"))
 
     @Nested
     public val mixin: MixinExtension = MixinExtension(project)
