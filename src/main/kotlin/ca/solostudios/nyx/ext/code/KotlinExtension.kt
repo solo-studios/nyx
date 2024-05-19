@@ -123,6 +123,8 @@ public open class KotlinExtension(
      */
     public val withJavadocJar: Property<Boolean> = property<Boolean>().convention(withJavadocJar)
 
+    public val compilerArgs: ListProperty<String> = listProperty()
+
     /**
      * Enables the strict explicit api mode
      *
@@ -265,6 +267,9 @@ public open class KotlinExtension(
 
             if (suppressWarnings.isPresent)
                 kotlinOptions.suppressWarnings = suppressWarnings.get()
+
+            if (compilerArgs.isPresent)
+                kotlinOptions.options.freeCompilerArgs.addAll(compilerArgs)
         }
     }
 }

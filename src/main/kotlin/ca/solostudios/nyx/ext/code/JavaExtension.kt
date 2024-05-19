@@ -5,6 +5,7 @@ import ca.solostudios.nyx.api.HasProject
 import ca.solostudios.nyx.util.isFalse
 import ca.solostudios.nyx.util.isTrue
 import ca.solostudios.nyx.util.java
+import ca.solostudios.nyx.util.listProperty
 import ca.solostudios.nyx.util.property
 import ca.solostudios.nyx.util.tasks
 import org.gradle.api.Action
@@ -12,6 +13,7 @@ import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.java.archives.Manifest
 import org.gradle.api.plugins.JavaPluginExtension
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.compile.JavaCompile
@@ -94,6 +96,8 @@ public open class JavaExtension(
      */
     public val withJavadocJar: Property<Boolean> = property<Boolean>().convention(withJavadocJar)
 
+    public val compilerArgs: ListProperty<String> = listProperty()
+
     /**
      * Configures the manifest used in the resulting jar file(s)
      *
@@ -156,6 +160,9 @@ public open class JavaExtension(
 
                 if (jvmTarget.isPresent)
                     options.release = jvmTarget.get()
+
+                if (compilerArgs.isPresent)
+                    options.compilerArgs.addAll(compilerArgs.get())
             }
 
             withType<Javadoc>().configureEach {
