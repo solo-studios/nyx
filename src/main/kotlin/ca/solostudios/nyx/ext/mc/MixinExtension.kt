@@ -17,6 +17,7 @@ public class MixinExtension(override val project: Project) : ConfiguresProject, 
     public val verbose: Property<Boolean> = property<Boolean>().convention(false)
     public val dumpTargetOnFailure: Property<Boolean> = property<Boolean>().convention(true)
     public val checks: Property<Boolean> = property<Boolean>().convention(false)
+    public val verify: Property<Boolean> = property<Boolean>().convention(false)
 
     /**
      * Sets the mixin default refmap name to `mixins/`[name]`/refmap.json`.
@@ -40,13 +41,15 @@ public class MixinExtension(override val project: Project) : ConfiguresProject, 
                 configureEach {
                     if (debug.isPresent)
                         property("mixin.debug", debug.get().toString())
-                    if (verbose.isTrue)
+                    if (verbose.isPresent)
                         property("mixin.debug.verbose", verbose.get().toString())
-                    if (dumpTargetOnFailure.isTrue)
+                    if (dumpTargetOnFailure.isPresent)
                         property("mixin.dumpTargetOnFailure", dumpTargetOnFailure.get().toString())
                     // makes silent failures into hard-failures
-                    if (checks.isTrue)
+                    if (checks.isPresent)
                         property("mixin.checks", checks.get().toString())
+                    if (verify.isPresent)
+                        property("mixin.debug.verify", verify.get().toString())
 
 
                     if (hotswapMixins.isTrue) {
