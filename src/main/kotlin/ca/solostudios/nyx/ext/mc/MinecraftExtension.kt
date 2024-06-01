@@ -124,15 +124,6 @@ public class MinecraftExtension(override val project: Project) : ConfiguresProje
             }
         }
 
-        loom {
-            runs {
-                configureEach {
-                    vmArg("-Xmx${allocatedMemory.get()}G")
-                    vmArgs(additionalJvmArgs.get())
-                }
-            }
-        }
-
         mixin.onLoad()
         project.plugins.withId("com.modrinth.minotaur") {
             minotaur.onLoad()
@@ -160,6 +151,15 @@ public class MinecraftExtension(override val project: Project) : ConfiguresProje
 
     override fun configureProject() {
         mixin.configureProject()
+
+        loom {
+            runs {
+                configureEach {
+                    vmArg("-Xmx${allocatedMemory.get()}G")
+                    vmArgs(additionalJvmArgs.get())
+                }
+            }
+        }
 
         project.plugins.withId("com.modrinth.minotaur") {
             minotaur.configureProject()

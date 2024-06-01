@@ -40,20 +40,20 @@ public class MixinExtension(override val project: Project) : ConfiguresProject, 
             runs {
                 configureEach {
                     if (debug.isPresent)
-                        property("mixin.debug", debug.get().toString())
+                        this.property("mixin.debug", debug.get().toString())
                     if (verbose.isPresent)
-                        property("mixin.debug.verbose", verbose.get().toString())
+                        this.property("mixin.debug.verbose", verbose.get().toString())
                     if (dumpTargetOnFailure.isPresent)
-                        property("mixin.dumpTargetOnFailure", dumpTargetOnFailure.get().toString())
+                        this.property("mixin.dumpTargetOnFailure", dumpTargetOnFailure.get().toString())
                     // makes silent failures into hard-failures
                     if (checks.isPresent)
-                        property("mixin.checks", checks.get().toString())
+                        this.property("mixin.checks", checks.get().toString())
                     if (verify.isPresent)
-                        property("mixin.debug.verify", verify.get().toString())
+                        this.property("mixin.debug.verify", verify.get().toString())
 
 
                     if (hotswapMixins.isTrue) {
-                        property("mixin.hotSwap", "true")
+                        this.property("mixin.hotSwap", "true")
 
                         val compileClasspath by configurations.named("compileClasspath")
 
