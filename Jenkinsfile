@@ -36,7 +36,7 @@ pipeline {
         }
         stage('Deploy Release') {
             when {
-                tag 'v*'
+                tag pattern: 'v*', comparator: 'GLOB'
             }
             steps {
                 withCredentials([
