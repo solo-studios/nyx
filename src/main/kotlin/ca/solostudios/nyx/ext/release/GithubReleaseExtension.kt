@@ -76,7 +76,7 @@ public class GithubReleaseExtension(override val project: Project) : ConfiguresP
         else
             githubRelease.token(System.getenv("MODRINTH_TOKEN"))
 
-        val version = projectInfo.version.get()
+        val version = projectInfo.version
 
         githubRelease {
             owner(projectInfo.repository.projectOwner)

@@ -39,9 +39,11 @@ public class ProjectInfoExtension(override val project: Project) : ConfiguresPro
      *
      * Defaults to `project.group`.
      */
-    public val group: Property<String> = property<String>().convention(project) {
-        project.group.toStringOrEmpty()
-    }
+    public var group: String
+        get() = project.group.toStringOrEmpty()
+        set(value) {
+            project.group = value
+        }
 
     /**
      * The module name used when publishing.
@@ -59,18 +61,22 @@ public class ProjectInfoExtension(override val project: Project) : ConfiguresPro
      *
      * Defaults to `project.version`.
      */
-    public val version: Property<String> = property<String>().convention(project) {
-        project.version.toStringOrEmpty()
-    }
+    public var version: String
+        get() = project.version.toStringOrEmpty()
+        set(value) {
+            project.version = value
+        }
 
     /**
      * The description used when publishing.
      *
      * Defaults to `project.description`.
      */
-    public val description: Property<String> = property<String>().convention(project) {
-        project.description.toStringOrEmpty()
-    }
+    public var description: String
+        get() = project.description.toStringOrEmpty()
+        set(value) {
+            project.description = value
+        }
 
     /**
      * The url of the organization used when publishing.
@@ -154,11 +160,5 @@ public class ProjectInfoExtension(override val project: Project) : ConfiguresPro
                 archiveBaseName = project.name
             }
         }
-
-        // update the version/group/description according to the properties
-        // if they have not been set, it will just be updating the value with its existing contents.
-        project.version = version.get()
-        project.group = group.get()
-        project.description = description.get()
     }
 }

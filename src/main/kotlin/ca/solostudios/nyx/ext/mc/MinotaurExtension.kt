@@ -69,8 +69,7 @@ public class MinotaurExtension(override val project: Project) : ConfiguresProjec
         if (projectId.isPresent)
             modrinth.projectId = projectId
 
-        if (projectInfo.version.isPresent)
-            modrinth.versionNumber.convention(projectInfo.version)
+        modrinth.versionNumber.convention(projectInfo.version)
 
         if (versionType.isPresent)
             modrinth.versionType = versionType.map { it.channelName }

@@ -120,7 +120,7 @@ public class PublishingExtension(override val project: Project) : ConfiguresProj
 
                 when {
                     signingKey != null && signingKeyId != null && signingPassword != null -> {
-                        useInMemoryPgpKeys(signingKey, signingKeyId, signingPassword)
+                        useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
                     }
 
                     signingKey != null && signingPassword != null -> {
@@ -173,19 +173,18 @@ public class PublishingExtension(override val project: Project) : ConfiguresProj
 
     internal fun MavenPublication.configurePublication(applyArtifactId: Boolean = true, applyGroupId: Boolean = true) {
         if (applyGroupId)
-            groupId = projectInfo.group.orEmpty()
+            groupId = projectInfo.group
 
         // Only apply artifact if needed (ie. when not multiplatform)
         if (applyArtifactId)
             artifactId = projectInfo.module.orEmpty()
 
-        version = projectInfo.version.orEmpty()
+        version = projectInfo.version
 
         pom {
             name = projectInfo.name
 
-            if (projectInfo.description.isPresent)
-                description = projectInfo.description
+            description = projectInfo.description
             if (projectInfo.repository.projectUrl.isPresent)
                 url = projectInfo.repository.projectUrl
 
