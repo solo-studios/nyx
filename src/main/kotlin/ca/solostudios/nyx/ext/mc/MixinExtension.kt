@@ -56,10 +56,10 @@ public class MixinExtension(override val project: Project) : ConfiguresProject, 
                         this.property("mixin.hotSwap", "true")
 
                         val compileClasspath by configurations.named("compileClasspath")
-
-                        val mixinJarFile = compileClasspath.files {
-                            it.group == "net.fabricmc" && it.name == "sponge-mixin"
-                        }.firstOrNull()
+                        val mixinJarFile = compileClasspath.resolvedConfiguration.resolvedArtifacts.firstOrNull {
+                            val module = it.moduleVersion.id
+                            module.group == "net.fabricmc" && module.name == "sponge-mixin"
+                        }
                         if (mixinJarFile != null)
                             vmArg("-javaagent:$mixinJarFile")
                     }
