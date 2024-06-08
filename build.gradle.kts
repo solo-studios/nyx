@@ -126,7 +126,7 @@ gradlePlugin {
             displayName = "Nyx"
             id = "ca.solo-studios.nyx"
             implementationClass = "ca.solostudios.nyx.NyxPlugin"
-            description = nyx.project.description.get()
+            description = nyx.project.description
 
             tags = listOf("kotlin", "publishing", "convention")
         }
