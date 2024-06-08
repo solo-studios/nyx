@@ -15,13 +15,6 @@ pipeline {
                 sh 'chmod +x gradlew'
             }
         }
-        stage('Clean') {
-            steps {
-                withGradle {
-                    sh './gradlew clean'
-                }
-            }
-        }
         stage('Build') {
             steps {
                 withGradle {
@@ -34,14 +27,34 @@ pipeline {
                 }
             }
         }
-        stage('Deploy Release') {
+
+        stage('Deploy Release to Solo Studios repository') {
+            steps {
+                withCredentials([
+                        string(credentialsId: 'maven-signing-key', variable: 'ORG_GRADLE_PROJECT_signingKey'),
+                        // string(credentialsId: 'maven-signing-key-id', variable: 'ORG_GRADLE_PROJECT_signingKeyId'),
+                        string(credentialsId: 'maven-signing-key-password', variable: 'ORG_GRADLE_PROJECT_signingPassword'),
+                        usernamePassword(
+                                credentialsId: 'solo-studios-maven',
+                                passwordVariable: 'ORG_GRADLE_PROJECT_SoloStudiosPassword',
+                                usernameVariable: 'ORG_GRADLE_PROJECT_SoloStudiosUsername'
+                        )
+                ]) {
+                    withGradle {
+                        sh './gradlew publishAllPublicationsToSoloStudiosRepository'
+                    }
+                }
+            }
+        }
+
+        stage('Deploy Release to Sonatype Repository') {
             when {
-                tag pattern: 'v*', comparator: 'GLOB'
+                buildingTag()
             }
             steps {
                 withCredentials([
                         string(credentialsId: 'maven-signing-key', variable: 'ORG_GRADLE_PROJECT_signingKey'),
-                        string(credentialsId: 'maven-signing-key-id', variable: 'ORG_GRADLE_PROJECT_signingKeyId'),
+                        // string(credentialsId: 'maven-signing-key-id', variable: 'ORG_GRADLE_PROJECT_signingKeyId'),
                         string(credentialsId: 'maven-signing-key-password', variable: 'ORG_GRADLE_PROJECT_signingPassword'),
                         usernamePassword(
                                 credentialsId: 'solo-studios-maven',
@@ -55,10 +68,16 @@ pipeline {
                         )
                 ]) {
                     withGradle {
-                        sh './gradlew publish'
+                        sh './gradlew publishAllPublicationsToSonatypeRepository'
                     }
                 }
             }
+        }
+    }
+
+    post {
+        always {
+            cleanWs()
         }
     }
 }
