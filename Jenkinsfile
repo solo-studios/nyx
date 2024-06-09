@@ -15,15 +15,19 @@ pipeline {
                 sh 'chmod +x gradlew'
             }
         }
+
         stage('Build') {
             steps {
                 withGradle {
                     sh './gradlew build'
                 }
             }
+
             post {
                 success {
                     archiveArtifacts artifacts: '**/build/libs/*.jar', fingerprint: true, onlyIfSuccessful: true
+
+                    javadoc javadocDir: 'build/dokka/html/', keepAll: true
                 }
             }
         }
@@ -32,7 +36,7 @@ pipeline {
             steps {
                 withCredentials([
                         string(credentialsId: 'maven-signing-key', variable: 'ORG_GRADLE_PROJECT_signingKey'),
-                        // string(credentialsId: 'maven-signing-key-id', variable: 'ORG_GRADLE_PROJECT_signingKeyId'),
+                        string(credentialsId: 'maven-signing-key-id', variable: 'ORG_GRADLE_PROJECT_signingKeyId'),
                         string(credentialsId: 'maven-signing-key-password', variable: 'ORG_GRADLE_PROJECT_signingPassword'),
                         usernamePassword(
                                 credentialsId: 'solo-studios-maven',
@@ -51,16 +55,12 @@ pipeline {
             when {
                 buildingTag()
             }
+
             steps {
                 withCredentials([
                         string(credentialsId: 'maven-signing-key', variable: 'ORG_GRADLE_PROJECT_signingKey'),
-                        // string(credentialsId: 'maven-signing-key-id', variable: 'ORG_GRADLE_PROJECT_signingKeyId'),
+                        string(credentialsId: 'maven-signing-key-id', variable: 'ORG_GRADLE_PROJECT_signingKeyId'),
                         string(credentialsId: 'maven-signing-key-password', variable: 'ORG_GRADLE_PROJECT_signingPassword'),
-                        usernamePassword(
-                                credentialsId: 'solo-studios-maven',
-                                passwordVariable: 'ORG_GRADLE_PROJECT_SoloStudiosPassword',
-                                usernameVariable: 'ORG_GRADLE_PROJECT_SoloStudiosUsername'
-                        ),
                         usernamePassword(
                                 credentialsId: 'sonatype-maven-credentials',
                                 passwordVariable: 'ORG_GRADLE_PROJECT_SonatypePassword',
