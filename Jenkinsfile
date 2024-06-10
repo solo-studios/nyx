@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file Jenkinsfile is part of nyx
- * Last modified on 10-06-2024 03:21 p.m.
+ * Last modified on 10-06-2024 03:26 p.m.
  *
  * MIT License
  *
@@ -63,7 +63,7 @@ pipeline {
             steps {
                 withCredentials([
                         string(credentialsId: 'maven-signing-key', variable: 'ORG_GRADLE_PROJECT_signingKey'),
-                        string(credentialsId: 'maven-signing-key-id', variable: 'ORG_GRADLE_PROJECT_signingKeyId'),
+                        // string(credentialsId: 'maven-signing-key-id', variable: 'ORG_GRADLE_PROJECT_signingKeyId'),
                         string(credentialsId: 'maven-signing-key-password', variable: 'ORG_GRADLE_PROJECT_signingPassword'),
                         usernamePassword(
                                 credentialsId: 'solo-studios-maven',
@@ -86,7 +86,7 @@ pipeline {
             steps {
                 withCredentials([
                         string(credentialsId: 'maven-signing-key', variable: 'ORG_GRADLE_PROJECT_signingKey'),
-                        string(credentialsId: 'maven-signing-key-id', variable: 'ORG_GRADLE_PROJECT_signingKeyId'),
+                        // string(credentialsId: 'maven-signing-key-id', variable: 'ORG_GRADLE_PROJECT_signingKeyId'),
                         string(credentialsId: 'maven-signing-key-password', variable: 'ORG_GRADLE_PROJECT_signingPassword'),
                         usernamePassword(
                                 credentialsId: 'sonatype-maven-credentials',
