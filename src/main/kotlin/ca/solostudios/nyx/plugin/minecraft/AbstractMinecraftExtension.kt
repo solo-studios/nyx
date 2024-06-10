@@ -1,7 +1,7 @@
 /*
- * Copyright (c) 2023-2024 solonovamax <solonovamax@12oclockpoint.com>
+ * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
- * The file NyxExtension.kt is part of nyx
+ * The file AbstractMinecraftExtension.kt is part of nyx
  * Last modified on 10-06-2024 03:21 p.m.
  *
  * MIT License
@@ -25,31 +25,33 @@
  * SOFTWARE.
  */
 
-package ca.solostudios.nyx
+package ca.solostudios.nyx.plugin.minecraft
 
 import ca.solostudios.nyx.internal.InternalNyxExtension
-import ca.solostudios.nyx.project.ProjectInfoExtension
-import org.gradle.api.Action
+import ca.solostudios.nyx.internal.util.listProperty
+import ca.solostudios.nyx.internal.util.mapProperty
+import ca.solostudios.nyx.internal.util.property
 import org.gradle.api.Project
-import org.gradle.api.tasks.Nested
+import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.MapProperty
+import org.gradle.api.provider.Property
 
-public class NyxExtension(override val project: Project) : InternalNyxExtension {
-    @Nested
-    public val info: ProjectInfoExtension = ProjectInfoExtension(project)
+public abstract class AbstractMinecraftExtension(
+    project: Project,
+) : InternalNyxExtension {
+    public val allocatedMemory: Property<Int> = project.property<Int>().convention(2)
 
-    public fun info(action: Action<ProjectInfoExtension>) {
-        action.execute(info)
-    }
+    public val additionalJvmArgs: ListProperty<String> = project.listProperty<String>()
+        .convention(listOf("-XX:+UseZGC"))
 
-    public fun info(action: (ProjectInfoExtension).() -> Unit) {
-        info.apply(action)
-    }
+    public val additionalJvmProperties: MapProperty<String, String> = project.mapProperty<String, String>()
+        .convention(mapOf())
 
-    override fun configureProject() {
-        info.configureProject()
-    }
+    internal abstract fun setDefaultMixinRefmapName(defaultName: String)
+
+    internal abstract fun addMixinConfig(name: String)
 
     public companion object {
-        public const val NAME: String = "nyx"
+        public const val NAME: String = "minecraft"
     }
 }

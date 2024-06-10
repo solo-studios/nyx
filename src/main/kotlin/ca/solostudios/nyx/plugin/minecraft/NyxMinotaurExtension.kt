@@ -1,13 +1,39 @@
-package ca.solostudios.nyx.ext.mc
+/*
+ * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
+ *
+ * The file NyxMinotaurExtension.kt is part of nyx
+ * Last modified on 10-06-2024 03:24 p.m.
+ *
+ * MIT License
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * GRADLE-CONVENTIONS-PLUGIN IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 
-import ca.solostudios.nyx.api.ConfiguresProject
-import ca.solostudios.nyx.api.HasProject
-import ca.solostudios.nyx.ext.project.ProjectInfoExtension
-import ca.solostudios.nyx.util.listProperty
-import ca.solostudios.nyx.util.modrinth
-import ca.solostudios.nyx.util.nyx
-import ca.solostudios.nyx.util.property
-import ca.solostudios.nyx.util.tasks
+package ca.solostudios.nyx.plugin.minecraft
+
+import ca.solostudios.nyx.internal.HasProject
+import ca.solostudios.nyx.internal.InternalNyxExtension
+import ca.solostudios.nyx.internal.util.listProperty
+import ca.solostudios.nyx.internal.util.modrinth
+import ca.solostudios.nyx.internal.util.property
+import ca.solostudios.nyx.internal.util.tasks
+import ca.solostudios.nyx.project.ProjectInfoExtension
 import com.modrinth.minotaur.TaskModrinthUpload
 import com.modrinth.minotaur.dependencies.container.NamedDependencyContainer
 import masecla.modrinth4j.model.version.ProjectVersion
@@ -22,10 +48,10 @@ import org.gradle.kotlin.dsl.getValue
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.withType
 
-public class MinotaurExtension(override val project: Project) : ConfiguresProject, HasProject {
-    private val projectInfo: ProjectInfoExtension
-        get() = nyx.project
-
+public class NyxMinotaurExtension(
+    override val project: Project,
+    private val info: ProjectInfoExtension,
+) : InternalNyxExtension {
     /**
      * The modrinth project id.
      */
@@ -57,8 +83,6 @@ public class MinotaurExtension(override val project: Project) : ConfiguresProjec
         DependenciesDsl(project).apply(dsl)
     }
 
-    override fun onLoad() {}
-
     override fun configureProject() {
         val tokenProperty = project.providers.gradleProperty(MODRINTH_TOKEN_GRADLE_PROPERTY)
         if (tokenProperty.isPresent)
@@ -69,7 +93,7 @@ public class MinotaurExtension(override val project: Project) : ConfiguresProjec
         if (projectId.isPresent)
             modrinth.projectId = projectId
 
-        modrinth.versionNumber.convention(projectInfo.version)
+        modrinth.versionNumber.convention(info.version)
 
         if (versionType.isPresent)
             modrinth.versionType = versionType.map { it.channelName }
@@ -90,7 +114,7 @@ public class MinotaurExtension(override val project: Project) : ConfiguresProjec
             modrinth.autoAddDependsOn = autoAddDependsOn
 
         // currently only support loom
-        // TODO: support neoforge (normal forge can suck my balls)
+        // TODO: support neoforge
         if (tasks.findByName("remapJar") != null) {
             val remapJar by tasks.named<Jar>("remapJar")
 
@@ -135,6 +159,7 @@ public class MinotaurExtension(override val project: Project) : ConfiguresProjec
 
     public companion object {
         public const val MODRINTH_TOKEN_GRADLE_PROPERTY: String = "modrinth.token"
+        public const val NAME: String = "minotaur"
     }
 
     /**

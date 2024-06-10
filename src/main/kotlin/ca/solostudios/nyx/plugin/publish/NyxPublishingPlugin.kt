@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2023-2024 solonovamax <solonovamax@12oclockpoint.com>
+ * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
- * The file NyxExtension.kt is part of nyx
- * Last modified on 10-06-2024 03:21 p.m.
+ * The file NyxPublishingPlugin.kt is part of nyx
+ * Last modified on 10-06-2024 03:24 p.m.
  *
  * MIT License
  *
@@ -25,31 +25,26 @@
  * SOFTWARE.
  */
 
-package ca.solostudios.nyx
+package ca.solostudios.nyx.plugin.publish
 
-import ca.solostudios.nyx.internal.InternalNyxExtension
-import ca.solostudios.nyx.project.ProjectInfoExtension
-import org.gradle.api.Action
+import ca.solostudios.nyx.NyxExtension
+import ca.solostudios.nyx.internal.InternalNyxPlugin
+import ca.solostudios.nyx.internal.util.create
+import ca.solostudios.nyx.plugin.publish.release.NyxGithubReleaseExtension
 import org.gradle.api.Project
-import org.gradle.api.tasks.Nested
+import org.gradle.kotlin.dsl.the
 
-public class NyxExtension(override val project: Project) : InternalNyxExtension {
-    @Nested
-    public val info: ProjectInfoExtension = ProjectInfoExtension(project)
+internal class NyxPublishingPlugin : InternalNyxPlugin {
+    override fun apply(project: Project) {
+        val nyxExtension = project.the<NyxExtension>()
+        val publishingExtension = nyxExtension.create<PublishingExtension>(PublishingExtension.NAME, project, nyxExtension.info)
 
-    public fun info(action: Action<ProjectInfoExtension>) {
-        action.execute(info)
-    }
+        project.plugins.withId("com.github.breadmoirai.github-release") {
+            publishingExtension.create<NyxGithubReleaseExtension>(NyxGithubReleaseExtension.NAME, project, nyxExtension.info)
+        }
 
-    public fun info(action: (ProjectInfoExtension).() -> Unit) {
-        info.apply(action)
-    }
-
-    override fun configureProject() {
-        info.configureProject()
-    }
-
-    public companion object {
-        public const val NAME: String = "nyx"
+        afterEvaluate(project) {
+            publishingExtension.configureProject()
+        }
     }
 }

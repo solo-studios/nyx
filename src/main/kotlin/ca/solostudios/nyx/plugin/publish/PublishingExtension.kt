@@ -1,24 +1,46 @@
-package ca.solostudios.nyx.ext
+/*
+ * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
+ *
+ * The file PublishingExtension.kt is part of nyx
+ * Last modified on 10-06-2024 03:24 p.m.
+ *
+ * MIT License
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * GRADLE-CONVENTIONS-PLUGIN IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 
-import ca.solostudios.nyx.api.ConfiguresProject
-import ca.solostudios.nyx.api.HasProject
-import ca.solostudios.nyx.ext.project.ProjectInfoExtension
-import ca.solostudios.nyx.ext.release.GithubReleaseExtension
-import ca.solostudios.nyx.util.isTrue
-import ca.solostudios.nyx.util.nyx
-import ca.solostudios.nyx.util.orEmpty
-import ca.solostudios.nyx.util.property
-import ca.solostudios.nyx.util.publishing
-import ca.solostudios.nyx.util.signing
-import ca.solostudios.nyx.util.tasks
-import org.gradle.api.Action
+package ca.solostudios.nyx.plugin.publish
+
+import ca.solostudios.nyx.internal.InternalNyxExtension
+import ca.solostudios.nyx.internal.util.isTrue
+import ca.solostudios.nyx.internal.util.orEmpty
+import ca.solostudios.nyx.internal.util.property
+import ca.solostudios.nyx.internal.util.publishing
+import ca.solostudios.nyx.internal.util.signing
+import ca.solostudios.nyx.internal.util.tasks
+import ca.solostudios.nyx.project.ProjectInfoExtension
 import org.gradle.api.Project
 import org.gradle.api.artifacts.dsl.RepositoryHandler
 import org.gradle.api.provider.Property
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.publish.maven.plugins.MavenPublishPlugin
 import org.gradle.api.publish.maven.tasks.AbstractPublishToMaven
-import org.gradle.api.tasks.Nested
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.create
@@ -31,9 +53,10 @@ import org.gradle.plugins.signing.Sign
 import org.gradle.plugins.signing.SigningPlugin
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinMultiplatformPlugin
 
-public class PublishingExtension(override val project: Project) : ConfiguresProject, HasProject {
-    private val projectInfo: ProjectInfoExtension
-        get() = nyx.project
+public class PublishingExtension(
+    override val project: Project,
+    private val info: ProjectInfoExtension,
+) : InternalNyxExtension {
 
     /**
      * Enables publishing
@@ -63,17 +86,6 @@ public class PublishingExtension(override val project: Project) : ConfiguresProj
      */
     public val allowInMemoryPgpKeys: Property<Boolean> = property<Boolean>().convention(true)
 
-    @Nested
-    public val github: GithubReleaseExtension = GithubReleaseExtension(project)
-
-    public fun github(action: Action<GithubReleaseExtension>) {
-        action.execute(github)
-    }
-
-    public fun github(action: (GithubReleaseExtension).() -> Unit) {
-        github.apply(action)
-    }
-
     /**
      * - Makes publish tasks depend on the signing task
      * - Enables in-memory pgp keys
@@ -94,16 +106,10 @@ public class PublishingExtension(override val project: Project) : ConfiguresProj
         }
     }
 
-    override fun onLoad() {
-        project.plugins.withId("com.github.breadmoirai.github-release") {
-            github.onLoad()
-        }
-    }
-
     override fun configureProject() {
-        project.plugins.withId("com.github.breadmoirai.github-release") {
-            github.configureProject()
-        }
+        // project.plugins.withId("com.github.breadmoirai.github-release") {
+        //     github.configureProject()
+        // }
 
         if (!publish.isTrue)
             return
@@ -159,7 +165,7 @@ public class PublishingExtension(override val project: Project) : ConfiguresProj
 
                     else -> {
                         if (withType<MavenPublication>().isEmpty()) {
-                            create<MavenPublication>(nyx.project.module.get()) {
+                            create<MavenPublication>(info.module.get()) {
                                 from(project.components["java"])
 
                                 configurePublication()
@@ -173,65 +179,69 @@ public class PublishingExtension(override val project: Project) : ConfiguresProj
 
     internal fun MavenPublication.configurePublication(applyArtifactId: Boolean = true, applyGroupId: Boolean = true) {
         if (applyGroupId)
-            groupId = projectInfo.group
+            groupId = info.group
 
         // Only apply artifact if needed (ie. when not multiplatform)
         if (applyArtifactId)
-            artifactId = projectInfo.module.orEmpty()
+            artifactId = info.module.orEmpty()
 
-        version = projectInfo.version
+        version = info.version
 
         pom {
-            name = projectInfo.name
+            name = info.name
 
-            description = projectInfo.description
-            if (projectInfo.repository.projectUrl.isPresent)
-                url = projectInfo.repository.projectUrl
+            description = info.description
+            if (info.repository.projectUrl.isPresent)
+                url = info.repository.projectUrl
 
-            // inceptionYear = projectInfo.inceptionYear
-            if (projectInfo.organizationName.isPresent || projectInfo.organizationUrl.isPresent) {
+            // inceptionYear = info.inceptionYear
+            if (info.organizationName.isPresent || info.organizationUrl.isPresent) {
                 organization {
-                    if (projectInfo.organizationName.isPresent)
-                        name = projectInfo.organizationName
-                    if (projectInfo.organizationUrl.isPresent)
-                        url = projectInfo.organizationUrl
+                    if (info.organizationName.isPresent)
+                        name = info.organizationName
+                    if (info.organizationUrl.isPresent)
+                        url = info.organizationUrl
                 }
             }
 
             developers {
                 // Add all configured developers
-                for (developerCallback in projectInfo.developers.get()) {
+                for (developerCallback in info.developers.get()) {
                     developer(developerCallback)
                 }
             }
 
             // we assume there is only ever a single license
-            if (projectInfo.license.name.isPresent || projectInfo.license.url.isPresent) {
+            if (info.license.name.isPresent || info.license.url.isPresent) {
                 licenses {
                     license {
-                        if (projectInfo.license.name.isPresent)
-                            name = projectInfo.license.name
-                        if (projectInfo.license.url.isPresent)
-                            url = projectInfo.license.url
+                        if (info.license.name.isPresent)
+                            name = info.license.name
+                        if (info.license.url.isPresent)
+                            url = info.license.url
                     }
                 }
             }
 
             issueManagement {
-                if (projectInfo.repository.issueManagement.isPresent)
-                    system = projectInfo.repository.issueManagement
-                if (projectInfo.repository.projectIssues.isPresent)
-                    url = projectInfo.repository.projectIssues
+                if (info.repository.issueManagement.isPresent)
+                    system = info.repository.issueManagement
+                if (info.repository.projectIssues.isPresent)
+                    url = info.repository.projectIssues
             }
 
             scm {
-                if (projectInfo.repository.projectCloneScmUri.isPresent)
-                    connection = projectInfo.repository.projectCloneScmUri
-                if (projectInfo.repository.projectCloneDeveloperUri.isPresent)
-                    developerConnection = projectInfo.repository.projectCloneDeveloperUri
-                if (projectInfo.repository.projectUrl.isPresent)
-                    url = projectInfo.repository.projectUrl
+                if (info.repository.projectCloneScmUri.isPresent)
+                    connection = info.repository.projectCloneScmUri
+                if (info.repository.projectCloneDeveloperUri.isPresent)
+                    developerConnection = info.repository.projectCloneDeveloperUri
+                if (info.repository.projectUrl.isPresent)
+                    url = info.repository.projectUrl
             }
         }
+    }
+
+    public companion object {
+        public const val NAME: String = "publishing"
     }
 }

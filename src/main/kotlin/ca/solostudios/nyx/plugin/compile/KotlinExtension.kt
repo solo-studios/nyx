@@ -1,30 +1,45 @@
-package ca.solostudios.nyx.ext.code
+/*
+ * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
+ *
+ * The file KotlinExtension.kt is part of nyx
+ * Last modified on 10-06-2024 03:21 p.m.
+ *
+ * MIT License
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * GRADLE-CONVENTIONS-PLUGIN IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 
-import ca.solostudios.nyx.api.ConfiguresProject
-import ca.solostudios.nyx.api.HasProject
-import ca.solostudios.nyx.util.artifacts
-import ca.solostudios.nyx.util.isTrue
-import ca.solostudios.nyx.util.kotlin
-import ca.solostudios.nyx.util.listProperty
-import ca.solostudios.nyx.util.property
-import ca.solostudios.nyx.util.publishing
-import ca.solostudios.nyx.util.tasks
+package ca.solostudios.nyx.plugin.compile
+
+import ca.solostudios.nyx.internal.InternalNyxExtension
+import ca.solostudios.nyx.internal.util.addDokkaJavadocJarTask
+import ca.solostudios.nyx.internal.util.isTrue
+import ca.solostudios.nyx.internal.util.kotlin
+import ca.solostudios.nyx.internal.util.listProperty
+import ca.solostudios.nyx.internal.util.property
 import org.gradle.api.Project
-import org.gradle.api.plugins.JavaBasePlugin
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
-import org.gradle.api.provider.Provider
-import org.gradle.api.publish.maven.MavenPublication
-import org.gradle.jvm.tasks.Jar
 import org.gradle.jvm.toolchain.JavaToolchainSpec
 import org.gradle.kotlin.dsl.assign
-import org.gradle.kotlin.dsl.getValue
-import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.provideDelegate
-import org.gradle.kotlin.dsl.register
-import org.gradle.kotlin.dsl.withType
-import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode
 import org.jetbrains.kotlin.gradle.dsl.KotlinCommonCompilerOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinCommonOptions
@@ -38,15 +53,10 @@ import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 import org.slf4j.kotlin.error
 import org.slf4j.kotlin.getLogger
 
-public open class KotlinExtension(
+public class KotlinExtension(
     override val project: Project,
-    warningsAsErrors: Provider<Boolean>,
-    suppressWarnings: Provider<Boolean>,
-    jvmToolchain: Provider<Int>,
-    jvmTarget: Provider<Int>,
-    withSourcesJar: Provider<Boolean>,
-    withJavadocJar: Provider<Boolean>,
-) : ConfiguresProject, HasProject {
+    compile: CompileExtension,
+) : InternalNyxExtension {
     private val logger by getLogger()
 
     /**
@@ -75,7 +85,7 @@ public open class KotlinExtension(
      *
      * @see CompileExtension.warningsAsErrors
      */
-    public val warningsAsErrors: Property<Boolean> = property<Boolean>().convention(warningsAsErrors)
+    public val warningsAsErrors: Property<Boolean> = property<Boolean>().convention(compile.warningsAsErrors)
 
     /**
      * The explicit api mode
@@ -89,7 +99,7 @@ public open class KotlinExtension(
      *
      * @see CompileExtension.suppressWarnings
      */
-    public val suppressWarnings: Property<Boolean> = property<Boolean>().convention(suppressWarnings)
+    public val suppressWarnings: Property<Boolean> = property<Boolean>().convention(compile.suppressWarnings)
 
     /**
      * The jvm toolchain release to use.
@@ -97,7 +107,7 @@ public open class KotlinExtension(
      * @see JavaToolchainSpec.getLanguageVersion
      * @see CompileExtension.jvmToolchain
      */
-    public val jvmToolchain: Property<Int> = property<Int>().convention(jvmToolchain)
+    public val jvmToolchain: Property<Int> = property<Int>().convention(compile.jvmToolchain)
 
     /**
      * The jvm target to use.
@@ -105,7 +115,7 @@ public open class KotlinExtension(
      * @see JavaPluginExtension.setTargetCompatibility
      * @see CompileExtension.jvmTarget
      */
-    public val jvmTarget: Property<Int> = property<Int>().convention(jvmTarget)
+    public val jvmTarget: Property<Int> = property<Int>().convention(compile.jvmTarget)
 
     /**
      * Enables sources jar
@@ -113,7 +123,7 @@ public open class KotlinExtension(
      * @see JavaPluginExtension.withSourcesJar
      * @see CompileExtension.withSourcesJar
      */
-    public val withSourcesJar: Property<Boolean> = property<Boolean>().convention(withSourcesJar)
+    public val withSourcesJar: Property<Boolean> = property<Boolean>().convention(compile.withSourcesJar)
 
     /**
      * Enables javadoc jar
@@ -121,7 +131,7 @@ public open class KotlinExtension(
      * @see JavaPluginExtension.withJavadocJar
      * @see CompileExtension.withJavadocJar
      */
-    public val withJavadocJar: Property<Boolean> = property<Boolean>().convention(withJavadocJar)
+    public val withJavadocJar: Property<Boolean> = property<Boolean>().convention(compile.withJavadocJar)
 
     public val compilerArgs: ListProperty<String> = listProperty()
 
@@ -143,11 +153,28 @@ public open class KotlinExtension(
         explicitApi = ExplicitApiMode.Warning
     }
 
-    override fun onLoad() {}
-
     override fun configureProject() {
-        if (withJavadocJar.isTrue)
+        if (withJavadocJar.isTrue) {
+            if (!project.plugins.hasPlugin("org.jetbrains.dokka")) {
+                // Project does not have dokka plugin. do not attempt to configure it.
+                logger.error(IllegalStateException()) {
+                    """
+                        Requested to add a javadoc jar for a kotlin project, however the dokka plugin has not been applied.
+
+                        Please apply the dokka plugin in order to generate the javadoc jar for kotlin source code:
+                        plugins {
+                            id("org.jetbrains.dokka") version "<version>"
+                        }
+                    """.trimIndent()
+                }
+                return
+            }
+
+            // Ensure dokka is applied
+            // project.apply<DokkaPlugin>()
+
             addDokkaJavadocJarTask()
+        }
 
         kotlin {
             if (this@KotlinExtension.explicitApi.isPresent)
@@ -194,64 +221,12 @@ public open class KotlinExtension(
         }
     }
 
-    internal fun addDokkaJavadocJarTask() {
-        if (!project.plugins.hasPlugin("org.jetbrains.dokka")) {
-            // Project does not have dokka plugin. do not attempt to configure it.
-            logger.error(IllegalStateException()) {
-                """
-                    Requested to add a javadoc jar for a kotlin project, however the dokka plugin has not been applied.
-
-                    Please apply the dokka plugin in order to generate the javadoc jar for kotlin source code:
-                    plugins {
-                        id("org.jetbrains.dokka") version "<version>"
-                    }
-                """.trimIndent()
-            }
-            return
-        }
-
-        // Ensure dokka is applied
-        // project.apply<DokkaPlugin>()
-
-        tasks {
-            val dokkaHtml by named<DokkaTask>("dokkaHtml")
-            // configure the javadoc jar task without creating it (either get an existing task or create a new task)
-            val hasJavadocJarTask = findByName("javadocJar") != null
-            val javadocJar by if (hasJavadocJarTask) named<Jar>("javadocJar") {
-                configureJavadocJar(dokkaHtml)
-            } else register<Jar>("javadocJar") {
-                configureJavadocJar(dokkaHtml)
-            }
-
-            artifacts {
-                add("archives", javadocJar)
-            }
-
-            if (project.plugins.hasPlugin("publishing") && !hasJavadocJarTask) {
-                // Add javadoc jar to maven publications (is this the best way to do it?)
-                publishing {
-                    publications.withType<MavenPublication>().configureEach {
-                        artifact(javadocJar)
-                    }
-                }
-            }
-        }
-    }
-
-    internal fun Jar.configureJavadocJar(dokkaHtml: DokkaTask) {
-        dependsOn(dokkaHtml)
-        from(dokkaHtml.outputDirectory)
-        archiveClassifier = "javadoc"
-        description = "Assembles a jar archive containing the main dokka kdoc"
-        group = JavaBasePlugin.DOCUMENTATION_GROUP
-    }
-
-    internal fun configureJvmCompilation(compilation: KotlinCompilation<KotlinJvmOptions>) {
+    private fun configureJvmCompilation(compilation: KotlinCompilation<KotlinJvmOptions>) {
         if (jvmTarget.isPresent)
             compilation.kotlinOptions.jvmTarget = /* evil */ if (jvmTarget.get() == 8) "1.8" else jvmTarget.get().toString()
     }
 
-    internal fun configureCommonCompilations(target: KotlinTarget) {
+    private fun configureCommonCompilations(target: KotlinTarget) {
         target.compilations.configureEach {
             if (apiVersion.isPresent)
                 kotlinOptions.apiVersion = apiVersion.get()
@@ -271,5 +246,9 @@ public open class KotlinExtension(
             if (compilerArgs.isPresent)
                 kotlinOptions.options.freeCompilerArgs.addAll(compilerArgs)
         }
+    }
+
+    public companion object {
+        public const val NAME: String = "kotlin"
     }
 }

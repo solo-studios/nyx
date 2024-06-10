@@ -1,7 +1,7 @@
 /*
- * Copyright (c) 2023-2024 solonovamax <solonovamax@12oclockpoint.com>
+ * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
- * The file NyxExtension.kt is part of nyx
+ * The file InternalNyxExtension.kt is part of nyx
  * Last modified on 10-06-2024 03:21 p.m.
  *
  * MIT License
@@ -25,31 +25,7 @@
  * SOFTWARE.
  */
 
-package ca.solostudios.nyx
+package ca.solostudios.nyx.internal
 
-import ca.solostudios.nyx.internal.InternalNyxExtension
-import ca.solostudios.nyx.project.ProjectInfoExtension
-import org.gradle.api.Action
-import org.gradle.api.Project
-import org.gradle.api.tasks.Nested
-
-public class NyxExtension(override val project: Project) : InternalNyxExtension {
-    @Nested
-    public val info: ProjectInfoExtension = ProjectInfoExtension(project)
-
-    public fun info(action: Action<ProjectInfoExtension>) {
-        action.execute(info)
-    }
-
-    public fun info(action: (ProjectInfoExtension).() -> Unit) {
-        info.apply(action)
-    }
-
-    override fun configureProject() {
-        info.configureProject()
-    }
-
-    public companion object {
-        public const val NAME: String = "nyx"
-    }
-}
+@AllOpen
+internal interface InternalNyxExtension : HasProject, ConfiguresProject

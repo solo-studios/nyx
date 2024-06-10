@@ -1,13 +1,39 @@
-package ca.solostudios.nyx.ext.code
+/*
+ * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
+ *
+ * The file JavaExtension.kt is part of nyx
+ * Last modified on 10-06-2024 03:21 p.m.
+ *
+ * MIT License
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * GRADLE-CONVENTIONS-PLUGIN IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 
-import ca.solostudios.nyx.api.ConfiguresProject
-import ca.solostudios.nyx.api.HasProject
-import ca.solostudios.nyx.util.isFalse
-import ca.solostudios.nyx.util.isTrue
-import ca.solostudios.nyx.util.java
-import ca.solostudios.nyx.util.listProperty
-import ca.solostudios.nyx.util.property
-import ca.solostudios.nyx.util.tasks
+package ca.solostudios.nyx.plugin.compile
+
+import ca.solostudios.nyx.internal.InternalNyxExtension
+import ca.solostudios.nyx.internal.util.isFalse
+import ca.solostudios.nyx.internal.util.isTrue
+import ca.solostudios.nyx.internal.util.java
+import ca.solostudios.nyx.internal.util.listProperty
+import ca.solostudios.nyx.internal.util.property
+import ca.solostudios.nyx.internal.util.tasks
 import org.gradle.api.Action
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
@@ -15,7 +41,6 @@ import org.gradle.api.java.archives.Manifest
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
-import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.javadoc.Javadoc
 import org.gradle.jvm.toolchain.JavaLanguageVersion
@@ -23,17 +48,10 @@ import org.gradle.jvm.toolchain.JavaToolchainSpec
 import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.withType
 
-public open class JavaExtension(
+public class JavaExtension(
     override val project: Project,
-    encoding: Provider<String>,
-    warningsAsErrors: Provider<Boolean>,
-    allWarnings: Provider<Boolean>,
-    suppressWarnings: Provider<Boolean>,
-    jvmToolchain: Provider<Int>,
-    jvmTarget: Provider<Int>,
-    withSourcesJar: Property<Boolean>,
-    withJavadocJar: Property<Boolean>,
-) : ConfiguresProject, HasProject {
+    compile: CompileExtension,
+) : InternalNyxExtension {
     /**
      * The encoding to be used for all files.
      *
@@ -41,28 +59,28 @@ public open class JavaExtension(
      *
      * @see CompileExtension.encoding
      */
-    public val encoding: Property<String> = property<String>().convention(encoding)
+    public val encoding: Property<String> = property<String>().convention(compile.encoding)
 
     /**
      * Enables all compilers to output warnings as errors.
      *
      * @see CompileExtension.warningsAsErrors
      */
-    public val warningsAsErrors: Property<Boolean> = property<Boolean>().convention(warningsAsErrors)
+    public val warningsAsErrors: Property<Boolean> = property<Boolean>().convention(compile.warningsAsErrors)
 
     /**
      * Enables all warnings
      *
      * @see CompileExtension.allWarnings
      */
-    public val allWarnings: Property<Boolean> = property<Boolean>().convention(allWarnings)
+    public val allWarnings: Property<Boolean> = property<Boolean>().convention(compile.allWarnings)
 
     /**
      * Suppresses all warnings
      *
      * @see CompileExtension.suppressWarnings
      */
-    public val suppressWarnings: Property<Boolean> = property<Boolean>().convention(suppressWarnings)
+    public val suppressWarnings: Property<Boolean> = property<Boolean>().convention(compile.suppressWarnings)
 
     /**
      * The jvm toolchain release to use.
@@ -70,7 +88,7 @@ public open class JavaExtension(
      * @see JavaToolchainSpec.getLanguageVersion
      * @see CompileExtension.jvmToolchain
      */
-    public val jvmToolchain: Property<Int> = property<Int>().convention(jvmToolchain)
+    public val jvmToolchain: Property<Int> = property<Int>().convention(compile.jvmToolchain)
 
     /**
      * The jvm target to use.
@@ -78,7 +96,7 @@ public open class JavaExtension(
      * @see JavaPluginExtension.setTargetCompatibility
      * @see CompileExtension.jvmTarget
      */
-    public val jvmTarget: Property<Int> = property<Int>().convention(jvmTarget)
+    public val jvmTarget: Property<Int> = property<Int>().convention(compile.jvmTarget)
 
     /**
      * Enables sources jar
@@ -86,7 +104,7 @@ public open class JavaExtension(
      * @see JavaPluginExtension.withSourcesJar
      * @see CompileExtension.withSourcesJar
      */
-    public val withSourcesJar: Property<Boolean> = property<Boolean>().convention(withSourcesJar)
+    public val withSourcesJar: Property<Boolean> = property<Boolean>().convention(compile.withSourcesJar)
 
     /**
      * Enables javadoc jar
@@ -94,7 +112,7 @@ public open class JavaExtension(
      * @see JavaPluginExtension.withJavadocJar
      * @see CompileExtension.withJavadocJar
      */
-    public val withJavadocJar: Property<Boolean> = property<Boolean>().convention(withJavadocJar)
+    public val withJavadocJar: Property<Boolean> = property<Boolean>().convention(compile.withJavadocJar)
 
     public val compilerArgs: ListProperty<String> = listProperty()
 
@@ -120,8 +138,6 @@ public open class JavaExtension(
             manifest(action)
         }
     }
-
-    override fun onLoad() {}
 
     override fun configureProject() {
         java {
@@ -170,5 +186,9 @@ public open class JavaExtension(
                     options.encoding = encoding.get()
             }
         }
+    }
+
+    public companion object {
+        public const val NAME: String = "java"
     }
 }

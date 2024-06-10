@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2023 solonovamax <solonovamax@12oclockpoint.com>
+ * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
- * The file StringUtil.kt is part of gradle-conventions-plugin
- * Last modified on 13-11-2023 08:17 p.m.
+ * The file RepositoryHandlerPublishingExtensions.kt is part of nyx
+ * Last modified on 10-06-2024 03:21 p.m.
  *
  * MIT License
  *
@@ -27,12 +27,17 @@
 
 package ca.solostudios.nyx.util
 
-public fun String.capitalizeWord(): String = replaceFirstChar { if (it.isLowerCase()) it.uppercase() else it.toString() }
+import org.gradle.api.artifacts.dsl.RepositoryHandler
+import org.gradle.api.artifacts.repositories.MavenArtifactRepository
+import org.gradle.authentication.http.BasicAuthentication
+import org.gradle.kotlin.dsl.create
 
-public fun Any?.toStringOrEmpty(): String = this as? String ?: this?.toString() ?: ""
+public fun RepositoryHandler.reposiliteMaven(action: MavenArtifactRepository.() -> Unit = {}): MavenArtifactRepository {
+    return maven {
+        action()
 
-public fun String.formatAsName(): String {
-    return split("-").map {
-        it.takeIf { it != "kt" } ?: "Kotlin"
-    }.joinToString(separator = " ") { it.capitalizeWord() }
+        authentication { // publishing doesn't work without this for some reason
+            create<BasicAuthentication>("basic")
+        }
+    }
 }

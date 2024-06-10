@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2023 solonovamax <solonovamax@12oclockpoint.com>
+ * Copyright (c) 2023-2024 solonovamax <solonovamax@12oclockpoint.com>
  *
- * The file build.gradle.kts is part of gradle-conventions-plugin
- * Last modified on 13-11-2023 07:13 p.m.
+ * The file build.gradle.kts is part of nyx
+ * Last modified on 10-06-2024 03:21 p.m.
  *
  * MIT License
  *
@@ -32,6 +32,9 @@ plugins {
 
     `java-gradle-plugin`
 
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.allopen)
+
     alias(libs.plugins.gradle.plugin.development)
 
     alias(libs.plugins.dokka)
@@ -51,10 +54,30 @@ nyx {
         warningsAsErrors = true
         distributeLicense = true
         buildDependsOnJar = true
-        jvmTarget = 8
         reproducibleBuilds = true
+        jvmTarget = 17
 
-        kotlin.explicitApi()
+        kotlin {
+            explicitApi()
+            allOpen.annotations("ca.solostudios.nyx.internal.AllOpen")
+        }
+    }
+
+    compile {
+        withJavadocJar()
+        withSourcesJar()
+
+        allWarnings = true
+        warningsAsErrors = true
+        distributeLicense = true
+        buildDependsOnJar = true
+        reproducibleBuilds = true
+        jvmTarget = 17
+
+        kotlin {
+            explicitApi()
+            allOpen.annotations("ca.solostudios.nyx.internal.AllOpen")
+        }
     }
 
     project {
@@ -83,17 +106,19 @@ nyx {
 
 repositories {
     maven("https://maven.solo-studios.ca/releases/")
-    gradlePluginPortal()
     mavenCentral()
-    maven("https://maven.fabricmc.net/")
-    maven("https://maven.quiltmc.org/repository/release")
-    maven("https://maven.architectury.dev/")
-    maven("https://maven.minecraftforge.net/")
+    gradlePluginPortal()
+    // maven("https://maven.fabricmc.net/")
+    // maven("https://maven.quiltmc.org/repository/release")
+    // maven("https://maven.architectury.dev/")
+    // maven("https://maven.neoforged.net/releases")
 }
 
 dependencies {
-    compileOnly(gradleApi())
-    // compileOnly(gradleApi("8.6"))
+    // compileOnly(gradleApi())
+    api(libs.kotlin.stdlib)
+
+    compileOnly(gradleApi("8.6"))
 
     api(libs.apache.commons)
 
@@ -115,6 +140,9 @@ dependencies {
 
     compileOnly(libs.github.release)
     compileOnly(libs.modrinth.minotaur)
+
+    compileOnly(libs.neogradle.userdev)
+    compileOnly(libs.neogradle.mixin)
 }
 
 gradlePlugin {
@@ -142,6 +170,21 @@ gradlePlugin {
         }
     }
 }
+
+publishing {
+    repositories {
+        maven {
+            name = "SoloStudios"
+            url = uri("https://maven.solo-studios.ca/releases/")
+
+            credentials(PasswordCredentials::class)
+            authentication { // publishing doesn't work without this for some reason
+                create<BasicAuthentication>("basic")
+            }
+        }
+    }
+}
+
 
 nyx {
     publishing {

@@ -1,16 +1,40 @@
-package ca.solostudios.nyx.ext.code
+/*
+ * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
+ *
+ * The file CompileExtension.kt is part of nyx
+ * Last modified on 10-06-2024 03:21 p.m.
+ *
+ * MIT License
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * GRADLE-CONVENTIONS-PLUGIN IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 
-import ca.solostudios.nyx.api.ConfiguresProject
-import ca.solostudios.nyx.api.HasProject
-import ca.solostudios.nyx.util.isTrue
-import ca.solostudios.nyx.util.property
-import ca.solostudios.nyx.util.tasks
-import org.gradle.api.Action
+package ca.solostudios.nyx.plugin.compile
+
+import ca.solostudios.nyx.internal.InternalNyxExtension
+import ca.solostudios.nyx.internal.util.isTrue
+import ca.solostudios.nyx.internal.util.property
+import ca.solostudios.nyx.internal.util.tasks
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.provider.Property
-import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.bundling.AbstractArchiveTask
 import org.gradle.api.tasks.bundling.Zip
 import org.gradle.jvm.tasks.Jar
@@ -18,10 +42,9 @@ import org.gradle.jvm.toolchain.JavaToolchainSpec
 import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.withType
-import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
 import java.io.File
 
-public class CompileExtension(override val project: Project) : ConfiguresProject, HasProject {
+public class CompileExtension(override val project: Project) : InternalNyxExtension {
     /**
      * Enables all warnings
      *
@@ -114,30 +137,6 @@ public class CompileExtension(override val project: Project) : ConfiguresProject
      */
     public val reproducibleBuilds: Property<Boolean> = property<Boolean>().convention(true)
 
-    @Nested
-    public val kotlin: KotlinExtension = KotlinExtension(
-        project,
-        warningsAsErrors,
-        suppressWarnings,
-        jvmToolchain,
-        jvmTarget,
-        withSourcesJar,
-        withJavadocJar,
-    )
-
-    @Nested
-    public val java: JavaExtension = JavaExtension(
-        project,
-        encoding,
-        warningsAsErrors,
-        allWarnings,
-        suppressWarnings,
-        jvmToolchain,
-        jvmTarget,
-        withSourcesJar,
-        withJavadocJar,
-    )
-
 
     /**
      * Enables warnings as errors
@@ -166,53 +165,7 @@ public class CompileExtension(override val project: Project) : ConfiguresProject
         withJavadocJar = true
     }
 
-    /**
-     * Configures the kotlin compiler
-     */
-    public fun kotlin(action: Action<KotlinExtension>) {
-        action.execute(kotlin)
-    }
-
-    /**
-     * Configures the kotlin compiler
-     */
-    public fun kotlin(action: (KotlinExtension).() -> Unit) {
-        kotlin.apply(action)
-    }
-
-    /**
-     * Configures the java compiler
-     */
-    public fun java(action: Action<JavaExtension>) {
-        action.execute(java)
-    }
-
-    /**
-     * Configures the java compiler
-     */
-    public fun java(action: (JavaExtension).() -> Unit) {
-        java.apply(action)
-    }
-
-    override fun onLoad() {
-        project.plugins.withId("java") {
-            java.onLoad()
-        }
-
-        project.plugins.withType<KotlinBasePlugin> {
-            kotlin.onLoad()
-        }
-    }
-
     override fun configureProject() {
-        project.plugins.withId("java") {
-            java.configureProject()
-        }
-
-        project.plugins.withType<KotlinBasePlugin> {
-            kotlin.configureProject()
-        }
-
         tasks {
             if (distributeLicense.isTrue) {
                 val license = project.findNearestLicense()
@@ -262,5 +215,9 @@ public class CompileExtension(override val project: Project) : ConfiguresProject
         }
 
         return null
+    }
+
+    public companion object {
+        public const val NAME: String = "compile"
     }
 }
