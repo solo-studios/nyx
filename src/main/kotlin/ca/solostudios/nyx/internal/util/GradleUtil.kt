@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file GradleUtil.kt is part of nyx
- * Last modified on 10-06-2024 03:21 p.m.
+ * Last modified on 11-06-2024 05:21 p.m.
  *
  * MIT License
  *
@@ -75,6 +75,9 @@ internal fun <T : Any> Any.create(name: String, kClass: KClass<T>, vararg args: 
     return (this as ExtensionAware).extensions.create(name, kClass.java, *args)
 }
 
+internal val HasProject.plugins: PluginContainer
+    get() = project.plugins
+
 internal inline fun <reified T : Named> HasProject.named(name: String): T = project.objects.named(name)
 
 internal fun HasProject.tasks(block: TaskContainer.() -> Unit) = project.tasks.apply(block)
@@ -135,6 +138,8 @@ internal val HasProject.githubRelease: GithubReleaseExtension
     get() = project.the<GithubReleaseExtension>()
 
 internal val HasProject.nyx: NyxExtension
+    get() = project.the<NyxExtension>()
+internal val Project.nyx: NyxExtension
     get() = project.the<NyxExtension>()
 
 internal val NyxExtension.publishing: NyxPublishingExtension

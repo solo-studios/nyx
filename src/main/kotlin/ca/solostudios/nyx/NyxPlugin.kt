@@ -2,7 +2,7 @@
  * Copyright (c) 2023-2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxPlugin.kt is part of nyx
- * Last modified on 10-06-2024 03:24 p.m.
+ * Last modified on 10-06-2024 03:41 p.m.
  *
  * MIT License
  *
@@ -42,7 +42,6 @@ import net.neoforged.gradle.common.CommonProjectPlugin as NeoGradleCommonProject
 public class NyxPlugin : InternalNyxPlugin {
     override fun apply(project: Project) {
         val extension = project.create<NyxExtension>(NyxExtension.NAME, project)
-        // extension.onLoad()
 
         project.plugins.apply(NyxPublishingPlugin::class)
 
@@ -66,14 +65,8 @@ public class NyxPlugin : InternalNyxPlugin {
             // ignore
         }
 
-        afterEvaluate(extension, project)
-    }
-
-    private fun afterEvaluate(extension: NyxExtension, project: Project) {
-        with(project) {
-            afterEvaluate {
-                extension.configureProject()
-            }
+        afterEvaluate(project) {
+            extension.configureProject()
         }
     }
 }

@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file JavaExtension.kt is part of nyx
- * Last modified on 10-06-2024 03:21 p.m.
+ * Last modified on 11-06-2024 05:31 p.m.
  *
  * MIT License
  *
@@ -34,6 +34,8 @@ import ca.solostudios.nyx.internal.util.java
 import ca.solostudios.nyx.internal.util.listProperty
 import ca.solostudios.nyx.internal.util.property
 import ca.solostudios.nyx.internal.util.tasks
+import ca.solostudios.nyx.plugin.minecraft.neoforge.NeoGradleExtension
+import net.neoforged.gradle.neoform.runtime.tasks.RecompileSourceJar
 import org.gradle.api.Action
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
@@ -165,6 +167,15 @@ public class JavaExtension(
                 if (encoding.isPresent)
                     options.encoding = encoding.get()
 
+                if (jvmTarget.isPresent)
+                    options.release = jvmTarget.get()
+
+                if (compilerArgs.isPresent)
+                    options.compilerArgs.addAll(compilerArgs.get())
+
+                if (shouldSkipWarningConfiguration())
+                    return@configureEach
+
                 if (warningsAsErrors.isTrue)
                     options.compilerArgs.add("-Werror")
 
@@ -173,18 +184,20 @@ public class JavaExtension(
 
                 if (suppressWarnings.isFalse)
                     options.isWarnings = false
-
-                if (jvmTarget.isPresent)
-                    options.release = jvmTarget.get()
-
-                if (compilerArgs.isPresent)
-                    options.compilerArgs.addAll(compilerArgs.get())
             }
 
             withType<Javadoc>().configureEach {
                 if (encoding.isPresent)
                     options.encoding = encoding.get()
             }
+        }
+    }
+
+    private fun JavaCompile.shouldSkipWarningConfiguration(): Boolean {
+        return when {
+            NeoGradleExtension.isNotLoaded(project) -> false
+            this is RecompileSourceJar -> true
+            else -> false
         }
     }
 

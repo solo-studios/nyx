@@ -2,7 +2,7 @@
  * Copyright (c) 2023-2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxExtension.kt is part of nyx
- * Last modified on 10-06-2024 03:21 p.m.
+ * Last modified on 10-06-2024 06:46 p.m.
  *
  * MIT License
  *
@@ -35,13 +35,14 @@ import org.gradle.api.tasks.Nested
 
 public class NyxExtension(override val project: Project) : InternalNyxExtension {
     @Nested
+    @Suppress("LeakingThis")
     public val info: ProjectInfoExtension = ProjectInfoExtension(project)
 
     public fun info(action: Action<ProjectInfoExtension>) {
         action.execute(info)
     }
 
-    public fun info(action: (ProjectInfoExtension).() -> Unit) {
+    public fun info(action: ProjectInfoExtension.() -> Unit) {
         info.apply(action)
     }
 

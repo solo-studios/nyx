@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NeoGradleExtension.kt is part of nyx
- * Last modified on 10-06-2024 03:24 p.m.
+ * Last modified on 11-06-2024 05:30 p.m.
  *
  * MIT License
  *
@@ -30,12 +30,14 @@ package ca.solostudios.nyx.plugin.minecraft.neoforge
 import ca.solostudios.nyx.internal.util.neoMinecraft
 import ca.solostudios.nyx.internal.util.neoMixins
 import ca.solostudios.nyx.internal.util.neoRuns
+import ca.solostudios.nyx.internal.util.nyx
 import ca.solostudios.nyx.plugin.minecraft.AbstractMinecraftExtension
 import net.neoforged.gradle.dsl.common.extensions.AccessTransformers
 import net.neoforged.gradle.dsl.common.extensions.Mappings
 import net.neoforged.gradle.dsl.common.runtime.naming.NamingChannel
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
+import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.Property
 
 
@@ -86,6 +88,17 @@ public class NeoGradleExtension(
             jvmArguments.add("-Xmx${allocatedMemory.get()}G")
             jvmArguments.addAll(additionalJvmArgs)
             systemProperties.putAll(additionalJvmProperties)
+        }
+    }
+
+    internal companion object {
+        internal fun isLoaded(project: Project): Boolean {
+            val nyx = project.nyx as ExtensionAware
+            return nyx.extensions.findByName(NAME) is NeoGradleExtension
+        }
+
+        internal fun isNotLoaded(project: Project): Boolean {
+            return !isLoaded(project)
         }
     }
 }
