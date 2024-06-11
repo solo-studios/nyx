@@ -2,7 +2,7 @@
  * Copyright (c) 2023-2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file build.gradle.kts is part of nyx
- * Last modified on 11-06-2024 06:20 p.m.
+ * Last modified on 11-06-2024 06:23 p.m.
  *
  * MIT License
  *
@@ -218,6 +218,13 @@ nyx {
                 }
             }
         }
+    }
+}
+
+tasks {
+    val publishPluginMavenPublicationToSoloStudiosRepository by named("publishPluginMavenPublicationToSoloStudiosRepository") {
+        println(this)
+        println("this: $this, inputs: $inputs")
     }
 }
 
