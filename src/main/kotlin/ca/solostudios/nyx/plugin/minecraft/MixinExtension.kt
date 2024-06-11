@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file MixinExtension.kt is part of nyx
- * Last modified on 11-06-2024 06:13 p.m.
+ * Last modified on 11-06-2024 06:38 p.m.
  *
  * MIT License
  *
@@ -40,8 +40,8 @@ public class MixinExtension(
     private val minecraftExtension: AbstractMinecraftExtension,
 ) : InternalNyxExtension {
     public val hotswapMixins: Property<Boolean> = property<Boolean>().convention(true)
-    public val debug: Property<Boolean> = property<Boolean>().convention(true)
-    public val verbose: Property<Boolean> = property<Boolean>().convention(false)
+    public val debug: Property<Boolean> = property<Boolean>().convention(false)
+    public val verbose: Property<Boolean> = property<Boolean>().convention(true)
     public val dumpTargetOnFailure: Property<Boolean> = property<Boolean>().convention(true)
     public val checks: Property<Boolean> = property<Boolean>().convention(false)
     public val verify: Property<Boolean> = property<Boolean>().convention(false)
