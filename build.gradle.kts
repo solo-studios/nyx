@@ -2,7 +2,7 @@
  * Copyright (c) 2023-2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file build.gradle.kts is part of nyx
- * Last modified on 11-06-2024 06:30 p.m.
+ * Last modified on 11-06-2024 06:32 p.m.
  *
  * MIT License
  *
@@ -171,20 +171,6 @@ gradlePlugin {
     }
 }
 
-publishing {
-    repositories {
-        maven {
-            name = "SoloStudios"
-            url = uri("https://maven.solo-studios.ca/releases/")
-
-            credentials(PasswordCredentials::class)
-            authentication { // publishing doesn't work without this for some reason
-                create<BasicAuthentication>("basic")
-            }
-        }
-    }
-}
-
 
 nyx {
     publishing {
@@ -217,16 +203,6 @@ nyx {
                     create<BasicAuthentication>("basic")
                 }
             }
-        }
-    }
-}
-
-tasks {
-    afterEvaluate {
-        val publishPluginMavenPublicationToSoloStudiosRepository by named<PublishToMavenRepository>("publishPluginMavenPublicationToSoloStudiosRepository") {
-            inputs.property("isSnapshot", isSnapshot)
-            println("this: $this, inputs: $inputs, class: $javaClass")
-            println("url: ${repository.url}, ${repository.artifactUrls}")
         }
     }
 }
