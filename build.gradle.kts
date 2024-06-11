@@ -2,7 +2,7 @@
  * Copyright (c) 2023-2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file build.gradle.kts is part of nyx
- * Last modified on 10-06-2024 03:21 p.m.
+ * Last modified on 11-06-2024 06:20 p.m.
  *
  * MIT License
  *
@@ -209,6 +209,8 @@ nyx {
                 val releasesUrl = uri("https://maven.solo-studios.ca/releases/")
                 val snapshotUrl = uri("https://maven.solo-studios.ca/snapshots/")
                 url = if (isSnapshot) snapshotUrl else releasesUrl
+
+                println("snapshot: $isSnapshot, url: $url")
 
                 credentials(PasswordCredentials::class)
                 authentication { // publishing doesn't work without this for some reason
