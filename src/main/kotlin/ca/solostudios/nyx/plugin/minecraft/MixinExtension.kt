@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file MixinExtension.kt is part of nyx
- * Last modified on 10-06-2024 03:21 p.m.
+ * Last modified on 11-06-2024 06:13 p.m.
  *
  * MIT License
  *
@@ -76,13 +76,13 @@ public class MixinExtension(
         if (hotswapMixins.isTrue) {
             minecraftExtension.additionalJvmProperties.put("mixin.hotSwap", "true")
 
-            val compileClasspath by configurations.named("compileClasspath")
-            val mixinJarFile = compileClasspath.resolvedConfiguration.resolvedArtifacts.firstOrNull {
+            val runtimeClasspath by configurations.named("runtimeClasspath")
+            val mixinJarFile = runtimeClasspath.resolvedConfiguration.resolvedArtifacts.firstOrNull {
                 val module = it.moduleVersion.id
                 module.group == "net.fabricmc" && module.name == "sponge-mixin"
             }
             if (mixinJarFile != null)
-                minecraftExtension.additionalJvmArgs.add("-javaagent:$mixinJarFile")
+                minecraftExtension.additionalJvmArgs.add("-javaagent:${mixinJarFile.file}")
         }
     }
 
