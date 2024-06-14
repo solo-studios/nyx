@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file Jenkinsfile is part of nyx
- * Last modified on 10-06-2024 03:26 p.m.
+ * Last modified on 14-06-2024 03:18 p.m.
  *
  * MIT License
  *
@@ -80,7 +80,7 @@ pipeline {
 
         stage('Deploy Release to Sonatype Repository') {
             when {
-                buildingTag()
+                expression { env.TAG_NAME != null && env.TAG_NAME.matches('v\\d+\\.\\d+\\.\\d+') }
             }
 
             steps {
