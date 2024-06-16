@@ -34,7 +34,7 @@ import ca.solostudios.nyx.internal.util.property
 import ca.solostudios.nyx.internal.util.publishing
 import ca.solostudios.nyx.internal.util.signing
 import ca.solostudios.nyx.internal.util.tasks
-import ca.solostudios.nyx.project.ProjectInfoExtension
+import ca.solostudios.nyx.project.NyxProjectInfoExtension
 import org.gradle.api.Project
 import org.gradle.api.artifacts.dsl.RepositoryHandler
 import org.gradle.api.provider.Property
@@ -53,9 +53,9 @@ import org.gradle.plugins.signing.Sign
 import org.gradle.plugins.signing.SigningPlugin
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinMultiplatformPlugin
 
-public class PublishingExtension(
+public class NyxPublishingExtension(
     override val project: Project,
-    private val info: ProjectInfoExtension,
+    private val info: NyxProjectInfoExtension,
 ) : InternalNyxExtension {
 
     /**
@@ -107,10 +107,6 @@ public class PublishingExtension(
     }
 
     override fun configureProject() {
-        // project.plugins.withId("com.github.breadmoirai.github-release") {
-        //     github.configureProject()
-        // }
-
         if (!publish.isTrue)
             return
 

@@ -29,6 +29,7 @@ package ca.solostudios.nyx.internal.util
 
 import ca.solostudios.nyx.NyxExtension
 import ca.solostudios.nyx.internal.HasProject
+import ca.solostudios.nyx.plugin.publish.NyxPublishingExtension
 import ca.solostudios.nyx.plugin.publish.release.NyxGithubReleaseExtension
 import com.github.breadmoirai.githubreleaseplugin.GithubReleaseExtension
 import com.modrinth.minotaur.ModrinthExtension
@@ -57,7 +58,6 @@ import org.gradle.kotlin.dsl.withType
 import org.gradle.plugins.signing.SigningExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import kotlin.reflect.KClass
-import ca.solostudios.nyx.plugin.publish.PublishingExtension as NyxPublishingExtension
 import net.neoforged.gradle.dsl.common.extensions.Minecraft as NeoMinecraft
 import net.neoforged.gradle.dsl.mixin.extension.Mixin as NeoMixin
 

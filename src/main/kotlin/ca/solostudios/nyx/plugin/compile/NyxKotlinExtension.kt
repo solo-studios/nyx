@@ -53,9 +53,9 @@ import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 import org.slf4j.kotlin.error
 import org.slf4j.kotlin.getLogger
 
-public class KotlinExtension(
+public class NyxKotlinExtension(
     override val project: Project,
-    compile: CompileExtension,
+    compile: NyxCompileExtension,
 ) : InternalNyxExtension {
     private val logger by getLogger()
 
@@ -83,7 +83,7 @@ public class KotlinExtension(
     /**
      * Enables all compilers to output warnings as errors.
      *
-     * @see CompileExtension.warningsAsErrors
+     * @see NyxCompileExtension.warningsAsErrors
      */
     public val warningsAsErrors: Property<Boolean> = property<Boolean>().convention(compile.warningsAsErrors)
 
@@ -97,7 +97,7 @@ public class KotlinExtension(
     /**
      * Suppresses all warnings
      *
-     * @see CompileExtension.suppressWarnings
+     * @see NyxCompileExtension.suppressWarnings
      */
     public val suppressWarnings: Property<Boolean> = property<Boolean>().convention(compile.suppressWarnings)
 
@@ -105,7 +105,7 @@ public class KotlinExtension(
      * The jvm toolchain release to use.
      *
      * @see JavaToolchainSpec.getLanguageVersion
-     * @see CompileExtension.jvmToolchain
+     * @see NyxCompileExtension.jvmToolchain
      */
     public val jvmToolchain: Property<Int> = property<Int>().convention(compile.jvmToolchain)
 
@@ -113,7 +113,7 @@ public class KotlinExtension(
      * The jvm target to use.
      *
      * @see JavaPluginExtension.setTargetCompatibility
-     * @see CompileExtension.jvmTarget
+     * @see NyxCompileExtension.jvmTarget
      */
     public val jvmTarget: Property<Int> = property<Int>().convention(compile.jvmTarget)
 
@@ -121,7 +121,7 @@ public class KotlinExtension(
      * Enables sources jar
      *
      * @see JavaPluginExtension.withSourcesJar
-     * @see CompileExtension.withSourcesJar
+     * @see NyxCompileExtension.withSourcesJar
      */
     public val withSourcesJar: Property<Boolean> = property<Boolean>().convention(compile.withSourcesJar)
 
@@ -129,7 +129,7 @@ public class KotlinExtension(
      * Enables javadoc jar
      *
      * @see JavaPluginExtension.withJavadocJar
-     * @see CompileExtension.withJavadocJar
+     * @see NyxCompileExtension.withJavadocJar
      */
     public val withJavadocJar: Property<Boolean> = property<Boolean>().convention(compile.withJavadocJar)
 
@@ -177,8 +177,8 @@ public class KotlinExtension(
         }
 
         kotlin {
-            if (this@KotlinExtension.explicitApi.isPresent)
-                explicitApi = this@KotlinExtension.explicitApi.get()
+            if (this@NyxKotlinExtension.explicitApi.isPresent)
+                explicitApi = this@NyxKotlinExtension.explicitApi.get()
 
             if (jvmToolchain.isPresent)
                 jvmToolchain(jvmToolchain.get())

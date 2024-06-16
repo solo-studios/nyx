@@ -32,7 +32,7 @@ import ca.solostudios.nyx.internal.util.property
 import org.gradle.api.Project
 import org.gradle.api.provider.Property
 
-public open class LicenseInfoExtension(override val project: Project) : HasProject {
+public open class NyxLicenseInfoExtension(override val project: Project) : HasProject {
     /**
      * The name for the selected license. Recommended to be the SPDX identifier.
      */

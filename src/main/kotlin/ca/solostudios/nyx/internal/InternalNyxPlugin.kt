@@ -31,10 +31,4 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 
 @AllOpen
-internal interface InternalNyxPlugin : Plugin<Project> {
-    fun afterEvaluate(project: Project, block: Project.() -> Unit) {
-        with(project) {
-            afterEvaluate(block)
-        }
-    }
-}
+internal interface InternalNyxPlugin : Plugin<Project>

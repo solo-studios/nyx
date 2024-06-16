@@ -32,8 +32,8 @@ import ca.solostudios.nyx.internal.InternalNyxPlugin
 import ca.solostudios.nyx.internal.util.capitalizeWord
 import ca.solostudios.nyx.internal.util.configurations
 import ca.solostudios.nyx.internal.util.create
-import ca.solostudios.nyx.plugin.minecraft.loom.MinecraftLoomExtension
-import ca.solostudios.nyx.plugin.minecraft.neoforge.NeoGradleExtension
+import ca.solostudios.nyx.plugin.minecraft.loom.NyxFabricLoomExtension
+import ca.solostudios.nyx.plugin.minecraft.neoforge.NyxNeoGradleExtension
 import net.fabricmc.loom.bootstrap.LoomGradlePluginBootstrap
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
@@ -51,7 +51,7 @@ internal class NyxMinecraftPlugin : InternalNyxPlugin {
         project.plugins.withId("com.modrinth.minotaur") {
             val minotaurExtension = minecraftExtension.create<NyxMinotaurExtension>(NyxMinotaurExtension.NAME, project, nyxExtension.info)
 
-            afterEvaluate(project) {
+            project.afterEvaluate {
                 minotaurExtension.configureProject()
             }
         }
@@ -70,20 +70,20 @@ internal class NyxMinecraftPlugin : InternalNyxPlugin {
             addLoomIncludeConfigurations()
         }
 
-        val extensionClass = if (isLoom) MinecraftLoomExtension::class else NeoGradleExtension::class
+        val extensionClass = if (isLoom) NyxFabricLoomExtension::class else NyxNeoGradleExtension::class
 
         val minecraftExtension = nyxExtension.create(AbstractMinecraftExtension.NAME, extensionClass, project)
 
         // Only add mixin extension if it's applicable (loom or neogradle mixin)
         if (isLoom || plugins.hasPlugin("net.neoforged.gradle.mixin")) {
-            val mixinExtension = minecraftExtension.create<MixinExtension>(MixinExtension.NAME, project, minecraftExtension)
+            val mixinExtension = minecraftExtension.create<NyxMixinExtension>(NyxMixinExtension.NAME, project, minecraftExtension)
 
             afterEvaluate {
                 mixinExtension.configureProject()
             }
         }
 
-        afterEvaluate(project) {
+        afterEvaluate {
             minecraftExtension.configureProject()
         }
 

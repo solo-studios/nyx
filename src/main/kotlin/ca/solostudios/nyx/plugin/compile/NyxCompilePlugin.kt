@@ -38,24 +38,24 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
 internal class NyxCompilePlugin : InternalNyxPlugin {
     override fun apply(project: Project) {
         val nyxExtension = project.the<NyxExtension>()
-        val compileExtension = nyxExtension.create<CompileExtension>(CompileExtension.NAME, project)
+        val compileExtension = nyxExtension.create<NyxCompileExtension>(NyxCompileExtension.NAME, project)
 
-        afterEvaluate(project) {
+        project.afterEvaluate {
             compileExtension.configureProject()
         }
 
         project.plugins.withId("java") {
-            val javaExtension = compileExtension.create<JavaExtension>(JavaExtension.NAME, project, compileExtension)
+            val javaExtension = compileExtension.create<NyxJavaExtension>(NyxJavaExtension.NAME, project, compileExtension)
 
-            afterEvaluate(project) {
+            project.afterEvaluate {
                 javaExtension.configureProject()
             }
         }
 
         project.plugins.withType<KotlinBasePlugin> {
-            val kotlinExtension = compileExtension.create<KotlinExtension>(KotlinExtension.NAME, project, compileExtension)
+            val kotlinExtension = compileExtension.create<NyxKotlinExtension>(NyxKotlinExtension.NAME, project, compileExtension)
 
-            afterEvaluate(project) {
+            project.afterEvaluate {
                 kotlinExtension.configureProject()
             }
         }

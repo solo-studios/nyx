@@ -33,7 +33,7 @@ import ca.solostudios.nyx.internal.util.listProperty
 import ca.solostudios.nyx.internal.util.modrinth
 import ca.solostudios.nyx.internal.util.property
 import ca.solostudios.nyx.internal.util.tasks
-import ca.solostudios.nyx.project.ProjectInfoExtension
+import ca.solostudios.nyx.project.NyxProjectInfoExtension
 import com.modrinth.minotaur.TaskModrinthUpload
 import com.modrinth.minotaur.dependencies.container.NamedDependencyContainer
 import masecla.modrinth4j.model.version.ProjectVersion
@@ -50,7 +50,7 @@ import org.gradle.kotlin.dsl.withType
 
 public class NyxMinotaurExtension(
     override val project: Project,
-    private val info: ProjectInfoExtension,
+    private val info: NyxProjectInfoExtension,
 ) : InternalNyxExtension {
     /**
      * The modrinth project id.

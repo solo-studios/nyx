@@ -32,7 +32,7 @@ import ca.solostudios.nyx.internal.HasProject
 import ca.solostudios.nyx.internal.util.fileCollection
 import ca.solostudios.nyx.internal.util.githubRelease
 import ca.solostudios.nyx.internal.util.property
-import ca.solostudios.nyx.project.ProjectInfoExtension
+import ca.solostudios.nyx.project.NyxProjectInfoExtension
 import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.provider.Property
@@ -40,7 +40,7 @@ import org.gradle.kotlin.dsl.assign
 
 public class NyxGithubReleaseExtension(
     override val project: Project,
-    private val info: ProjectInfoExtension,
+    private val info: NyxProjectInfoExtension,
 ) : ConfiguresProject, HasProject {
     /**
      * Whether to automatically generate the body for this release.

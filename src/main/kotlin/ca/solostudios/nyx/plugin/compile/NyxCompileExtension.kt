@@ -44,19 +44,19 @@ import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.withType
 import java.io.File
 
-public class CompileExtension(override val project: Project) : InternalNyxExtension {
+public class NyxCompileExtension(override val project: Project) : InternalNyxExtension {
     /**
      * Enables all warnings
      *
-     * @see JavaExtension.allWarnings
+     * @see NyxJavaExtension.allWarnings
      */
     public val allWarnings: Property<Boolean> = property<Boolean>().convention(false)
 
     /**
      * Enables all compilers to output warnings as errors.
      *
-     * @see JavaExtension.warningsAsErrors
-     * @see KotlinExtension.warningsAsErrors
+     * @see NyxJavaExtension.warningsAsErrors
+     * @see NyxKotlinExtension.warningsAsErrors
      */
     public val warningsAsErrors: Property<Boolean> = property<Boolean>().convention(false)
 
@@ -72,7 +72,7 @@ public class CompileExtension(override val project: Project) : InternalNyxExtens
      *
      * Defaults to `UTF-8`.
      *
-     * @see JavaExtension.encoding
+     * @see NyxJavaExtension.encoding
      */
     public val encoding: Property<String> = property<String>().convention("UTF-8")
 
@@ -89,8 +89,8 @@ public class CompileExtension(override val project: Project) : InternalNyxExtens
     /**
      * Suppresses all warnings
      *
-     * @see JavaExtension.suppressWarnings
-     * @see KotlinExtension.suppressWarnings
+     * @see NyxJavaExtension.suppressWarnings
+     * @see NyxKotlinExtension.suppressWarnings
      */
     public val suppressWarnings: Property<Boolean> = property<Boolean>().convention(false)
 
@@ -98,8 +98,8 @@ public class CompileExtension(override val project: Project) : InternalNyxExtens
      * The jvm toolchain release to use.
      *
      * @see JavaToolchainSpec.getLanguageVersion
-     * @see JavaExtension.jvmToolchain
-     * @see KotlinExtension.jvmToolchain
+     * @see NyxJavaExtension.jvmToolchain
+     * @see NyxKotlinExtension.jvmToolchain
      */
     public val jvmToolchain: Property<Int> = property()
 
@@ -107,8 +107,8 @@ public class CompileExtension(override val project: Project) : InternalNyxExtens
      * The jvm target to use.
      *
      * @see JavaPluginExtension.setTargetCompatibility
-     * @see JavaExtension.jvmTarget
-     * @see KotlinExtension.jvmTarget
+     * @see NyxJavaExtension.jvmTarget
+     * @see NyxKotlinExtension.jvmTarget
      */
     public val jvmTarget: Property<Int> = property()
 
@@ -116,8 +116,8 @@ public class CompileExtension(override val project: Project) : InternalNyxExtens
      * Enables sources jar
      *
      * @see JavaPluginExtension.withSourcesJar
-     * @see JavaExtension.withSourcesJar
-     * @see KotlinExtension.withSourcesJar
+     * @see NyxJavaExtension.withSourcesJar
+     * @see NyxKotlinExtension.withSourcesJar
      */
     public val withSourcesJar: Property<Boolean> = property()
 
@@ -125,8 +125,8 @@ public class CompileExtension(override val project: Project) : InternalNyxExtens
      * Enables javadoc jar
      *
      * @see JavaPluginExtension.withJavadocJar
-     * @see JavaExtension.withJavadocJar
-     * @see KotlinExtension.withJavadocJar
+     * @see NyxJavaExtension.withJavadocJar
+     * @see NyxKotlinExtension.withJavadocJar
      */
     public val withJavadocJar: Property<Boolean> = property()
 

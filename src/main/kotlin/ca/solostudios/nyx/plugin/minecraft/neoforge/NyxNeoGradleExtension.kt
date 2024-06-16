@@ -41,7 +41,7 @@ import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.Property
 
 
-public class NeoGradleExtension(
+public class NyxNeoGradleExtension(
     override val project: Project,
 ) : AbstractMinecraftExtension(project) {
     public val modIdentifier: Property<String>
@@ -94,7 +94,7 @@ public class NeoGradleExtension(
     internal companion object {
         internal fun isLoaded(project: Project): Boolean {
             val nyx = project.nyx as ExtensionAware
-            return nyx.extensions.findByName(NAME) is NeoGradleExtension
+            return nyx.extensions.findByName(NAME) is NyxNeoGradleExtension
         }
 
         internal fun isNotLoaded(project: Project): Boolean {

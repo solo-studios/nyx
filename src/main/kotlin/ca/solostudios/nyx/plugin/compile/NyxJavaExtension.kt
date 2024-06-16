@@ -34,7 +34,7 @@ import ca.solostudios.nyx.internal.util.java
 import ca.solostudios.nyx.internal.util.listProperty
 import ca.solostudios.nyx.internal.util.property
 import ca.solostudios.nyx.internal.util.tasks
-import ca.solostudios.nyx.plugin.minecraft.neoforge.NeoGradleExtension
+import ca.solostudios.nyx.plugin.minecraft.neoforge.NyxNeoGradleExtension
 import net.neoforged.gradle.neoform.runtime.tasks.RecompileSourceJar
 import org.gradle.api.Action
 import org.gradle.api.JavaVersion
@@ -50,37 +50,37 @@ import org.gradle.jvm.toolchain.JavaToolchainSpec
 import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.withType
 
-public class JavaExtension(
+public class NyxJavaExtension(
     override val project: Project,
-    compile: CompileExtension,
+    compile: NyxCompileExtension,
 ) : InternalNyxExtension {
     /**
      * The encoding to be used for all files.
      *
      * Defaults to `UTF-8`.
      *
-     * @see CompileExtension.encoding
+     * @see NyxCompileExtension.encoding
      */
     public val encoding: Property<String> = property<String>().convention(compile.encoding)
 
     /**
      * Enables all compilers to output warnings as errors.
      *
-     * @see CompileExtension.warningsAsErrors
+     * @see NyxCompileExtension.warningsAsErrors
      */
     public val warningsAsErrors: Property<Boolean> = property<Boolean>().convention(compile.warningsAsErrors)
 
     /**
      * Enables all warnings
      *
-     * @see CompileExtension.allWarnings
+     * @see NyxCompileExtension.allWarnings
      */
     public val allWarnings: Property<Boolean> = property<Boolean>().convention(compile.allWarnings)
 
     /**
      * Suppresses all warnings
      *
-     * @see CompileExtension.suppressWarnings
+     * @see NyxCompileExtension.suppressWarnings
      */
     public val suppressWarnings: Property<Boolean> = property<Boolean>().convention(compile.suppressWarnings)
 
@@ -88,7 +88,7 @@ public class JavaExtension(
      * The jvm toolchain release to use.
      *
      * @see JavaToolchainSpec.getLanguageVersion
-     * @see CompileExtension.jvmToolchain
+     * @see NyxCompileExtension.jvmToolchain
      */
     public val jvmToolchain: Property<Int> = property<Int>().convention(compile.jvmToolchain)
 
@@ -96,7 +96,7 @@ public class JavaExtension(
      * The jvm target to use.
      *
      * @see JavaPluginExtension.setTargetCompatibility
-     * @see CompileExtension.jvmTarget
+     * @see NyxCompileExtension.jvmTarget
      */
     public val jvmTarget: Property<Int> = property<Int>().convention(compile.jvmTarget)
 
@@ -104,7 +104,7 @@ public class JavaExtension(
      * Enables sources jar
      *
      * @see JavaPluginExtension.withSourcesJar
-     * @see CompileExtension.withSourcesJar
+     * @see NyxCompileExtension.withSourcesJar
      */
     public val withSourcesJar: Property<Boolean> = property<Boolean>().convention(compile.withSourcesJar)
 
@@ -112,7 +112,7 @@ public class JavaExtension(
      * Enables javadoc jar
      *
      * @see JavaPluginExtension.withJavadocJar
-     * @see CompileExtension.withJavadocJar
+     * @see NyxCompileExtension.withJavadocJar
      */
     public val withJavadocJar: Property<Boolean> = property<Boolean>().convention(compile.withJavadocJar)
 
@@ -195,7 +195,7 @@ public class JavaExtension(
 
     private fun JavaCompile.shouldSkipWarningConfiguration(): Boolean {
         return when {
-            NeoGradleExtension.isNotLoaded(project) -> false
+            NyxNeoGradleExtension.isNotLoaded(project) -> false
             this is RecompileSourceJar -> true
             else -> false
         }

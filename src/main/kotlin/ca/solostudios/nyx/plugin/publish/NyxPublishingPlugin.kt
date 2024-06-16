@@ -37,13 +37,13 @@ import org.gradle.kotlin.dsl.the
 internal class NyxPublishingPlugin : InternalNyxPlugin {
     override fun apply(project: Project) {
         val nyxExtension = project.the<NyxExtension>()
-        val publishingExtension = nyxExtension.create<PublishingExtension>(PublishingExtension.NAME, project, nyxExtension.info)
+        val publishingExtension = nyxExtension.create<NyxPublishingExtension>(NyxPublishingExtension.NAME, project, nyxExtension.info)
 
         project.plugins.withId("com.github.breadmoirai.github-release") {
             publishingExtension.create<NyxGithubReleaseExtension>(NyxGithubReleaseExtension.NAME, project, nyxExtension.info)
         }
 
-        afterEvaluate(project) {
+        project.afterEvaluate {
             publishingExtension.configureProject()
         }
     }

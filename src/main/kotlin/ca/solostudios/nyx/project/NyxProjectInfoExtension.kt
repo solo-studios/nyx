@@ -45,7 +45,7 @@ import org.gradle.api.tasks.bundling.AbstractArchiveTask
 import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.withType
 
-public class ProjectInfoExtension(override val project: Project) : ConfiguresProject, HasProject {
+public class NyxProjectInfoExtension(override val project: Project) : ConfiguresProject, HasProject {
     /**
      * The name of the project to be used when publishing.
      *
@@ -124,13 +124,13 @@ public class ProjectInfoExtension(override val project: Project) : ConfiguresPro
      * Information about the repository used when publishing.
      */
     @Nested
-    public val repository: RepositoryInfo = RepositoryInfo(project)
+    public val repository: NyxRepositoryInfo = NyxRepositoryInfo(project)
 
     /**
      * Information about the license used when publishing.
      */
     @Nested
-    public val license: LicenseInfoExtension = LicenseInfoExtension(project)
+    public val license: NyxLicenseInfoExtension = NyxLicenseInfoExtension(project)
 
     /**
      * Adds a developer to the publishing information
@@ -154,28 +154,28 @@ public class ProjectInfoExtension(override val project: Project) : ConfiguresPro
     /**
      * Configures the repository info
      */
-    public fun repository(action: Action<RepositoryInfo>) {
+    public fun repository(action: Action<NyxRepositoryInfo>) {
         action.execute(repository)
     }
 
     /**
      * Configures the repository info
      */
-    public fun repository(action: (RepositoryInfo).() -> Unit) {
+    public fun repository(action: (NyxRepositoryInfo).() -> Unit) {
         repository.apply(action)
     }
 
     /**
      * Configures the license info
      */
-    public fun license(action: Action<LicenseInfoExtension>) {
+    public fun license(action: Action<NyxLicenseInfoExtension>) {
         action.execute(license)
     }
 
     /**
      * Configures the license info
      */
-    public fun license(action: (LicenseInfoExtension).() -> Unit) {
+    public fun license(action: (NyxLicenseInfoExtension).() -> Unit) {
         license.apply(action)
     }
 

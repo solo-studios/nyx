@@ -34,23 +34,23 @@ import ca.solostudios.nyx.plugin.minecraft.NyxMinecraftPlugin
 import ca.solostudios.nyx.plugin.publish.NyxPublishingPlugin
 import net.fabricmc.loom.bootstrap.LoomGradlePluginBootstrap
 import org.gradle.api.Project
-import org.gradle.api.plugins.JavaBasePlugin
+import org.gradle.api.publish.maven.plugins.MavenPublishPlugin
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.withType
 import net.neoforged.gradle.common.CommonProjectPlugin as NeoGradleCommonProjectPlugin
 
 public class NyxPlugin : InternalNyxPlugin {
     override fun apply(project: Project) {
-        val extension = project.create<NyxExtension>(NyxExtension.NAME, project)
+        val nyx = project.create<NyxExtension>(NyxExtension.NAME, project)
 
-        project.plugins.apply(NyxPublishingPlugin::class)
-
-        project.plugins.withType<JavaBasePlugin> {
-            project.plugins.apply(NyxCompilePlugin::class)
+        project.plugins.withType<MavenPublishPlugin> {
+            project.plugins.apply(NyxPublishingPlugin::class)
         }
 
+        project.plugins.apply(NyxCompilePlugin::class)
+
         try {
-            project.plugins.withType(LoomGradlePluginBootstrap::class) {
+            project.plugins.withType<LoomGradlePluginBootstrap> {
                 project.plugins.apply(NyxMinecraftPlugin::class)
             }
         } catch (_: NoClassDefFoundError) {
@@ -58,15 +58,15 @@ public class NyxPlugin : InternalNyxPlugin {
         }
 
         try {
-            project.plugins.withType(NeoGradleCommonProjectPlugin::class) {
+            project.plugins.withType<NeoGradleCommonProjectPlugin> {
                 project.plugins.apply(NyxMinecraftPlugin::class)
             }
         } catch (_: NoClassDefFoundError) {
             // ignore
         }
 
-        afterEvaluate(project) {
-            extension.configureProject()
+        project.afterEvaluate {
+            nyx.configureProject()
         }
     }
 }

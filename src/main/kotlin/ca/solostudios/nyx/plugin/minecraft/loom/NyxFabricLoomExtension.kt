@@ -50,7 +50,7 @@ import kotlin.io.path.createFile
 import kotlin.io.path.exists
 import kotlin.io.path.writeText
 
-public class MinecraftLoomExtension(
+public class NyxFabricLoomExtension(
     override val project: Project,
 ) : AbstractMinecraftExtension(project) {
     private val logger by getLogger()

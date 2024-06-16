@@ -33,7 +33,7 @@ import org.gradle.api.Project
 import org.gradle.api.provider.Property
 import org.gradle.kotlin.dsl.assign
 
-public open class RepositoryInfo(override val project: Project) : HasProject {
+public open class NyxRepositoryInfo(override val project: Project) : HasProject {
     /**
      * The domain name of the website hosting the git repository.
      */

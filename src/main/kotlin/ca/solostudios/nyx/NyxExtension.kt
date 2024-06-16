@@ -28,7 +28,7 @@
 package ca.solostudios.nyx
 
 import ca.solostudios.nyx.internal.InternalNyxExtension
-import ca.solostudios.nyx.project.ProjectInfoExtension
+import ca.solostudios.nyx.project.NyxProjectInfoExtension
 import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.tasks.Nested
@@ -36,13 +36,13 @@ import org.gradle.api.tasks.Nested
 public class NyxExtension(override val project: Project) : InternalNyxExtension {
     @Nested
     @Suppress("LeakingThis")
-    public val info: ProjectInfoExtension = ProjectInfoExtension(project)
+    public val info: NyxProjectInfoExtension = NyxProjectInfoExtension(project)
 
-    public fun info(action: Action<ProjectInfoExtension>) {
+    public fun info(action: Action<NyxProjectInfoExtension>) {
         action.execute(info)
     }
 
-    public fun info(action: ProjectInfoExtension.() -> Unit) {
+    public fun info(action: NyxProjectInfoExtension.() -> Unit) {
         info.apply(action)
     }
 
