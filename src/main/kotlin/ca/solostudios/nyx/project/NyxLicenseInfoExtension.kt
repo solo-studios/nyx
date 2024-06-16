@@ -110,7 +110,7 @@ public open class NyxLicenseInfoExtension(override val project: Project) : HasPr
     }
 
     public fun useMPLv1() {
-        name.set("MPL-1.1")
+        name.set("MPL-1.0")
         url.set("https://mozilla.org/MPL/1.0/")
     }
 
