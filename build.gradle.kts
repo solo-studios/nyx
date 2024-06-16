@@ -46,40 +46,6 @@ plugins {
 }
 
 nyx {
-    compile {
-        withJavadocJar()
-        withSourcesJar()
-
-        allWarnings = true
-        warningsAsErrors = true
-        distributeLicense = true
-        buildDependsOnJar = true
-        reproducibleBuilds = true
-        jvmTarget = 17
-
-        kotlin {
-            explicitApi()
-            allOpen.annotations("ca.solostudios.nyx.internal.AllOpen")
-        }
-    }
-
-    compile {
-        withJavadocJar()
-        withSourcesJar()
-
-        allWarnings = true
-        warningsAsErrors = true
-        distributeLicense = true
-        buildDependsOnJar = true
-        reproducibleBuilds = true
-        jvmTarget = 17
-
-        kotlin {
-            explicitApi()
-            allOpen.annotations("ca.solostudios.nyx.internal.AllOpen")
-        }
-    }
-
     project {
         name = "Nyx"
         group = "ca.solo-studios"
@@ -102,16 +68,60 @@ nyx {
         repository.fromGithub("solo-studios", "nyx")
         license.useMIT()
     }
+
+    compile {
+        withJavadocJar()
+        withSourcesJar()
+
+        allWarnings = true
+        warningsAsErrors = true
+        distributeLicense = true
+        buildDependsOnJar = true
+        reproducibleBuilds = true
+        jvmTarget = 17
+
+        kotlin {
+            explicitApi()
+            allOpen.annotations("ca.solostudios.nyx.internal.AllOpen")
+        }
+    }
+
+    publishing {
+        configurePublications()
+
+        repositories {
+            maven {
+                name = "Sonatype"
+
+                val repositoryId: String? by project
+                url = when {
+                    isSnapshot           -> uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+                    repositoryId != null -> uri("https://s01.oss.sonatype.org/service/local/staging/deployByRepositoryId/$repositoryId/")
+                    else                 -> uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+                }
+
+                credentials(PasswordCredentials::class)
+            }
+            maven {
+                name = "SoloStudios"
+
+                val releasesUrl = uri("https://maven.solo-studios.ca/releases/")
+                val snapshotUrl = uri("https://maven.solo-studios.ca/snapshots/")
+                url = if (isSnapshot) snapshotUrl else releasesUrl
+
+                credentials(PasswordCredentials::class)
+                authentication { // publishing doesn't work without this for some reason
+                    create<BasicAuthentication>("basic")
+                }
+            }
+        }
+    }
 }
 
 repositories {
     maven("https://maven.solo-studios.ca/releases/")
     mavenCentral()
     gradlePluginPortal()
-    // maven("https://maven.fabricmc.net/")
-    // maven("https://maven.quiltmc.org/repository/release")
-    // maven("https://maven.architectury.dev/")
-    // maven("https://maven.neoforged.net/releases")
 }
 
 dependencies {
@@ -171,39 +181,6 @@ gradlePlugin {
     }
 }
 
-
-nyx {
-    publishing {
-        configurePublications()
-
-        repositories {
-            maven {
-                name = "Sonatype"
-
-                val repositoryId: String? by project
-                url = when {
-                    isSnapshot           -> uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
-                    repositoryId != null -> uri("https://s01.oss.sonatype.org/service/local/staging/deployByRepositoryId/$repositoryId/")
-                    else                 -> uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
-                }
-
-                credentials(PasswordCredentials::class)
-            }
-            maven {
-                name = "SoloStudios"
-
-                val releasesUrl = uri("https://maven.solo-studios.ca/releases/")
-                val snapshotUrl = uri("https://maven.solo-studios.ca/snapshots/")
-                url = if (isSnapshot) snapshotUrl else releasesUrl
-
-                credentials(PasswordCredentials::class)
-                authentication { // publishing doesn't work without this for some reason
-                    create<BasicAuthentication>("basic")
-                }
-            }
-        }
-    }
-}
 
 val Project.isSnapshot: Boolean
     get() = version.toString().endsWith("-SNAPSHOT")
