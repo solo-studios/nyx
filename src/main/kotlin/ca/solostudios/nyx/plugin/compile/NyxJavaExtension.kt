@@ -55,13 +55,11 @@ public class NyxJavaExtension(
     compile: NyxCompileExtension,
 ) : InternalNyxExtension {
     /**
-     * The encoding to be used for all files.
+     * Enables all warnings
      *
-     * Defaults to `UTF-8`.
-     *
-     * @see NyxCompileExtension.encoding
+     * @see NyxCompileExtension.allWarnings
      */
-    public val encoding: Property<String> = property<String>().convention(compile.encoding)
+    public val allWarnings: Property<Boolean> = property<Boolean>().convention(compile.allWarnings)
 
     /**
      * Enables all compilers to output warnings as errors.
@@ -71,11 +69,13 @@ public class NyxJavaExtension(
     public val warningsAsErrors: Property<Boolean> = property<Boolean>().convention(compile.warningsAsErrors)
 
     /**
-     * Enables all warnings
+     * The encoding to be used for all files.
      *
-     * @see NyxCompileExtension.allWarnings
+     * Defaults to `UTF-8`.
+     *
+     * @see NyxCompileExtension.encoding
      */
-    public val allWarnings: Property<Boolean> = property<Boolean>().convention(compile.allWarnings)
+    public val encoding: Property<String> = property<String>().convention(compile.encoding)
 
     /**
      * Suppresses all warnings

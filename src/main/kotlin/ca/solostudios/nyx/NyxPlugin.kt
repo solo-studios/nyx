@@ -34,7 +34,6 @@ import ca.solostudios.nyx.plugin.minecraft.NyxMinecraftPlugin
 import ca.solostudios.nyx.plugin.publish.NyxPublishingPlugin
 import net.fabricmc.loom.bootstrap.LoomGradlePluginBootstrap
 import org.gradle.api.Project
-import org.gradle.api.publish.maven.plugins.MavenPublishPlugin
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.withType
 import net.neoforged.gradle.common.CommonProjectPlugin as NeoGradleCommonProjectPlugin
@@ -43,9 +42,7 @@ public class NyxPlugin : InternalNyxPlugin {
     override fun apply(project: Project) {
         val nyx = project.create<NyxExtension>(NyxExtension.NAME, project)
 
-        project.plugins.withType<MavenPublishPlugin> {
-            project.plugins.apply(NyxPublishingPlugin::class)
-        }
+        project.plugins.apply(NyxPublishingPlugin::class)
 
         project.plugins.apply(NyxCompilePlugin::class)
 

@@ -33,6 +33,7 @@ import ca.solostudios.nyx.internal.util.fileCollection
 import ca.solostudios.nyx.internal.util.githubRelease
 import ca.solostudios.nyx.internal.util.property
 import ca.solostudios.nyx.project.NyxProjectInfoExtension
+import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.provider.Property
@@ -93,6 +94,20 @@ public class NyxGithubReleaseExtension(
      * A file collection of all the assets published in the release.
      */
     public val releaseAssets: ConfigurableFileCollection = fileCollection()
+
+    /**
+     * Configures the release assets
+     */
+    public fun releaseAssets(action: Action<ConfigurableFileCollection>) {
+        action.execute(releaseAssets)
+    }
+
+    /**
+     * Configures the release assets
+     */
+    public fun releaseAssets(action: (ConfigurableFileCollection).() -> Unit) {
+        releaseAssets.apply(action)
+    }
 
     override fun configureProject() {
         val tokenProperty = project.providers.gradleProperty(GITHUB_TOKEN_GRADLE_PROPERTY)

@@ -81,18 +81,18 @@ public class NyxKotlinExtension(
     public val optIn: ListProperty<String> = listProperty()
 
     /**
-     * Enables all compilers to output warnings as errors.
-     *
-     * @see NyxCompileExtension.warningsAsErrors
-     */
-    public val warningsAsErrors: Property<Boolean> = property<Boolean>().convention(compile.warningsAsErrors)
-
-    /**
      * The explicit api mode
      *
      * @see KotlinTopLevelExtension.explicitApi
      */
     public val explicitApi: Property<ExplicitApiMode> = property()
+
+    /**
+     * Enables all compilers to output warnings as errors.
+     *
+     * @see NyxCompileExtension.warningsAsErrors
+     */
+    public val warningsAsErrors: Property<Boolean> = property<Boolean>().convention(compile.warningsAsErrors)
 
     /**
      * Suppresses all warnings
