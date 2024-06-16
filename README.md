@@ -1,5 +1,21 @@
 # Nyx Gradle Plugin
 
+- [Nyx Gradle Plugin](#nyx-gradle-plugin)
+    - [Using](#using)
+    - [Features](#features)
+        - [Default](#default)
+        - [JVM plugins](#jvm-plugins)
+        - [Java (`java` plugin)](#java-java-plugin)
+        - [Kotlin (`org.jetbrains.kotlin.*`/`kotlin("jvm")` plugin)](#kotlin-orgjetbrainskotlinkotlinjvm-plugin)
+        - [Publishing Plugins](#publishing-plugins)
+            - [Maven Publish (`maven-publish` plugin)](#maven-publish-maven-publish-plugin)
+            - [GitHub Release Plugin (`com.github.breadmoirai.github-release` plugin)](#github-release-plugin-comgithubbreadmoiraigithub-release-plugin)
+        - [Minecraft Plugins](#minecraft-plugins)
+            - [Loom (`fabric-loom`, `org.quiltmc.loom`, and `dev.architectury.loom` plugins)](#loom-fabric-loom-orgquiltmcloom-and-devarchitecturyloom-plugins)
+            - [NeoGradle (`net.neoforged.gradle.userdev`, `net.neoforged.gradle.mixin`, and other `net.neoforged.gradle.*` plugins)](#neogradle-netneoforgedgradleuserdev-netneoforgedgradlemixin-and-other-netneoforgedgradle-plugins)
+            - [Mixins (any loom-based plugin or with `net.neoforged.gradle.mixin`)](#mixins-any-loom-based-plugin-or-with-netneoforgedgradlemixin)
+            - [Minotaur (`com.modrinth.minotaur` plugin)](#minotaur-commodrinthminotaur-plugin)
+
 ## Using
 
 Add the following to your `build.gradle`/`build.gradle.kts`
@@ -26,8 +42,7 @@ The enabled features depends on which other plugins are loaded.
 
 ### Default
 
-By default, Nyx adds a `nyx` block with an `info` extension.
-
+nyx adds a `nyx` block with an `info` extension.
 The `info` extension is used to configure metadata about the project:
 
 ```kotlin
@@ -52,7 +67,7 @@ nyx {
         // The description of your project. Used for publishing.
         // Defaults to project.description, if set.
         description = """
-            My project
+            My project's description
         """.trimIndent()
 
         // The url of the associated organization. Used for publishing.
@@ -196,7 +211,7 @@ nyx {
 
 ### JVM plugins
 
-When any jvm plugins are in use, a `compile` extension is added to `nyx`:
+When any jvm plugin is present, a `compile` extension will be added to `nyx`:
 
 ```kotlin
 nyx {
@@ -225,12 +240,14 @@ nyx {
         // Defaults to true
         buildDependsOnJar = true
 
-        // If all compiler warnings should be suppressed
+        // If all java/kotlin compiler warnings should be suppressed
         // Defaults to false
         suppressWarnings = true
 
         // The jvm toolchain version to use
         // Defaults to unset
+        // Note: this uses gradle toolchains: https://docs.gradle.org/current/userguide/toolchains.html
+        // This will force gradle to use a specific jdk version, installing it if not found
         jvmToolchain = 17
 
         // The jvm version to target. This is the bytecode version of the resulting class files
@@ -240,13 +257,13 @@ nyx {
         // If the sources jar should be enabled
         // Defaults to false
         withSourcesJar = true
-        withSourcesJar() // alternative
+        withSourcesJar() // alternative that sets it to true
 
         // If the javadoc jar should be enabled
-        // If the kotlin plugin is loaded, then the dokka plugin most alos be loaded to use this.
+        // If the kotlin plugin is loaded, then requires the dokka plugin to be loaded.
         // Defaults to false
         withJavadocJar = true
-        withJavadocJar() // alternative
+        withJavadocJar() // alternative that sets it to true
 
         // If reproducible builds should be enabled
         // This strips timestamps from all files in the resulting jar
@@ -258,14 +275,463 @@ nyx {
 
 ### Java (`java` plugin)
 
+When the `java` plugin is present, a `java` extension will be added to the `compile` extension:
+
+```kotlin
+nyx {
+    compile {
+        java {
+            // Enables/disabled the 'all warnings' feature for the java compiler
+            // Inherited from compile.allWarnings
+            allWarnings = true
+
+            // Enables/disables the 'warnings as errors' feature for the java compiler
+            // Inherited from compile.warningsAsErrors
+            warningsAsErrors = true
+
+            // The encoding used for compilation
+            // Inherited from compile.encoding
+            encoding = "UTF-8"
+
+            // If all java compiler warnings should be suppressed
+            // Inherited from compile.suppressWarnings
+            suppressWarnings = true
+
+            // The jvm toolchain version to use
+            // Note: this uses gradle toolchains: https://docs.gradle.org/current/userguide/toolchains.html
+            // This will force gradle to use a specific jdk version, installing it if not found
+            // Inherited from compile.jvmToolchain
+            jvmToolchain = 17
+
+            // The jvm version to target. This is the bytecode version of the resulting class files
+            // This will set the following properties
+            // - java.targetCompatibility
+            // - java.sourceCompatibility
+            // - options.release for all tasks of type JavaCompile
+            // Inherited from compile.jvmTarget
+            jvmTarget = 8
+
+            // If the sources jar should be enabled
+            // Inherited from compile.withSourcesJar
+            withSourcesJar = true
+            withSourcesJar() // alternative that sets it to true
+
+            // If the javadoc jar should be enabled
+            // Inherited from compile.withSourcesJar
+            withJavadocJar = true
+            withJavadocJar() // alternative that sets it to true
+
+            // A list of arguments to add to the compiler args passed to javac
+            // Defaults to an empty list
+            compilerArgs = listOf(
+                "-g", // generate all debug info
+                "-verbose"
+            )
+        }
+    }
+}
+```
+
 ### Kotlin (`org.jetbrains.kotlin.*`/`kotlin("jvm")` plugin)
 
-### Maven Publish (`maven-publish` plugin)
+When a `org.jetbrains.kotlin.*` plugin is present (such as when using `kotlin("jvm")`),
+a `kotlin` extension will be added to the `compile` extension:
 
-### Loom (`fabric-loom`, `org.quiltmc.loom`, and `dev.architectury.loom` plugins)
+```kotlin
+nyx {
+    compile {
+        kotlin {
+            // The kotlin api version to use
+            // Allow using declarations only from the specified version of bundled libraries
+            // Defaults to unset
+            apiVersion = "2.0"
 
-### NeoGradle (`net.neoforged.gradle.userdev`, `net.neoforged.gradle.mixin`, and other `net.neoforged.gradle.*` plugins)
+            // The kotlin language version to use
+            // Provide source compatibility with the specified version of Kotlin
+            // Defaults to unset
+            languageVersion = "2.0"
 
-### Minotaur (`com.modrinth.minotaur` plugin)
+            // The list of opt-in annotations
+            // Enable usages of API that requires opt-in with an opt-in requirement marker with the given fully qualified name
+            // Defaults to an empty list
+            optIn = listOf("kotlinx.serialization.ExperimentalSerializationApi")
 
-### GitHub Release Plugin (`com.github.breadmoirai.github-release` plugin)
+            // The explicit api mode
+            // Option that tells the compiler if and how to report issues on all public API declarations without explicit visibility or return type.
+            // Defaults to ExplicitApiMode.Disabled
+            explicitApi = ExplicitApiMode.Strict
+            explicitApi() // alternative that sets the explicit api mode to strict
+            explicitApiWarning() // alternative that sets the explicit api mode to warning
+
+            // Enables/disables the 'warnings as errors' feature for the kotlin compiler
+            // Inherited from compile.warningsAsErrors
+            warningsAsErrors = true
+
+            // If all kotlin compiler warnings should be suppressed
+            // Inherited from compile.suppressWarnings
+            suppressWarnings = true
+
+            // The jvm toolchain version to use
+            // Note: this uses gradle toolchains: https://docs.gradle.org/current/userguide/toolchains.html
+            // This will force gradle to use a specific jdk version, installing it if not found
+            // Inherited from compile.jvmToolchain
+            jvmToolchain = 17
+
+            // The jvm version to target. This is the bytecode version of the resulting class files
+            // This will set the following properties
+            // Inherited from compile.jvmTarget
+            jvmTarget = 8
+
+            // If the sources jar should be enabled
+            // Inherited from compile.withSourcesJar
+            withSourcesJar = true
+            withSourcesJar() // alternative that sets it to true
+
+            // If the javadoc jar should be enabled
+            // Requires the dokka plugin to be loaded
+            // Inherited from compile.withSourcesJar
+            withJavadocJar = true
+            withJavadocJar() // alternative that sets it to true
+
+            // A list of arguments to add to the compiler args passed to kotlinc
+            // Defaults to an empty list
+            compilerArgs = listOf("-Xcontext-receivers")
+        }
+    }
+}
+```
+
+### Publishing Plugins
+
+nyx has a `publishing` extension which allows you to configure how the project is published.
+
+#### Maven Publish (`maven-publish` plugin)
+
+setting `publishing.publish` to true will enable the `maven-publish` plugin,
+which allows you to configure how the project is published to a maven repository.
+
+If `publish` has been set to true, then a publishing configuration will be automatically added and configured with the following
+information:
+
+- `info.group` as the group id
+- `info.module` as the module id
+- `info.version` as the version
+- `info.name` as the name
+- `info.description` as the description
+- `info.repository.projectUrl` as the url
+- `info.organizationName`/`info.organizationUrl` as the organization name/url (if present)
+- `info.developers` as the developers
+- `info.license.name`/`info.license.url` as the license name/url if present
+- `info.repository.issueManagement` as the issue management system
+- `info.repository.projectIssues` as the issue management url
+- `info.repository.projectCloneScmUri` as the scm connection
+- `info.repository.projectCloneDeveloperUri` as the scm developer connection
+- `info.repository.projectUrl` as the scm url
+
+```kotlin
+nyx {
+    publishing {
+        // Enables/disables publishing
+        // Enabling this will apply the `maven-publish` plugin and the `signing` plugins
+        // Defaults to false
+        publish = true
+
+        // Enables/disables the `publish` task depending on the `sign` task
+        // Defaults to true
+        publishDependsOnSign = true
+
+        // Allows in-memory PGP keys to be used. This is useful for CI.
+        // Using the gradle properties
+        // - signingKey: the ascii-armored pgp key
+        // - signingKeyId: the id of the subkey pgp to use
+        // - signingPassword: the password of the ascii-armoed pgp key
+        //
+        // You can either provide these in multiple ways:
+        // - on the command line using -PsigningKey="..." -PsigningKeyId="..." -PsigningPassword="..." (not recommended)
+        // - by adding them to your `gradle.properties` in either $GRADLE_USER_HOME or the project directory
+        // - by adding them as environment variables using the syntax `ORG_GRADLE_PROJECT_${variable name}`
+        allowInMemoryPgpKeys = true
+
+        // This will set publish, publishDependsOnSign, and allowInMemoryPgpKeys all to true
+        configurePublications()
+
+        // This is where you configure the repositories you're publishing to.
+        // It is configured exactly the same as if you were using the normal publishing block
+        repositories {
+            maven {
+                name = "SoloStudios"
+                url = uri("https://maven.solo-studios.ca/releases/")
+
+                // Since PasswordCredentials has been used, gradle get the credentials from
+                // - the SoloStudiosUsername property
+                // - the SoloStudiosPassword property
+                //
+                // You can set these in multiple ways:
+                // - on the command line using -PSoloStudiosUsername="..." -PSoloStudiosPassword="..." (not recommended)
+                // - by adding them to your `gradle.properties` in either $GRADLE_USER_HOME or the project directory
+                // - by adding them as environment variables using the syntax `ORG_GRADLE_PROJECT_${variable name}`
+                //
+                // for your personal development machine, I recommend placing them in the `gradle.properties` in your $GRADLE_USER_HOME directory
+                // this is located at `~/.gradle/gradle.properties` on linux/macos and `%USERPROFILE%\.gradle\gradle.properties` on windows
+                // for a CI server, I recommend providing them using environment variables
+                credentials(PasswordCredentials::class)
+            }
+        }
+    }
+}
+```
+
+#### GitHub Release Plugin (`com.github.breadmoirai.github-release` plugin)
+
+If the `com.github.breadmoirai.github-release` plugin is present, then a `github` extension will be added to the `publishing` extension.
+
+The github release extension will attempt to load the token used for publishing from one of two places:
+
+- the `github.token` gradle property.
+  This can be specified in several different ways
+    - on the command line using `-Pgithub.token="..."` (not recommended)
+    - by adding `github.token` to your `gradle.properties` in either $GRADLE_USER_HOME or the project directory
+      (located at `~/.gradle/gradle.properties` on linux/macos and `%USERPROFILE%\.gradle\gradle.properties` on windows)
+    - by adding a `ORG_GRADLE_PROJECT_github.token` environment variable (recommended for CI environments)
+- the `GITHUB_TOKEN` environment variable
+
+```kotlin
+nyx {
+    publishing {
+        github {
+            // Enables/disables the generation of release notes
+            // Defaults to unset
+            generateReleaseNotes = true
+
+            // The text describing the tag for the release
+            // Defaults to unset
+            body = file("CHANGELOG").readText()
+
+            // Enables/disables the draft setting for a release
+            // Defaults to unset
+            draft = true
+
+            // Enables/disables the prerelease setting for a release
+            // Defaults to unset
+            prerelease = true
+
+            // Enables/disables overwriting an existing release
+            // Defaults to unset
+            overwrite = true
+
+            // Enables/disables uploading artifacts to an existing release
+            // Defaults to unset
+            allowUploadToExisting = true
+
+            // Enables the dry-run setting, which will not publish the release to github
+            // Defaults to unset
+            dryRun = true
+
+            // A file collection of all the release assets
+            // using the from method to use the outputs of the jar task as the inputs for this
+            releaseAssets.from(tasks.jar)
+            // you can also use the releaseAssets function instead
+            releaseAssets {
+                from(tasks["javadocJar"])
+            }
+        }
+    }
+}
+```
+
+### Minecraft Plugins
+
+If one of several different minecraft gradle plugins is present, then a `minecraft` extension will be added to `nyx`
+
+```kotlin
+nyx {
+    minecraft {
+        // The memory to be allocated to the jvm, in gigabytes
+        // Defaults to 2
+        allocatedMemory = 4
+
+        // Any additional jvm arguments to be passed to the jvm
+        // Defaults to ["-XX:+UseZGC"]
+        additionalJvmArgs.add("-XX:+ZGenerational") // -XX:+ZGenerational only works with jdk >= 21
+
+        // Any additional jvm properties to be added to the jvm
+        // Equivalent to adding -D[property]=[value]
+        // Defaults to unset
+        additionalJvmProperties.put("fabric.development", "true")
+    }
+}
+```
+
+#### Loom (`fabric-loom`, `org.quiltmc.loom`, and `dev.architectury.loom` plugins)
+
+If any loom-based plugin is present (currently supported: `fabric-loom`, `org.quiltmc.loom`, and `dev.architectury.loom`),
+then the `minecraft` extension is extended as follows:
+
+```kotlin
+nyx {
+    minecraft {
+        // Enables data generation
+        configureDataGeneration()
+
+        // Adds an access widener at `src/main/resources/${name}.accesswidener`
+        // If the access widener does not exist, it will be created and a warning will be emitted
+        accessWidener("my-project") // this adds an access widener at src/main/resources/my-project.accesswidener
+    }
+}
+```
+
+#### NeoGradle (`net.neoforged.gradle.userdev`, `net.neoforged.gradle.mixin`, and other `net.neoforged.gradle.*` plugins)
+
+If a neogradle plugin is present, then the `minecraft` exntesion is extended as follows:
+
+```kotlin
+nyx {
+    minecraft {
+        // Sets the mod identifier
+        modIdentifier = "my-mod"
+
+        // Configures the naming channels
+        namingChannels {
+            // See the neogradle docs for more information
+        }
+
+        // Configures the mappings
+        mappings {
+            // See the neogradle docs for more information
+        }
+
+        // Configures the access transformers
+        accessTransformers {
+            // See the neogradle docs for more information
+        }
+    }
+}
+```
+
+#### Mixins (any loom-based plugin or with `net.neoforged.gradle.mixin`)
+
+If mixins are enabled, then a `mixin` extension will be added to the `minecraft` extension.
+
+Mixins are only enabled when either a loom-based plugin is present, or when `net.neoforged.gradle.mixin` is present.
+
+```kotlin
+nyx {
+    minecraft {
+        mixin {
+            // Enables/disables hotswapping mixins
+            // Note: this will also find the first net.fabricmc:sponge-mixin artifact on the runtime classpath and add it as a java agent
+            // If you have just added this plugin and had previously generated run configurations, delete them so they can be re-created
+            // Sets the mixin.hotSwap jvm property
+            // Defaults to true
+            hotswapMixins = true
+
+            // Enables/disables *ALL* mixin debug features. this includes mixin.debug.verify
+            // Note: enabling this can sometimes cause issues with other mods' mixins
+            // Sets the mixin.debug jvm property
+            // Defaults to false
+            debug = true
+
+            // Enables/disables mixin verbose logging
+            // Sets the mixin.debug.verbose jvm property
+            // Defaults to true
+            verbose = true
+
+            // Enables/disables dumping the target class on failures
+            // Sets the mixin.dumpTargetOnFailure jvm property
+            // Defaults to true
+            dumpTargetOnFailure = true
+
+            // Enables/disables mixin checks
+            // Note: enabling this can sometimes cause issues with other mods' mixins.
+            // Sets the mixin.checks jvm property
+            // Defaults to false
+            checks = true
+
+            // Enables/disables mixin debug verification
+            // Note: enabling this can sometimes cause issues with other mods' mixins
+            // Sets the mixin.debug.verify jvm property
+            // Defaults to false
+            verify = true
+        }
+    }
+}
+```
+
+#### Minotaur (`com.modrinth.minotaur` plugin)
+
+If the `com.modrinth.minotaur` plugin is present, then a `minotaur` extension will be added to the `minecraft` extension.
+This is used for publishing to modrinth.
+
+The modrinth extension will attempt to load the token used for publishing from one of two places:
+
+- the `modrinth.token` gradle property.
+  This can be specified in several different ways
+    - on the command line using `-Pmodrinth.token="..."` (not recommended)
+    - by adding `modrinth.token` to your `gradle.properties` in either $GRADLE_USER_HOME or the project directory
+      (located at `~/.gradle/gradle.properties` on linux/macos and `%USERPROFILE%\.gradle\gradle.properties` on windows)
+    - by adding a `ORG_GRADLE_PROJECT_modrinth.token` environment variable (recommended for CI environments)
+- the `MODRINTH_TOKEN` environment variable
+
+```kotlin
+nyx {
+    minecraft {
+        minotaur {
+            // The project id/slug
+            // Defaults to unset
+            projectId = "my-project"
+
+            // The changelog for this release
+            // Defaults to unset
+            changelog = file("CHANGELOG").readText()
+
+            // The version type for this release
+            // Defaults to unset
+            versionType = VersionType.BETA
+
+            // The list of game versions this release supports
+            // Defaults to unset
+            gameVersions = listOf("1.19.2", "1.19.3", "1.19.4")
+
+            // If the modrinth task should fail silently
+            // Defaults to unset
+            failSilently = false
+
+            // Enables/disables the detection of loaders
+            // Defaults to unset
+            detectLoaders = true
+
+            // Enables/disables automatically adding the dependencies of this release
+            // Defaults to unset
+            autoAddDependsOn
+
+            // Configures the dependencies
+            dependencies {
+                // Mark a project as incompatible
+                incompatible("project-id")
+
+                // Mark a specific version as incompatible
+                incompatible("project-id", "1.2.3")
+
+                // Mark a project as optional
+                optional("project-id")
+
+                // Mark a specific version as optional
+                optional("project-id", "1.2.3")
+
+                // Mark a project as required
+                required("project-id")
+
+                // Mark a specific version as required
+                required("project-id", "1.2.3")
+
+                // Mark a project as embedded
+                embedded("project-id")
+
+                // Mark a specific version as embedded
+                embedded("project-id", "1.2.3")
+            }
+        }
+    }
+}
+```
+
