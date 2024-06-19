@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file RepositoryHandlerExtensions.kt is part of nyx
- * Last modified on 10-06-2024 03:21 p.m.
+ * Last modified on 19-06-2024 05:27 p.m.
  *
  * MIT License
  *
@@ -31,6 +31,9 @@ import org.gradle.api.artifacts.dsl.RepositoryHandler
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository
 import org.gradle.kotlin.dsl.maven
 
+/**
+ * Adds the fabric maven repository.
+ */
 public fun RepositoryHandler.fabric(action: MavenArtifactRepository.() -> Unit = {}): MavenArtifactRepository {
     return maven("https://maven.fabricmc.net/") {
         name = "Fabric"
@@ -38,6 +41,9 @@ public fun RepositoryHandler.fabric(action: MavenArtifactRepository.() -> Unit =
     }
 }
 
+/**
+ * Adds the quilt maven repository.
+ */
 public fun RepositoryHandler.quilt(action: MavenArtifactRepository.() -> Unit = {}): MavenArtifactRepository {
     return maven("https://maven.quiltmc.org/repository/release/") {
         name = "Quilt"
@@ -46,6 +52,9 @@ public fun RepositoryHandler.quilt(action: MavenArtifactRepository.() -> Unit = 
 
 }
 
+/**
+ * Adds the architectury maven repository.
+ */
 public fun RepositoryHandler.architectury(action: MavenArtifactRepository.() -> Unit = {}): MavenArtifactRepository {
     return maven("https://maven.architectury.dev/") {
         name = "Architectury"
@@ -53,6 +62,9 @@ public fun RepositoryHandler.architectury(action: MavenArtifactRepository.() -> 
     }
 }
 
+/**
+ * Adds the neoforged maven repository.
+ */
 public fun RepositoryHandler.neoforged(action: MavenArtifactRepository.() -> Unit = {}): MavenArtifactRepository {
     return maven("https://maven.neoforged.net/releases/") {
         name = "Neoforged"
@@ -60,6 +72,9 @@ public fun RepositoryHandler.neoforged(action: MavenArtifactRepository.() -> Uni
     }
 }
 
+/**
+ * Adds the solo-studios maven repository.
+ */
 public fun RepositoryHandler.soloStudios(action: MavenArtifactRepository.() -> Unit = {}): MavenArtifactRepository {
     return maven("https://maven.solo-studios.ca/releases/") {
         name = "Solo Studios"
@@ -67,6 +82,9 @@ public fun RepositoryHandler.soloStudios(action: MavenArtifactRepository.() -> U
     }
 }
 
+/**
+ * Adds the solo-studios snapshots maven repository.
+ */
 public fun RepositoryHandler.soloStudiosSnapshots(action: MavenArtifactRepository.() -> Unit = {}): MavenArtifactRepository {
     return maven("https://maven.solo-studios.ca/snapshots/") {
         name = "Solo Studios Snapshots"
@@ -77,6 +95,9 @@ public fun RepositoryHandler.soloStudiosSnapshots(action: MavenArtifactRepositor
     }
 }
 
+/**
+ * Adds masa's maven repository.
+ */
 public fun RepositoryHandler.masaModding(action: MavenArtifactRepository.() -> Unit = {}): MavenArtifactRepository {
     return maven("https://masa.dy.fi/maven/") {
         name = "Masa Modding"
@@ -84,6 +105,9 @@ public fun RepositoryHandler.masaModding(action: MavenArtifactRepository.() -> U
     }
 }
 
+/**
+ * Adds Shedaniel's maven repository.
+ */
 public fun RepositoryHandler.shedaniel(action: MavenArtifactRepository.() -> Unit = {}): MavenArtifactRepository {
     return maven("https://maven.shedaniel.me/") {
         name = "Shedaniel"
@@ -91,13 +115,19 @@ public fun RepositoryHandler.shedaniel(action: MavenArtifactRepository.() -> Uni
     }
 }
 
+/**
+ * Adds BlameJared's maven repository.
+ */
 public fun RepositoryHandler.blamejared(action: MavenArtifactRepository.() -> Unit = {}): MavenArtifactRepository {
     return maven("https://maven.blamejared.com/") {
-        name = "BlameJared Maven"
+        name = "BlameJared"
         action()
     }
 }
 
+/**
+ * Adds the TerraformersMC maven repository.
+ */
 public fun RepositoryHandler.terraformersMC(action: MavenArtifactRepository.() -> Unit = {}): MavenArtifactRepository {
     return maven("https://maven.terraformersmc.com/releases/") {
         name = "TerraformersMC"
@@ -105,6 +135,9 @@ public fun RepositoryHandler.terraformersMC(action: MavenArtifactRepository.() -
     }
 }
 
+/**
+ * Adds the CodeMC maven repository.
+ */
 public fun RepositoryHandler.codeMC(action: MavenArtifactRepository.() -> Unit = {}): MavenArtifactRepository {
     return maven("https://repo.codemc.org/repository/maven-public/") {
         name = "CodeMC"
@@ -112,13 +145,19 @@ public fun RepositoryHandler.codeMC(action: MavenArtifactRepository.() -> Unit =
     }
 }
 
-public fun RepositoryHandler.wishForest(action: MavenArtifactRepository.() -> Unit = {}): MavenArtifactRepository {
+/**
+ * Adds the wishforest maven repository.
+ */
+public fun RepositoryHandler.wispForest(action: MavenArtifactRepository.() -> Unit = {}): MavenArtifactRepository {
     return maven("https://maven.wispforest.io/") {
         name = "Wisp Forest"
         action()
     }
 }
 
+/**
+ * Adds JamiesWhiteShirt's maven repository.
+ */
 public fun RepositoryHandler.jamiesWhiteShirt(action: MavenArtifactRepository.() -> Unit = {}): MavenArtifactRepository {
     return maven("https://maven.jamieswhiteshirt.com/libs-release/") {
         name = "JamiesWhiteShirt"
@@ -126,6 +165,9 @@ public fun RepositoryHandler.jamiesWhiteShirt(action: MavenArtifactRepository.()
     }
 }
 
+/**
+ * Adds the cursemaven maven repository.
+ */
 public fun RepositoryHandler.curseMaven(action: MavenArtifactRepository.() -> Unit = {}): MavenArtifactRepository {
     return maven("https://www.cursemaven.com/") {
         name = "Curseforge"
@@ -133,6 +175,9 @@ public fun RepositoryHandler.curseMaven(action: MavenArtifactRepository.() -> Un
     }
 }
 
+/**
+ * Adds the sonatype snapshots maven repository.
+ */
 public fun RepositoryHandler.sonatypeSnapshots(action: MavenArtifactRepository.() -> Unit = {}): MavenArtifactRepository {
     return maven("https://oss.sonatype.org/content/repositories/snapshots/") {
         name = "Sonatype Snapshots"
@@ -143,6 +188,9 @@ public fun RepositoryHandler.sonatypeSnapshots(action: MavenArtifactRepository.(
     }
 }
 
+/**
+ * Adds the modrinth maven repository.
+ */
 public fun RepositoryHandler.modrinth(action: MavenArtifactRepository.() -> Unit = {}): MavenArtifactRepository {
     return maven("https://api.modrinth.com/maven/") {
         name = "Modrinth"
@@ -150,6 +198,9 @@ public fun RepositoryHandler.modrinth(action: MavenArtifactRepository.() -> Unit
     }
 }
 
+/**
+ * Adds the ladysnake maven repository.
+ */
 public fun RepositoryHandler.ladysnake(action: MavenArtifactRepository.() -> Unit = {}): MavenArtifactRepository {
     return maven("https://maven.ladysnake.org/releases/") {
         name = "Ladysnake"
@@ -157,6 +208,9 @@ public fun RepositoryHandler.ladysnake(action: MavenArtifactRepository.() -> Uni
     }
 }
 
+/**
+ * Adds the ParchmentMC maven repository.
+ */
 public fun RepositoryHandler.parchment(action: MavenArtifactRepository.() -> Unit = {}): MavenArtifactRepository {
     return maven("https://maven.parchmentmc.org") {
         name = "ParchmentMC"
@@ -164,6 +218,9 @@ public fun RepositoryHandler.parchment(action: MavenArtifactRepository.() -> Uni
     }
 }
 
+/**
+ * Adds the devOS maven repository.
+ */
 public fun RepositoryHandler.devOS(action: MavenArtifactRepository.() -> Unit = {}): MavenArtifactRepository {
     return maven("https://mvn.devos.one/releases/") {
         name = "devOS"
@@ -171,6 +228,9 @@ public fun RepositoryHandler.devOS(action: MavenArtifactRepository.() -> Unit = 
     }
 }
 
+/**
+ * Adds the devOS snapshots maven repository.
+ */
 public fun RepositoryHandler.devOSSnapshots(action: MavenArtifactRepository.() -> Unit = {}): MavenArtifactRepository {
     return maven("https://mvn.devos.one/snapshots/") {
         name = "devOS Snapshots"
@@ -178,6 +238,9 @@ public fun RepositoryHandler.devOSSnapshots(action: MavenArtifactRepository.() -
     }
 }
 
+/**
+ * Adds the sleeping.town maven repository.
+ */
 public fun RepositoryHandler.sleepingTown(action: MavenArtifactRepository.() -> Unit = {}): MavenArtifactRepository {
     return maven("https://repo.sleeping.town/") {
         name = "Sleeping Town"
@@ -185,6 +248,9 @@ public fun RepositoryHandler.sleepingTown(action: MavenArtifactRepository.() -> 
     }
 }
 
+/**
+ * Adds the modmaven maven repository.
+ */
 public fun RepositoryHandler.modMaven(action: MavenArtifactRepository.() -> Unit = {}): MavenArtifactRepository {
     return maven("https://modmaven.dev/") {
         name = "ModMaven"
@@ -192,6 +258,9 @@ public fun RepositoryHandler.modMaven(action: MavenArtifactRepository.() -> Unit
     }
 }
 
+/**
+ * Adds tterrag's maven repository.
+ */
 public fun RepositoryHandler.tterrag(action: MavenArtifactRepository.() -> Unit = {}): MavenArtifactRepository {
     return maven("https://maven.tterrag.com/") {
         name = "tterrag"

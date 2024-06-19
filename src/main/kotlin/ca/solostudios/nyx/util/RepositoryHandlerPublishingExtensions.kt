@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file RepositoryHandlerPublishingExtensions.kt is part of nyx
- * Last modified on 10-06-2024 03:21 p.m.
+ * Last modified on 19-06-2024 05:16 p.m.
  *
  * MIT License
  *
@@ -31,13 +31,30 @@ import org.gradle.api.artifacts.dsl.RepositoryHandler
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository
 import org.gradle.authentication.http.BasicAuthentication
 import org.gradle.kotlin.dsl.create
+import org.gradle.kotlin.dsl.maven
 
+/**
+ * Configures a maven repository with basic authentication.
+ */
 public fun RepositoryHandler.reposiliteMaven(action: MavenArtifactRepository.() -> Unit = {}): MavenArtifactRepository {
     return maven {
-        action()
-
         authentication { // publishing doesn't work without this for some reason
             create<BasicAuthentication>("basic")
         }
+
+        action()
+    }
+}
+
+/**
+ * Configures a maven repository with basic authentication.
+ */
+public fun RepositoryHandler.reposiliteMaven(url: Any, action: MavenArtifactRepository.() -> Unit = {}): MavenArtifactRepository {
+    return maven(url) {
+        authentication { // publishing doesn't work without this for some reason
+            create<BasicAuthentication>("basic")
+        }
+
+        action()
     }
 }

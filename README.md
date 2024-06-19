@@ -4,6 +4,7 @@
     - [Using](#using)
     - [Features](#features)
         - [Default](#default)
+            - [Misc. Utilities](#misc-utilities)
         - [JVM plugins](#jvm-plugins)
         - [Java (`java` plugin)](#java-java-plugin)
         - [Kotlin (`org.jetbrains.kotlin.*`/`kotlin("jvm")` plugin)](#kotlin-orgjetbrainskotlinkotlinjvm-plugin)
@@ -142,38 +143,14 @@ nyx {
             // Uses MIT license
             useMIT()
 
-            // Uses Apache 1.1 license
-            useApachev11()
-
             // Uses Apache 2.0 license
             useApachev2()
-
-            // Uses ISC license
-            useISC()
-
-            // Uses BSD-0 license (has no url)
-            use0BSD()
-
-            // Uses BSD-1-Clause license
-            useBSD1Clause()
-
-            // Uses BSD-2-Clause license
-            useBSD2Clause()
 
             // Uses BSD-3-Clause license
             useBSD3Clause()
 
-            // Uses GPL 2.0
-            useGPLv2()
-
             // Uses GPL 3.0
             useGPLv3()
-
-            // Uses LGPL 2.0
-            useLGPLv2()
-
-            // Uses LGPL 2.1
-            useLGPLv21()
 
             // Uses LGPL 3.0
             useLGPLv3()
@@ -181,33 +158,86 @@ nyx {
             // Uses AGPL 3.0
             useAGPLv3()
 
-            // Uses MPL 1.0
-            useMPLv1()
-
-            // Uses MPL 1.1
-            useMPLv11()
-
             // Uses MPL 2.0
             useMPLv2()
 
-            // Uses EPL 1.0
-            useEPLv1()
-
-            // Uses EPL 2.0
-            useEPLv2()
-
-            // Uses Unlicense
-            useUnlicense()
-
-            // Uses CC0
-            useCC0()
-
-            // Uses WTFPL
-            useWTFPL()
+            // For a list of all available licenses please see NyxLicenseInfoExtension.kt
         }
     }
 }
 ```
+
+#### Misc. Utilities
+
+Some additional miscellaneous utilities are offered, specifically for adding/configuring repositories.
+
+They must be imported from the `ca.solostudios.nyx.util` package.
+
+##### Utilities for common repositories
+
+nyx contains several utility functions for adding common repositories:
+
+```kotlin
+import ca.solostudios.nyx.util.*
+
+repositories {
+    fabric() // Adds the fabric maven repository
+    quilt() // Adds the quilt maven repository
+    architectury() // Adds the architectury maven repository
+    neoforged() // Adds the neoforged maven repository
+    soloStudios() // Adds the solo-studios maven repository
+    soloStudiosSnapshots() // Adds the solo-studios snapshots maven repository
+    masaModding() // Adds masa's maven repository
+    shedaniel() // Adds Shedaniel's maven repository
+    blamejared() // Adds BlameJared's maven repository
+    terraformersMC() // Adds the TerraformersMC maven repository
+    codeMC() // Adds the CodeMC maven repository
+    wispForest() // Adds the wishforest maven repository
+    jamiesWhiteShirt() // Adds JamiesWhiteShirt's maven repository
+    curseMaven() // Adds the cursemaven maven repository
+    sonatypeSnapshots() // Adds the sonatype snapshots maven repository
+    modrinth() // Adds the modrinth maven repository
+    ladysnake() // Adds the ladysnake maven repository
+    parchment() // Adds the ParchmentMC maven repository
+    devOS() // Adds the devOS maven repository
+    devOSSnapshots() // Adds the devOS snapshots maven repository
+    sleepingTown() // Adds the sleeping.town maven repository
+    modMaven() // Adds the modmaven maven repository
+    tterrag() // Adds tterrag's maven repository
+}
+```
+
+##### Utilities for publishing to repositories
+
+nyx contains several utility functions for publishing to repositories:
+
+```kotlin
+import ca.solostudios.nyx.util.*
+
+nyx {
+    publishing {
+        repositories {
+            // Configures publication to a reposilite maven repository.
+            reposiliteMaven("https://maven.solo-studios.ca/releases/") {
+                name = "SoloStudios"
+                credentials(PasswordCredentials::class)
+            }
+            // this is equivalent to the following:
+            maven("https://maven.solo-studios.ca/releases/") {
+                name = "SoloStudios"
+                credentials(PasswordCredentials::class)
+
+                authentication {
+                    create<BasicAuthentication>("basic")
+                }
+            }
+        }
+    }
+}
+```
+
+Use the `reposiliteMaven` if you are publishing to a reposilite repository, as it is slightly more convenient.
+
 
 ### JVM plugins
 
