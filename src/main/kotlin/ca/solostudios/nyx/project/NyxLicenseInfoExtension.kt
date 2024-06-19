@@ -1,8 +1,8 @@
 /*
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
- * The file LicenseInfoExtension.kt is part of nyx
- * Last modified on 10-06-2024 03:21 p.m.
+ * The file NyxLicenseInfoExtension.kt is part of nyx
+ * Last modified on 19-06-2024 05:11 p.m.
  *
  * MIT License
  *
@@ -27,12 +27,12 @@
 
 package ca.solostudios.nyx.project
 
-import ca.solostudios.nyx.internal.HasProject
+import ca.solostudios.nyx.internal.InternalNyxExtension
 import ca.solostudios.nyx.internal.util.property
 import org.gradle.api.Project
 import org.gradle.api.provider.Property
 
-public open class NyxLicenseInfoExtension(override val project: Project) : HasProject {
+public class NyxLicenseInfoExtension(override val project: Project) : InternalNyxExtension {
     /**
      * The name for the selected license. Recommended to be the SPDX identifier.
      */
@@ -366,4 +366,6 @@ public open class NyxLicenseInfoExtension(override val project: Project) : HasPr
         name.set("CC-BY-ND-3.0")
         url.set("https://creativecommons.org/licenses/by-nd/3.0/")
     }
+
+    override fun configureProject() {}
 }

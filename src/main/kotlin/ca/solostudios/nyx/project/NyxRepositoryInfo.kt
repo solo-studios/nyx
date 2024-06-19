@@ -1,8 +1,8 @@
 /*
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
- * The file RepositoryInfo.kt is part of nyx
- * Last modified on 10-06-2024 03:21 p.m.
+ * The file NyxRepositoryInfo.kt is part of nyx
+ * Last modified on 19-06-2024 05:11 p.m.
  *
  * MIT License
  *
@@ -27,13 +27,13 @@
 
 package ca.solostudios.nyx.project
 
-import ca.solostudios.nyx.internal.HasProject
+import ca.solostudios.nyx.internal.InternalNyxExtension
 import ca.solostudios.nyx.internal.util.property
 import org.gradle.api.Project
 import org.gradle.api.provider.Property
 import org.gradle.kotlin.dsl.assign
 
-public open class NyxRepositoryInfo(override val project: Project) : HasProject {
+public class NyxRepositoryInfo(override val project: Project) : InternalNyxExtension {
     /**
      * The domain name of the website hosting the git repository.
      */
@@ -173,4 +173,6 @@ public open class NyxRepositoryInfo(override val project: Project) : HasProject 
         projectOwner = owner
         projectRepo = repo
     }
+
+    override fun configureProject() {}
 }

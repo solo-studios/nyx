@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxGithubReleaseExtension.kt is part of nyx
- * Last modified on 10-06-2024 03:24 p.m.
+ * Last modified on 19-06-2024 05:12 p.m.
  *
  * MIT License
  *
@@ -27,8 +27,7 @@
 
 package ca.solostudios.nyx.plugin.publish.release
 
-import ca.solostudios.nyx.internal.ConfiguresProject
-import ca.solostudios.nyx.internal.HasProject
+import ca.solostudios.nyx.internal.InternalNyxExtension
 import ca.solostudios.nyx.internal.util.fileCollection
 import ca.solostudios.nyx.internal.util.githubRelease
 import ca.solostudios.nyx.internal.util.property
@@ -42,7 +41,7 @@ import org.gradle.kotlin.dsl.assign
 public class NyxGithubReleaseExtension(
     override val project: Project,
     private val info: NyxProjectInfoExtension,
-) : ConfiguresProject, HasProject {
+) : InternalNyxExtension {
     /**
      * Whether to automatically generate the body for this release.
      * If `body` is specified, the body will be pre-pended to the automatically generated notes.
@@ -81,7 +80,7 @@ public class NyxGithubReleaseExtension(
     /**
      * If these artifacts can be uploaded to an existing release.
      */
-    public val allowUploadToExisting: Property<Boolean> = property()
+    public val uploadToExisting: Property<Boolean> = property()
 
     /**
      * If this is a dry run.
@@ -96,10 +95,57 @@ public class NyxGithubReleaseExtension(
     public val releaseAssets: ConfigurableFileCollection = fileCollection()
 
     /**
-     * Configures the release assets
+     * Enables release note generation.
+     *
+     * @see generateSequence
      */
-    public fun releaseAssets(action: Action<ConfigurableFileCollection>) {
-        action.execute(releaseAssets)
+    public fun withGenerateReleaseNotes() {
+        generateReleaseNotes = true
+    }
+
+    /**
+     * Enables draft releases.
+     *
+     * @see draft
+     */
+    public fun withDraft() {
+        draft = true
+    }
+
+    /**
+     * Enables prereleases.
+     *
+     * @see prerelease
+     */
+    public fun withPrerelease() {
+        prerelease = true
+    }
+
+    /**
+     * Enables overwriting existing releases.
+     *
+     * @see overwrite
+     */
+    public fun withOverwrite() {
+        overwrite = true
+    }
+
+    /**
+     * Enables uploading to existing releases.
+     *
+     * @see uploadToExisting
+     */
+    public fun withUploadToExisting() {
+        uploadToExisting = true
+    }
+
+    /**
+     * Enables dry run.
+     *
+     * @see dryRun
+     */
+    public fun withDryRun() {
+        dryRun = true
     }
 
     /**
@@ -107,6 +153,13 @@ public class NyxGithubReleaseExtension(
      */
     public fun releaseAssets(action: (ConfigurableFileCollection).() -> Unit) {
         releaseAssets.apply(action)
+    }
+
+    /**
+     * Configures the release assets
+     */
+    public fun releaseAssets(action: Action<ConfigurableFileCollection>) {
+        action.execute(releaseAssets)
     }
 
     override fun configureProject() {
@@ -125,6 +178,24 @@ public class NyxGithubReleaseExtension(
             targetCommitish = null
             releaseName = "v$version"
         }
+
+        if (generateReleaseNotes.isPresent)
+            githubRelease.generateReleaseNotes = generateReleaseNotes
+
+        if (draft.isPresent)
+            githubRelease.draft = draft
+
+        if (prerelease.isPresent)
+            githubRelease.prerelease = prerelease
+
+        if (overwrite.isPresent)
+            githubRelease.overwrite = overwrite
+
+        if (uploadToExisting.isPresent)
+            githubRelease.allowUploadToExisting = uploadToExisting
+
+        if (dryRun.isPresent)
+            githubRelease.dryRun = dryRun
 
         if (!releaseAssets.isEmpty)
             githubRelease.releaseAssets(releaseAssets)

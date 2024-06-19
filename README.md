@@ -219,14 +219,17 @@ nyx {
         // Enables/disabled the 'all warnings' feature for the java or kotlin compiler
         // Defaults to false
         allWarnings = true
+        withAllWarnings() // Alternative that sets it to true
 
         // Enables/disables the 'warnings as errors' feature for the java/kotlin compiler
         // Defaults to false
         warningsAsErrors = true
+        withWarningsAsErrors() // Alternative that sets it to true
 
         // Include the LICENSE file in any output jar files
         // Defaults to true
         distributeLicense = true
+        withDistributeLicense() // Alternative that sets it to true
 
         // The encoding used for compilation
         // Defaults to UTF-8
@@ -235,14 +238,17 @@ nyx {
         // Enables zip64 support for any output jars
         // Defaults to false
         zip64 = true
+        withZip64() // Alternative that sets it to true
 
         // If the `build` task should depend on all tasks of type `Jar`
         // Defaults to true
         buildDependsOnJar = true
+        withBuildDependsOnJar() // Alternative that sets it to true
 
         // If all java/kotlin compiler warnings should be suppressed
         // Defaults to false
         suppressWarnings = true
+        withSuppressWarnings() // Alternative that sets it to true
 
         // The jvm toolchain version to use
         // Note: this uses gradle toolchains: https://docs.gradle.org/current/userguide/toolchains.html
@@ -267,6 +273,7 @@ nyx {
         // This strips timestamps from all files in the resulting jar
         // Defaults to false
         reproducibleBuilds = true
+        withReproducibleBuilds() // Alternative that sets it to true
     }
 }
 ```
@@ -282,10 +289,12 @@ nyx {
             // Enables/disabled the 'all warnings' feature for the java compiler
             // Inherited from compile.allWarnings
             allWarnings = true
+            withAllWarnings() // Alternative that sets it to true
 
             // Enables/disables the 'warnings as errors' feature for the java compiler
             // Inherited from compile.warningsAsErrors
             warningsAsErrors = true
+            withWarningsAsErrors() // Alternative that sets it to true
 
             // The encoding used for compilation
             // Inherited from compile.encoding
@@ -294,6 +303,7 @@ nyx {
             // If all java compiler warnings should be suppressed
             // Inherited from compile.suppressWarnings
             suppressWarnings = true
+            withSuppressWarnings() // Alternative that sets it to true
 
             // The jvm toolchain version to use
             // Note: this uses gradle toolchains: https://docs.gradle.org/current/userguide/toolchains.html
@@ -356,16 +366,18 @@ nyx {
             // Option that tells the compiler if and how to report issues on all public API declarations without explicit visibility or return type.
             // Defaults to ExplicitApiMode.Disabled
             explicitApi = ExplicitApiMode.Strict
-            explicitApi() // alternative that sets the explicit api mode to strict
-            explicitApiWarning() // alternative that sets the explicit api mode to warning
+            withExplicitApi() // Alternative that sets the explicit api mode to strict
+            withExplicitApiWarning() // Alternative that sets the explicit api mode to warning
 
             // Enables/disables the 'warnings as errors' feature for the kotlin compiler
             // Inherited from compile.warningsAsErrors
             warningsAsErrors = true
+            withWarningsAsErrors() // Alternative that sets it to true
 
             // If all kotlin compiler warnings should be suppressed
             // Inherited from compile.suppressWarnings
             suppressWarnings = true
+            withSuppressWarnings() // Alternative that sets it to true
 
             // The jvm toolchain version to use
             // Note: this uses gradle toolchains: https://docs.gradle.org/current/userguide/toolchains.html
@@ -431,10 +443,12 @@ nyx {
         // Enabling this will apply the `maven-publish` plugin and the `signing` plugins
         // Defaults to false
         publish = true
+        withPublish() // Alternative that sets it to true
 
         // Enables/disables the `publish` task depending on the `sign` task
         // Defaults to true
         publishDependsOnSign = true
+        withPublishDependsOnSign() // Alternative that sets it to true
 
         // Allows in-memory PGP keys to be used. This is useful for CI.
         // Using the gradle properties
@@ -446,10 +460,11 @@ nyx {
         // - on the command line using -PsigningKey="..." -PsigningKeyId="..." -PsigningPassword="..." (not recommended)
         // - by adding them to your `gradle.properties` in either $GRADLE_USER_HOME or the project directory
         // - by adding them as environment variables using the syntax `ORG_GRADLE_PROJECT_${variable name}`
-        allowInMemoryPgpKeys = true
+        inMemoryPgpKeys = true
+        withAllowInMemoryPgpKeys() // Alternative that sets it to true
 
         // This will set publish, publishDependsOnSign, and allowInMemoryPgpKeys all to true
-        configurePublications()
+        withSignedPublishing()
 
         // This is where you configure the repositories you're publishing to.
         // It is configured exactly the same as if you were using the normal publishing block
@@ -497,24 +512,30 @@ nyx {
         github {
             // Enables/disables the generation of release notes
             generateReleaseNotes = true
+            withGenerateReleaseNotes() // Alternative that sets it to true
 
             // The text describing the tag for the release
             body = file("CHANGELOG").readText()
 
             // Enables/disables the draft setting for a release
             draft = true
+            withDraft() // Alternative that sets it to true
 
             // Enables/disables the prerelease setting for a release
             prerelease = true
+            withPrerelease() // Alternative that sets it to true
 
             // Enables/disables overwriting an existing release
             overwrite = true
+            withOverwrite() // Alternative that sets it to true
 
             // Enables/disables uploading artifacts to an existing release
-            allowUploadToExisting = true
+            uploadToExisting = true
+            withUploadToExisting() // Alternative that sets it to true
 
             // Enables the dry-run setting, which will not publish the release to github
             dryRun = true
+            withDryRun() // Alternative that sets it to true
 
             // A file collection of all the release assets
             // using the from method to use the outputs of the jar task as the inputs for this
@@ -561,44 +582,44 @@ nyx {
         // Enables/disables interface injection
         // See loom docs for more information
         interfaceInjection = true
-        interfaceInjection() // Alternative that sets it to true
+        withInterfaceInjection() // Alternative that sets it to true
 
         // Enables/disables transitive access wideners
         // See loom docs for more information
         transitiveAccessWideners = true
-        transitiveAccessWideners() // Alternative that sets it to true
+        withTransitiveAccessWideners() // Alternative that sets it to true
 
         // Enables/disables mod-provided javadoc
         // See loom docs for more information
         modProvidedJavadoc = true
-        modProvidedJavadoc() // Alternative that sets it to true
+        withModProvidedJavadoc() // Alternative that sets it to true
 
         // Enables/disables runtime-only log4j
         // See loom docs for more information
         runtimeOnlyLog4j = true
-        runtimeOnlyLog4j() // Alternative that sets it to true
+        withRuntimeOnlyLog4j() // Alternative that sets it to true
 
         // Enables/disables split mod dependencies
         splitModDependencies = true
-        splitModDependencies() // Alternative that sets it to true
+        withSplitModDependencies() // Alternative that sets it to true
 
         // Enables/disables split environment sourcesets
         // See loom docs for more information
         splitEnvironmentalSourceSet = true
-        splitEnvironmentalSourceSet() // Alternative that sets it to true
+        withSplitEnvironmentalSourceSet() // Alternative that sets it to true
 
         // Enables/disables generation of only the minecraft server jar
         // See loom docs for more information
         serverOnlyMinecraftJar = true
-        serverOnlyMinecraftJar() // Alternative that sets it to true
+        withServerOnlyMinecraftJar() // Alternative that sets it to true
 
         // Enables/disables generation of only the minecraft client jar
         // See loom docs for more information
         clientOnlyMinecraftJar = true
-        clientOnlyMinecraftJar() // Alternative that sets it to true
+        withClientOnlyMinecraftJar() // Alternative that sets it to true
 
         // Enables data generation with default configuration
-        configureDataGeneration()
+        withDataGeneration()
         // Configures data generation
         configureDataGeneration {
             // See the loom docs for more information
@@ -669,47 +690,48 @@ nyx {
             // If you have just added this plugin and had previously generated run configurations, delete them so they can be re-created
             // Sets the mixin.hotSwap jvm property
             // Defaults to true
-            hotswapMixins = true
-            hotswapMixins() // Alternative that sets it to true
+            hotswap = true
+            withHotswap() // Alternative that sets it to true
 
             // Enables/disables *ALL* mixin debug features. this includes mixin.debug.verify
             // Note: enabling this can sometimes cause issues with other mods' mixins
             // Sets the mixin.debug jvm property
             // Defaults to false
             debug = true
-            debugMixins() // Alternative that sets it to true
+            withDebug() // Alternative that sets it to true
 
             // Enables/disables mixin verbose logging
             // Sets the mixin.debug.verbose jvm property
             // Defaults to true
             verbose = true
-            verboseMixins() // Alternative that sets it to true
+            withVerbose() // Alternative that sets it to true
 
             // Enables/disables dumping the target class on failures
             // Sets the mixin.dumpTargetOnFailure jvm property
             // Defaults to true
             dumpTargetOnFailure = true
-            dumpTargetMixinsOnFailure() // Alternative that sets it to true
+            withDumpTargetOnFailure() // Alternative that sets it to true
 
             // Enables/disables mixin checks
             // Note: enabling this can sometimes cause issues with other mods' mixins.
             // Sets the mixin.checks jvm property
             // Defaults to false
             checks = true
-            checkMixins() // Alternative that sets it to true
+            withChecks() // Alternative that sets it to true
 
             // Enables/disables mixin debug verification
             // Note: enabling this can sometimes cause issues with other mods' mixins
             // Sets the mixin.debug.verify jvm property
             // Defaults to false
             verify = true
-            verifyMixins() // Alternative that sets it to true
+            withVerify() // Alternative that sets it to true
 
             // Enables/disables exporting the mixins after they have been applied
             // This will export the classes in the `.mixin.out` dir under the run directory
+            // This sets the mixin.debug.export jvm property
             // Defaults to true
             export = true
-            exportMixins() // Alternative that sets it to true
+            withExports() // Alternative that sets it to true
 
             // Selects the mixin config file to use
             // This is relative to `src/main/resources/`
@@ -774,15 +796,15 @@ nyx {
 
             // If the modrinth task should fail silently
             failSilently = false
-            failSilently() // Alternative that sets it to true
+            withFailSilently() // Alternative that sets it to true
 
             // Enables/disables the detection of loaders
             detectLoaders = true
-            detectLoaders() // Alternative that sets it to true
+            withDetectLoaders() // Alternative that sets it to true
 
             // Enables/disables automatically adding the `dependsOn` information for upload files
             autoAddDependsOn = true
-            autoAddDependsOn() // Alternative that sets it to true
+            withAutoAddDependsOn() // Alternative that sets it to true
 
             // Configures the dependencies
             dependencies {

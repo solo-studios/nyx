@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxMinotaurExtension.kt is part of nyx
- * Last modified on 19-06-2024 03:39 p.m.
+ * Last modified on 19-06-2024 05:07 p.m.
  *
  * MIT License
  *
@@ -66,53 +66,108 @@ public class NyxMinotaurExtension(
      */
     public val changelog: Property<String> = property()
 
+    /**
+     * The updated body for the mod's page.
+     */
     public val syncBody: Property<String> = property()
 
     /**
-     * The project version type
+     * The project version type.
      */
     public val versionType: Property<VersionType> = property()
 
+    /**
+     * The file to upload.
+     */
     public val file: RegularFileProperty = fileProperty()
 
+    /**
+     * Any additional files to upload.
+     */
     public val additionalFiles: ConfigurableFileCollection = fileCollection()
 
+    /**
+     * All supported game versions.
+     */
     public val gameVersions: ListProperty<String> = listProperty()
 
+    /**
+     * All supported loaders.
+     */
     public val loaders: ListProperty<String> = listProperty()
 
+    /**
+     * If failures should be silent.
+     */
     public val failSilently: Property<Boolean> = property()
 
+    /**
+     * If minotaur should attempt to detect which loaders a mod supports.
+     */
     public val detectLoaders: Property<Boolean> = property()
 
+    /**
+     * If minotaur should automatically adding the `dependsOn` information for upload files.
+     */
     public val autoAddDependsOn: Property<Boolean> = property()
 
+    /**
+     * Configures any additional files.
+     *
+     * @see additionalFiles
+     */
     public fun additionalFiles(action: ConfigurableFileCollection.() -> Unit) {
         additionalFiles.apply(action)
     }
 
+    /**
+     * Configures any additional files.
+     *
+     * @see additionalFiles
+     */
     public fun additionalFiles(action: Action<ConfigurableFileCollection>) {
         action.execute(additionalFiles)
     }
 
-    public fun failSilently() {
+    /**
+     * Enables silent failures.
+     *
+     * @see failSilently
+     */
+    public fun withFailSilently() {
         failSilently = true
     }
 
-    public fun detectLoaders() {
+    /**
+     * Enables detecting supported loaders.
+     *
+     * @see detectLoaders
+     */
+    public fun withDetectLoaders() {
         detectLoaders = true
     }
 
-    public fun autoAddDependsOn() {
+    /**
+     * Enables automatically adding the `dependsOn` information for upload files.
+     *
+     * @see autoAddDependsOn
+     */
+    public fun withAutoAddDependsOn() {
         autoAddDependsOn = true
     }
 
-    public fun dependencies(action: Action<DependenciesDsl>) {
-        dependencies { action.execute(this) }
-    }
-
+    /**
+     * Configures the dependencies for the modrinth release.
+     */
     public fun dependencies(dsl: DependenciesDsl.() -> Unit) {
         DependenciesDsl(project).apply(dsl)
+    }
+
+    /**
+     * Configures the dependencies for the modrinth release.
+     */
+    public fun dependencies(action: Action<DependenciesDsl>) {
+        dependencies { action.execute(this) }
     }
 
     override fun configureProject() {

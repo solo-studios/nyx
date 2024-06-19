@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file GradlePropertyUtil.kt is part of nyx
- * Last modified on 10-06-2024 03:21 p.m.
+ * Last modified on 19-06-2024 05:12 p.m.
  *
  * MIT License
  *
@@ -27,7 +27,7 @@
 
 package ca.solostudios.nyx.internal.util
 
-import ca.solostudios.nyx.internal.HasProject
+import ca.solostudios.nyx.internal.InternalNyxExtension
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileCollection
@@ -46,35 +46,35 @@ import org.gradle.kotlin.dsl.setProperty
 internal fun <T> Property<T>.convention(project: Project, provider: () -> T): Property<T> = convention(project.provider(provider))
 
 internal inline fun <reified T> Project.property(): Property<T> = objects.property()
-internal inline fun <reified T> HasProject.property(): Property<T> = project.objects.property()
+internal inline fun <reified T> InternalNyxExtension.property(): Property<T> = project.objects.property()
 internal inline fun <reified T> DefaultTask.property(): Property<T> = project.objects.property()
 
 internal inline fun <reified T> Project.setProperty(): SetProperty<T> = objects.setProperty()
-internal inline fun <reified T> HasProject.setProperty(): SetProperty<T> = project.objects.setProperty()
+internal inline fun <reified T> InternalNyxExtension.setProperty(): SetProperty<T> = project.objects.setProperty()
 internal inline fun <reified T> DefaultTask.setProperty(): SetProperty<T> = project.objects.setProperty()
 
 internal inline fun <reified T> Project.listProperty(): ListProperty<T> = objects.listProperty()
-internal inline fun <reified T> HasProject.listProperty(): ListProperty<T> = project.objects.listProperty()
+internal inline fun <reified T> InternalNyxExtension.listProperty(): ListProperty<T> = project.objects.listProperty()
 internal inline fun <reified T> DefaultTask.listProperty(): ListProperty<T> = project.objects.listProperty()
 
 internal inline fun <reified K, reified V> Project.mapProperty(): MapProperty<K, V> = objects.mapProperty()
-internal inline fun <reified K, reified V> HasProject.mapProperty(): MapProperty<K, V> = project.objects.mapProperty()
+internal inline fun <reified K, reified V> InternalNyxExtension.mapProperty(): MapProperty<K, V> = project.objects.mapProperty()
 internal inline fun <reified K, reified V> DefaultTask.mapProperty(): MapProperty<K, V> = project.objects.mapProperty()
 
 internal fun Project.directoryProperty(): DirectoryProperty = objects.directoryProperty()
-internal fun HasProject.directoryProperty(): DirectoryProperty = project.objects.directoryProperty()
+internal fun InternalNyxExtension.directoryProperty(): DirectoryProperty = project.objects.directoryProperty()
 internal fun DefaultTask.directoryProperty(): DirectoryProperty = project.objects.directoryProperty()
 
 internal fun Project.fileProperty(): RegularFileProperty = objects.fileProperty()
-internal fun HasProject.fileProperty(): RegularFileProperty = project.objects.fileProperty()
+internal fun InternalNyxExtension.fileProperty(): RegularFileProperty = project.objects.fileProperty()
 internal fun DefaultTask.fileProperty(): RegularFileProperty = project.objects.fileProperty()
 
 internal fun Project.fileCollection(): ConfigurableFileCollection = objects.fileCollection()
-internal fun HasProject.fileCollection(): ConfigurableFileCollection = project.objects.fileCollection()
+internal fun InternalNyxExtension.fileCollection(): ConfigurableFileCollection = project.objects.fileCollection()
 internal fun DefaultTask.fileCollection(): ConfigurableFileCollection = project.objects.fileCollection()
 
 internal fun Project.fileTree(): ConfigurableFileTree = objects.fileTree()
-internal fun HasProject.fileTree(): ConfigurableFileTree = project.objects.fileTree()
+internal fun InternalNyxExtension.fileTree(): ConfigurableFileTree = project.objects.fileTree()
 internal fun DefaultTask.fileTree(): ConfigurableFileTree = project.objects.fileTree()
 
 internal fun Property<String>.orEmpty(): String = getOrElse("")

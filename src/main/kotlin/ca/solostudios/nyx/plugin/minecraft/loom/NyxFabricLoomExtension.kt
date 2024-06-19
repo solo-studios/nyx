@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxFabricLoomExtension.kt is part of nyx
- * Last modified on 19-06-2024 03:09 p.m.
+ * Last modified on 19-06-2024 04:44 p.m.
  *
  * MIT License
  *
@@ -37,6 +37,8 @@ import ca.solostudios.nyx.internal.util.publishing
 import ca.solostudios.nyx.internal.util.sourceSets
 import ca.solostudios.nyx.internal.util.tasks
 import ca.solostudios.nyx.plugin.minecraft.AbstractMinecraftExtension
+import net.fabricmc.loom.api.InterfaceInjectionExtensionAPI
+import net.fabricmc.loom.api.LoomGradleExtensionAPI
 import net.fabricmc.loom.api.ModSettings
 import net.fabricmc.loom.api.decompilers.DecompilerOptions
 import net.fabricmc.loom.configuration.FabricApiExtension
@@ -63,101 +65,242 @@ public class NyxFabricLoomExtension(
 ) : AbstractMinecraftExtension(project) {
     private val logger by getLogger()
 
+    /**
+     * The configured loom decompilers.
+     *
+     * @see LoomGradleExtensionAPI.getDecompilerOptions
+     */
     public val decompilers: NamedDomainObjectContainer<DecompilerOptions>
         get() = loom.decompilerOptions
 
+    /**
+     * The configured loom runs.
+     *
+     * @see LoomGradleExtensionAPI.getRuns
+     */
     public val runs: NamedDomainObjectContainer<RunConfigSettings>
         get() = loom.runs
 
+    /**
+     * The configured mods.
+     *
+     * @see LoomGradleExtensionAPI.getMods
+     */
     public val mods: NamedDomainObjectContainer<ModSettings>
         get() = loom.mods
 
+    /**
+     * If interface injection is enabled.
+     *
+     * @see InterfaceInjectionExtensionAPI.getIsEnabled
+     */
     public val interfaceInjection: Property<Boolean> = property()
 
+    /**
+     * If transitive access wideners are enabled.
+     *
+     * @see LoomGradleExtensionAPI.getEnableTransitiveAccessWideners
+     */
     public val transitiveAccessWideners: Property<Boolean> = property()
 
+    /**
+     * If mod provided javadocs is enabled.
+     *
+     * @see LoomGradleExtensionAPI.getEnableModProvidedJavadoc
+     */
     public val modProvidedJavadoc: Property<Boolean> = property()
 
+    /**
+     * If runtime only log4j is enabled.
+     *
+     * @see LoomGradleExtensionAPI.getRuntimeOnlyLog4j
+     */
     public val runtimeOnlyLog4j: Property<Boolean> = property()
 
+    /**
+     * If splitting mod dependencies is enabled.
+     *
+     * @see LoomGradleExtensionAPI.getSplitModDependencies
+     */
     public val splitModDependencies: Property<Boolean> = property()
 
+    /**
+     * If split environment sourcesets is enabled.
+     *
+     * @see LoomGradleExtensionAPI.splitEnvironmentSourceSets
+     */
     public val splitEnvironmentalSourceSet: Property<Boolean> = property()
 
+    /**
+     * If the generation of only the minecraft server jar is enabled.
+     *
+     * @see LoomGradleExtensionAPI.serverOnlyMinecraftJar
+     */
     public val serverOnlyMinecraftJar: Property<Boolean> = property()
 
+    /**
+     * If the generation of only the minecraft client jar is enabled.
+     *
+     * @see LoomGradleExtensionAPI.clientOnlyMinecraftJar
+     */
     public val clientOnlyMinecraftJar: Property<Boolean> = property()
 
-    public fun interfaceInjection() {
+    /**
+     * Enables interface injection.
+     *
+     * @see interfaceInjection
+     */
+    public fun withInterfaceInjection() {
         interfaceInjection = true
     }
 
-    public fun transitiveAccessWideners() {
+    /**
+     * Enables transitive access wideners.
+     *
+     * @see transitiveAccessWideners
+     */
+    public fun withTransitiveAccessWideners() {
         transitiveAccessWideners = true
     }
 
-    public fun modProvidedJavadoc() {
+    /**
+     * Enables mod provided javadocs.
+     *
+     * @see modProvidedJavadoc
+     */
+    public fun withModProvidedJavadoc() {
         modProvidedJavadoc = true
     }
 
-    public fun runtimeOnlyLog4j() {
+    /**
+     * Enables runtime only log4j.
+     *
+     * @see runtimeOnlyLog4j
+     */
+    public fun withRuntimeOnlyLog4j() {
         runtimeOnlyLog4j = true
     }
 
-    public fun splitModDependencies() {
+    /**
+     * Enables split mod dependencies.
+     *
+     * @see splitModDependencies
+     */
+    public fun withSplitModDependencies() {
         splitModDependencies = true
     }
 
-    public fun splitEnvironmentalSourceSet() {
+    /**
+     * Enables split environment source sets.
+     *
+     * @see splitEnvironmentalSourceSet
+     */
+    public fun withSplitEnvironmentalSourceSet() {
         splitEnvironmentalSourceSet = true
     }
 
-    public fun serverOnlyMinecraftJar() {
+    /**
+     * Enables generation of only the minecraft server jar.
+     *
+     * @see serverOnlyMinecraftJar
+     */
+    public fun withServerOnlyMinecraftJar() {
         serverOnlyMinecraftJar = true
     }
 
-    public fun clientOnlyMinecraftJar() {
+    /**
+     * Enables generation of only the minecraft client jar.
+     *
+     * @see clientOnlyMinecraftJar
+     */
+    public fun withClientOnlyMinecraftJar() {
         clientOnlyMinecraftJar = true
     }
 
-    public fun configureDataGeneration() {
+    /**
+     * Enables data generation.
+     *
+     * @see configureDataGeneration
+     * @see FabricApiExtension.configureDataGeneration
+     */
+    public fun withDataGeneration() {
         fabricApi {
             configureDataGeneration()
         }
     }
 
+    /**
+     * Configures data generation.
+     *
+     * @see FabricApiExtension.configureDataGeneration
+     */
     public fun configureDataGeneration(action: FabricApiExtension.DataGenerationSettings.() -> Unit) {
         fabricApi {
             configureDataGeneration(action)
         }
     }
 
+    /**
+     * Configures data generation.
+     *
+     * @see FabricApiExtension.configureDataGeneration
+     */
     public fun configureDataGeneration(action: Action<FabricApiExtension.DataGenerationSettings>) {
         fabricApi {
             configureDataGeneration(action)
         }
     }
 
+    /**
+     * Configures the loom decompilers.
+     *
+     * @see LoomGradleExtensionAPI.decompilers
+     */
     public fun decompilers(action: NamedDomainObjectContainer<DecompilerOptions>.() -> Unit) {
         decompilers.apply(action)
     }
 
+    /**
+     * Configures the loom decompilers.
+     *
+     * @see LoomGradleExtensionAPI.decompilers
+     */
     public fun decompilers(action: Action<NamedDomainObjectContainer<DecompilerOptions>>) {
         action.execute(decompilers)
     }
 
+    /**
+     * Configures the loom runs
+     *
+     * @see LoomGradleExtensionAPI.runs
+     */
     public fun runs(action: NamedDomainObjectContainer<RunConfigSettings>.() -> Unit) {
         runs.apply(action)
     }
 
+    /**
+     * Configures the loom runs
+     *
+     * @see LoomGradleExtensionAPI.runs
+     */
     public fun runs(action: Action<NamedDomainObjectContainer<RunConfigSettings>>) {
         action.execute(runs)
     }
 
+    /**
+     * Configures the mods.
+     *
+     * @see LoomGradleExtensionAPI.mods
+     */
     public fun mods(action: NamedDomainObjectContainer<ModSettings>.() -> Unit) {
         mods.apply(action)
     }
 
+    /**
+     * Configures the mods.
+     *
+     * @see LoomGradleExtensionAPI.mods
+     */
     public fun mods(action: Action<NamedDomainObjectContainer<ModSettings>>) {
         action.execute(mods)
     }

@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file AbstractMinecraftExtension.kt is part of nyx
- * Last modified on 10-06-2024 03:21 p.m.
+ * Last modified on 19-06-2024 04:48 p.m.
  *
  * MIT License
  *
@@ -39,11 +39,20 @@ import org.gradle.api.provider.Property
 public abstract class AbstractMinecraftExtension(
     project: Project,
 ) : InternalNyxExtension {
+    /**
+     * The amount of memory to be allocated to minecraft.
+     */
     public val allocatedMemory: Property<Int> = project.property<Int>().convention(2)
 
+    /**
+     * Any additional jvm arguments to be used when launching minecraft.
+     */
     public val additionalJvmArgs: ListProperty<String> = project.listProperty<String>()
         .convention(listOf("-XX:+UseZGC"))
 
+    /**
+     * Any additional jvm properties to be used when launching minecraft.
+     */
     public val additionalJvmProperties: MapProperty<String, String> = project.mapProperty<String, String>()
         .convention(mapOf())
 

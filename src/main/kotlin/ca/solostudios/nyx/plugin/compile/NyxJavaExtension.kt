@@ -1,8 +1,8 @@
 /*
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
- * The file JavaExtension.kt is part of nyx
- * Last modified on 11-06-2024 05:31 p.m.
+ * The file NyxJavaExtension.kt is part of nyx
+ * Last modified on 19-06-2024 05:12 p.m.
  *
  * MIT License
  *
@@ -43,6 +43,7 @@ import org.gradle.api.java.archives.Manifest
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.compile.CompileOptions
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.javadoc.Javadoc
 import org.gradle.jvm.toolchain.JavaLanguageVersion
@@ -55,18 +56,25 @@ public class NyxJavaExtension(
     compile: NyxCompileExtension,
 ) : InternalNyxExtension {
     /**
-     * Enables all warnings
+     * If all warnings are enabled.
      *
      * @see NyxCompileExtension.allWarnings
      */
     public val allWarnings: Property<Boolean> = property<Boolean>().convention(compile.allWarnings)
 
     /**
-     * Enables all compilers to output warnings as errors.
+     * If compilers outputting warnings as errors is enabled.
      *
      * @see NyxCompileExtension.warningsAsErrors
      */
     public val warningsAsErrors: Property<Boolean> = property<Boolean>().convention(compile.warningsAsErrors)
+
+    /**
+     * If all warnings should be suppressed.
+     *
+     * @see NyxCompileExtension.suppressWarnings
+     */
+    public val suppressWarnings: Property<Boolean> = property<Boolean>().convention(compile.suppressWarnings)
 
     /**
      * The encoding to be used for all files.
@@ -76,13 +84,6 @@ public class NyxJavaExtension(
      * @see NyxCompileExtension.encoding
      */
     public val encoding: Property<String> = property<String>().convention(compile.encoding)
-
-    /**
-     * Suppresses all warnings
-     *
-     * @see NyxCompileExtension.suppressWarnings
-     */
-    public val suppressWarnings: Property<Boolean> = property<Boolean>().convention(compile.suppressWarnings)
 
     /**
      * The jvm toolchain release to use.
@@ -101,22 +102,72 @@ public class NyxJavaExtension(
     public val jvmTarget: Property<Int> = property<Int>().convention(compile.jvmTarget)
 
     /**
-     * Enables sources jar
+     * If the sources jar is enabled.
      *
      * @see JavaPluginExtension.withSourcesJar
-     * @see NyxCompileExtension.withSourcesJar
+     * @see NyxCompileExtension.sourcesJar
      */
-    public val withSourcesJar: Property<Boolean> = property<Boolean>().convention(compile.withSourcesJar)
+    public val sourcesJar: Property<Boolean> = property<Boolean>().convention(compile.sourcesJar)
 
     /**
-     * Enables javadoc jar
+     * If the javadoc jar is enabled.
      *
      * @see JavaPluginExtension.withJavadocJar
-     * @see NyxCompileExtension.withJavadocJar
+     * @see NyxCompileExtension.javadocJar
      */
-    public val withJavadocJar: Property<Boolean> = property<Boolean>().convention(compile.withJavadocJar)
+    public val javadocJar: Property<Boolean> = property<Boolean>().convention(compile.javadocJar)
 
+    /**
+     * A list of arguments to pass to the compiler.
+     *
+     * @see CompileOptions.compilerArgs
+     */
     public val compilerArgs: ListProperty<String> = listProperty()
+
+    /**
+     * Enables all warnings
+     *
+     * @see allWarnings
+     */
+    public fun withAllWarnings() {
+        allWarnings = true
+    }
+
+    /**
+     * Enables warnings as errors
+     *
+     * @see warningsAsErrors
+     */
+    public fun withWarningsAsErrors() {
+        warningsAsErrors = true
+    }
+
+    /**
+     * Enables suppressing warnings
+     *
+     * @see suppressWarnings
+     */
+    public fun withSuppressWarnings() {
+        suppressWarnings = true
+    }
+
+    /**
+     * Enables the sources jar
+     *
+     * @see sourcesJar
+     */
+    public fun withSourcesJar() {
+        sourcesJar = true
+    }
+
+    /**
+     * Enables the javadoc jar
+     *
+     * @see javadocJar
+     */
+    public fun withJavadocJar() {
+        javadocJar = true
+    }
 
     /**
      * Configures the manifest used in the resulting jar file(s)
@@ -154,10 +205,10 @@ public class NyxJavaExtension(
                 sourceCompatibility = JavaVersion.toVersion(jvmTarget.get())
             }
 
-            if (withSourcesJar.isTrue)
+            if (sourcesJar.isTrue)
                 withSourcesJar()
 
-            if (withJavadocJar.isTrue)
+            if (javadocJar.isTrue)
                 withJavadocJar()
         }
 

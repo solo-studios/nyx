@@ -1,8 +1,8 @@
 /*
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
- * The file ProjectInfoExtension.kt is part of nyx
- * Last modified on 10-06-2024 03:21 p.m.
+ * The file NyxProjectInfoExtension.kt is part of nyx
+ * Last modified on 19-06-2024 05:12 p.m.
  *
  * MIT License
  *
@@ -27,8 +27,7 @@
 
 package ca.solostudios.nyx.project
 
-import ca.solostudios.nyx.internal.ConfiguresProject
-import ca.solostudios.nyx.internal.HasProject
+import ca.solostudios.nyx.internal.InternalNyxExtension
 import ca.solostudios.nyx.internal.util.convention
 import ca.solostudios.nyx.internal.util.formatAsName
 import ca.solostudios.nyx.internal.util.listProperty
@@ -45,7 +44,7 @@ import org.gradle.api.tasks.bundling.AbstractArchiveTask
 import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.withType
 
-public class NyxProjectInfoExtension(override val project: Project) : ConfiguresProject, HasProject {
+public class NyxProjectInfoExtension(override val project: Project) : InternalNyxExtension {
     /**
      * The name of the project to be used when publishing.
      *

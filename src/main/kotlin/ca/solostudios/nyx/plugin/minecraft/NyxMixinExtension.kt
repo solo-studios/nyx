@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxMixinExtension.kt is part of nyx
- * Last modified on 19-06-2024 03:04 p.m.
+ * Last modified on 19-06-2024 04:58 p.m.
  *
  * MIT License
  *
@@ -40,48 +40,146 @@ public class NyxMixinExtension(
     override val project: Project,
     private val minecraftExtension: AbstractMinecraftExtension,
 ) : InternalNyxExtension {
+    /**
+     * If hotswapping mixins should be enabled.
+     *
+     * Note: this will also find the first net.fabricmc:sponge-mixin artifact on the runtime classpath and add it as a java agent
+     *
+     * If you have just added this plugin and had previously generated run configurations, delete them so they can be re-created.
+     *
+     * This sets the `mixin.hotSwap` jvm property.
+     */
     public val hotswap: Property<Boolean> = property<Boolean>().convention(true)
+
+    /**
+     * If *ALL* mixin debug features should be enabled.
+     * This includes `mixin.debug.verify`.
+     *
+     * Note: enabling this can sometimes cause issues with other mods' mixins.
+     *
+     * This sets the `mixin.debug` jvm property.
+     */
     public val debug: Property<Boolean> = property<Boolean>().convention(false)
+
+    /**
+     * If mixin verbose logging should be enabled.
+     *
+     * This sets the `mixin.debug.verbose` jvm property.
+     */
     public val verbose: Property<Boolean> = property<Boolean>().convention(true)
+
+    /**
+     * If dumping the target class on failures should be enabled.
+     *
+     * This sets the `mixin.dumpTargetOnFailure` jvm property
+     */
     public val dumpTargetOnFailure: Property<Boolean> = property<Boolean>().convention(true)
+
+    /**
+     * If mixin checks should be enabled.
+     *
+     * Note: enabling this can sometimes cause issues with other mods' mixins.
+     *
+     * This sets the `mixin.checks` jvm property.
+     */
     public val checks: Property<Boolean> = property<Boolean>().convention(false)
+
+    /**
+     * If mixin debug verification should be enabled.
+     *
+     * Note: enabling this can sometimes cause issues with other mods' mixins.
+     *
+     * This sets the `mixin.debug.verify` jvm property
+     */
     public val verify: Property<Boolean> = property<Boolean>().convention(false)
+
+    /**
+     * If exporting the mixins after they have been applied should be enabled.
+     *
+     * This will export the classes in the `.mixin.out` dir under the run directory
+     *
+     * This sets the `mixin.debug.export` jvm property.
+     */
     public val export: Property<Boolean> = property<Boolean>().convention(true)
 
-    public fun hotswapMixins() {
+    /**
+     * Enables mixin hotswapping.
+     *
+     * @see hotswap
+     */
+    public fun withHotswap() {
         hotswap = true
     }
 
-    public fun debugMixins() {
+    /**
+     * Enables mixin debugging.
+     *
+     * @see debug
+     */
+    public fun withDebug() {
         debug = true
     }
 
-    public fun verboseMixins() {
+    /**
+     * Enables verbose mixins.
+     *
+     * @see verbose
+     */
+    public fun withVerbose() {
         verbose = true
     }
 
-    public fun dumpTargetMixinOnFailure() {
+    /**
+     * Enables dumping target classes on failure.
+     *
+     * @see dumpTargetOnFailure
+     */
+    public fun withDumpTargetOnFailure() {
         dumpTargetOnFailure = true
     }
 
-    public fun checkMixins() {
+    /**
+     * Enables mixin checks.
+     *
+     * @see checks
+     */
+    public fun withChecks() {
         checks = true
     }
 
-    public fun verifyMixins() {
+    /**
+     * Enables mixin debug verification.
+     *
+     * @see verify
+     */
+    public fun withVerify() {
         verify = true
     }
 
-    public fun exportMixins() {
+    /**
+     * Enables mixin exporting.
+     *
+     * @see export
+     */
+    public fun withExport() {
         export = true
     }
 
+    /**
+     * Selects the file name for the mixin config.
+     *
+     * This file is relative to `src/main/resources/`.
+     *
+     * This ONLY applies to forge.
+     */
     public fun mixinConfig(name: String) {
         minecraftExtension.addMixinConfig(name)
     }
 
     /**
      * Sets the mixin default refmap name to `mixins/`[name]`/refmap.json`.
+     *
+     * This ONLY applies to fabric.
      *
      * @param name The directory used for the refmap, defaults to `project.name`.
      */

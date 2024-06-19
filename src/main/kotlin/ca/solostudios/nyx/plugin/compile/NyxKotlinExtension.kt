@@ -1,8 +1,8 @@
 /*
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
- * The file KotlinExtension.kt is part of nyx
- * Last modified on 10-06-2024 03:21 p.m.
+ * The file NyxKotlinExtension.kt is part of nyx
+ * Last modified on 19-06-2024 04:33 p.m.
  *
  * MIT License
  *
@@ -42,6 +42,7 @@ import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.provideDelegate
 import org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode
 import org.jetbrains.kotlin.gradle.dsl.KotlinCommonCompilerOptions
+import org.jetbrains.kotlin.gradle.dsl.KotlinCommonCompilerToolOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinCommonOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
@@ -88,14 +89,14 @@ public class NyxKotlinExtension(
     public val explicitApi: Property<ExplicitApiMode> = property()
 
     /**
-     * Enables all compilers to output warnings as errors.
+     * If compilers outputting warnings as errors is enabled.
      *
      * @see NyxCompileExtension.warningsAsErrors
      */
     public val warningsAsErrors: Property<Boolean> = property<Boolean>().convention(compile.warningsAsErrors)
 
     /**
-     * Suppresses all warnings
+     * If all warnings should be suppressed.
      *
      * @see NyxCompileExtension.suppressWarnings
      */
@@ -118,43 +119,86 @@ public class NyxKotlinExtension(
     public val jvmTarget: Property<Int> = property<Int>().convention(compile.jvmTarget)
 
     /**
-     * Enables sources jar
+     * If the sources jar is enabled.
      *
      * @see JavaPluginExtension.withSourcesJar
-     * @see NyxCompileExtension.withSourcesJar
+     * @see NyxCompileExtension.sourcesJar
      */
-    public val withSourcesJar: Property<Boolean> = property<Boolean>().convention(compile.withSourcesJar)
+    public val sourcesJar: Property<Boolean> = property<Boolean>().convention(compile.sourcesJar)
 
     /**
-     * Enables javadoc jar
+     * If the javadoc jar is enabled.
+     *
+     * Requires dokka.
      *
      * @see JavaPluginExtension.withJavadocJar
-     * @see NyxCompileExtension.withJavadocJar
+     * @see NyxCompileExtension.javadocJar
      */
-    public val withJavadocJar: Property<Boolean> = property<Boolean>().convention(compile.withJavadocJar)
+    public val javadocJar: Property<Boolean> = property<Boolean>().convention(compile.javadocJar)
 
+    /**
+     * A list of arguments to pass to the compiler.
+     *
+     * @see KotlinCommonCompilerToolOptions.freeCompilerArgs
+     */
     public val compilerArgs: ListProperty<String> = listProperty()
 
     /**
-     * Enables the strict explicit api mode
+     * Enables the strict explicit api mode.
      *
      * @see KotlinTopLevelExtension.explicitApi
      */
-    public fun explicitApi() {
+    public fun withExplicitApi() {
         explicitApi = ExplicitApiMode.Strict
     }
 
     /**
-     * Enables the warning explicit api mode
+     * Enables the warning explicit api mode.
      *
      * @see KotlinTopLevelExtension.explicitApiWarning
      */
-    public fun explicitApiWarning() {
+    public fun withExplicitApiWarning() {
         explicitApi = ExplicitApiMode.Warning
     }
 
+    /**
+     * Enables warnings as errors.
+     *
+     * @see warningsAsErrors
+     */
+    public fun withWarningsAsErrors() {
+        warningsAsErrors = true
+    }
+
+    /**
+     * Enables suppressing warnings.
+     *
+     * @see suppressWarnings
+     */
+    public fun withSuppressWarnings() {
+        suppressWarnings = true
+    }
+
+    /**
+     * Enables the sources jar.
+     *
+     * @see sourcesJar
+     */
+    public fun withSourcesJar() {
+        sourcesJar = true
+    }
+
+    /**
+     * Enables the javadoc jar.
+     *
+     * @see javadocJar
+     */
+    public fun withJavadocJar() {
+        javadocJar = true
+    }
+
     override fun configureProject() {
-        if (withJavadocJar.isTrue) {
+        if (javadocJar.isTrue) {
             if (!project.plugins.hasPlugin("org.jetbrains.dokka")) {
                 // Project does not have dokka plugin. do not attempt to configure it.
                 logger.error(IllegalStateException()) {
@@ -193,7 +237,7 @@ public class NyxKotlinExtension(
                 }
 
                 is KotlinMultiplatformExtension -> {
-                    if (withSourcesJar.isTrue)
+                    if (sourcesJar.isTrue)
                         withSourcesJar(publish = true)
 
                     targets.configureEach {

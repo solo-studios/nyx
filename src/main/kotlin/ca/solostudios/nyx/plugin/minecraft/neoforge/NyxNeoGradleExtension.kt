@@ -1,8 +1,8 @@
 /*
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
- * The file NeoGradleExtension.kt is part of nyx
- * Last modified on 11-06-2024 05:30 p.m.
+ * The file NyxNeoGradleExtension.kt is part of nyx
+ * Last modified on 19-06-2024 04:47 p.m.
  *
  * MIT License
  *
@@ -34,7 +34,9 @@ import ca.solostudios.nyx.internal.util.nyx
 import ca.solostudios.nyx.plugin.minecraft.AbstractMinecraftExtension
 import net.neoforged.gradle.dsl.common.extensions.AccessTransformers
 import net.neoforged.gradle.dsl.common.extensions.Mappings
+import net.neoforged.gradle.dsl.common.extensions.Minecraft
 import net.neoforged.gradle.dsl.common.runtime.naming.NamingChannel
+import org.gradle.api.Action
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.api.plugins.ExtensionAware
@@ -44,30 +46,79 @@ import org.gradle.api.provider.Property
 public class NyxNeoGradleExtension(
     override val project: Project,
 ) : AbstractMinecraftExtension(project) {
+    /**
+     * The mod's identifier.
+     *
+     * @see Minecraft.getModIdentifier
+     */
     public val modIdentifier: Property<String>
         get() = neoMinecraft.modIdentifier
 
+    /**
+     * The naming channels.
+     *
+     * @see Minecraft.getNamingChannels
+     */
     public val namingChannels: NamedDomainObjectContainer<NamingChannel>
         get() = neoMinecraft.namingChannels
 
+    /**
+     * The mappings.
+     *
+     * @see Minecraft.getMappings
+     */
     public val mappings: Mappings
         get() = neoMinecraft.mappings
 
+    /**
+     * The access transformers.
+     *
+     * @see Minecraft.getAccessTransformers
+     */
     public val accessTransformers: AccessTransformers
         get() = neoMinecraft.accessTransformers
 
+    /**
+     * Configures the naming channels.
+     *
+     * @see Minecraft.namingChannels
+     */
     public fun namingChannels(block: NamedDomainObjectContainer<NamingChannel>.() -> Unit) {
         neoMinecraft.namingChannels.apply(block)
     }
 
-    public fun namingChannel(name: String, block: NamingChannel.() -> Unit) {
-        neoMinecraft.namingChannel(name, block)
+    /**
+     * Configures a specific naming channel.
+     *
+     * @see Minecraft.namingChannel
+     */
+    public fun namingChannel(name: String, action: NamingChannel.() -> Unit) {
+        neoMinecraft.namingChannel(name, action)
     }
 
+    /**
+     * Configures a specific naming channel.
+     *
+     * @see Minecraft.namingChannel
+     */
+    public fun namingChannel(name: String, action: Action<NamingChannel>) {
+        neoMinecraft.namingChannel(name, action)
+    }
+
+    /**
+     * Configures the mappings
+     *
+     * @see Minecraft.mappings
+     */
     public fun mappings(block: Mappings.() -> Unit) {
         neoMinecraft.mappings(block)
     }
 
+    /**
+     * Configures the access transformers
+     *
+     * @see Minecraft.accessTransformers
+     */
     public fun accessTransformers(block: AccessTransformers.() -> Unit) {
         neoMinecraft.accessTransformers(block)
     }

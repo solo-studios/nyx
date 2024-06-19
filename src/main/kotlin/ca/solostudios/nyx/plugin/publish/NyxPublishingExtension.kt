@@ -1,8 +1,8 @@
 /*
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
- * The file PublishingExtension.kt is part of nyx
- * Last modified on 10-06-2024 03:24 p.m.
+ * The file NyxPublishingExtension.kt is part of nyx
+ * Last modified on 19-06-2024 05:00 p.m.
  *
  * MIT License
  *
@@ -59,7 +59,7 @@ public class NyxPublishingExtension(
 ) : InternalNyxExtension {
 
     /**
-     * Enables publishing
+     * If publishing should be enabled.
      */
     public val publish: Property<Boolean> = property<Boolean>().convention(false)
 
@@ -69,7 +69,9 @@ public class NyxPublishingExtension(
     public val publishDependsOnSign: Property<Boolean> = property<Boolean>().convention(true)
 
     /**
-     * Allows for in-memory pgp keys to be used, via setting the following project properties:
+     * If in-memory pgp keys should be enabled.
+     *
+     * When in-memory pgp keys are used, you can set the following project properties:
      * - `signingKey`
      * - `signingKeyId`
      * - `signingPassword`
@@ -84,17 +86,44 @@ public class NyxPublishingExtension(
      * By default, this is located at `~/.gradle/gradle.properties` on Linux/MacOS,
      * and `%USERPROFILE%\.gradle\gradle.properties` on Windows.
      */
-    public val allowInMemoryPgpKeys: Property<Boolean> = property<Boolean>().convention(true)
+    public val inMemoryPgpKeys: Property<Boolean> = property<Boolean>().convention(true)
+
+    /**
+     * Enables publishing.
+     *
+     * @see publish
+     */
+    public fun withPublish() {
+        publish = true
+    }
+
+    /**
+     * Enables the `publish` task depending on the `sign` task.
+     *
+     * @see publishDependsOnSign
+     */
+    public fun withPublishDependsOnSign() {
+        publishDependsOnSign = true
+    }
+
+    /**
+     * Enables in-memory pgp keys.
+     *
+     * @see inMemoryPgpKeys
+     */
+    public fun withAllowInMemoryPgpKeys() {
+        inMemoryPgpKeys = true
+    }
 
     /**
      * - Makes publish tasks depend on the signing task
      * - Enables in-memory pgp keys
      * - Enables publishing
      */
-    public fun configurePublications() {
+    public fun withSignedPublishing() {
         publish = true
         publishDependsOnSign = true
-        allowInMemoryPgpKeys = true
+        inMemoryPgpKeys = true
     }
 
     /**
@@ -113,7 +142,7 @@ public class NyxPublishingExtension(
         project.apply<MavenPublishPlugin>()
         project.apply<SigningPlugin>()
 
-        if (allowInMemoryPgpKeys.isTrue) {
+        if (inMemoryPgpKeys.isTrue) {
             signing {
                 // Allow specifying the key, key id, and password via environment variables.
                 val signingKey: String? by project
