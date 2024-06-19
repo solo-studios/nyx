@@ -245,13 +245,11 @@ nyx {
         suppressWarnings = true
 
         // The jvm toolchain version to use
-        // Defaults to unset
         // Note: this uses gradle toolchains: https://docs.gradle.org/current/userguide/toolchains.html
         // This will force gradle to use a specific jdk version, installing it if not found
         jvmToolchain = 17
 
         // The jvm version to target. This is the bytecode version of the resulting class files
-        // Defaults to unset
         jvmTarget = 8
 
         // If the sources jar should be enabled
@@ -343,12 +341,10 @@ nyx {
         kotlin {
             // The kotlin api version to use
             // Allow using declarations only from the specified version of bundled libraries
-            // Defaults to unset
             apiVersion = "2.0"
 
             // The kotlin language version to use
             // Provide source compatibility with the specified version of Kotlin
-            // Defaults to unset
             languageVersion = "2.0"
 
             // The list of opt-in annotations
@@ -500,31 +496,24 @@ nyx {
     publishing {
         github {
             // Enables/disables the generation of release notes
-            // Defaults to unset
             generateReleaseNotes = true
 
             // The text describing the tag for the release
-            // Defaults to unset
             body = file("CHANGELOG").readText()
 
             // Enables/disables the draft setting for a release
-            // Defaults to unset
             draft = true
 
             // Enables/disables the prerelease setting for a release
-            // Defaults to unset
             prerelease = true
 
             // Enables/disables overwriting an existing release
-            // Defaults to unset
             overwrite = true
 
             // Enables/disables uploading artifacts to an existing release
-            // Defaults to unset
             allowUploadToExisting = true
 
             // Enables the dry-run setting, which will not publish the release to github
-            // Defaults to unset
             dryRun = true
 
             // A file collection of all the release assets
@@ -556,7 +545,6 @@ nyx {
 
         // Any additional jvm properties to be added to the jvm
         // Equivalent to adding -D[property]=[value]
-        // Defaults to unset
         additionalJvmProperties.put("fabric.development", "true")
     }
 }
@@ -757,32 +745,44 @@ nyx {
     minecraft {
         minotaur {
             // The project id/slug
-            // Defaults to unset
             projectId = "my-project"
 
             // The changelog for this release
-            // Defaults to unset
             changelog = file("CHANGELOG").readText()
 
+            // The updated body of the mod page
+            syncBody = file("README.md").readText()
+
             // The version type for this release
-            // Defaults to unset
             versionType = VersionType.BETA
 
+            // The file to upload.
+            // This is automatically set to output from remapJar if a loom-based plugin is present
+            file = tasks.named<Jar>("remapJar").archiveFile
+
+            // Any additional files to be uploaded
+            additionalFiles {
+                from(tasks.named("jar"))
+            }
+
             // The list of game versions this release supports
-            // Defaults to unset
             gameVersions = listOf("1.19.2", "1.19.3", "1.19.4")
 
+            // The list of loaders
+            // By default this is detected automatically
+            loaders = listOf("fabric", "quilt")
+
             // If the modrinth task should fail silently
-            // Defaults to unset
             failSilently = false
+            failSilently() // Alternative that sets it to true
 
             // Enables/disables the detection of loaders
-            // Defaults to unset
             detectLoaders = true
+            detectLoaders() // Alternative that sets it to true
 
-            // Enables/disables automatically adding the dependencies of this release
-            // Defaults to unset
-            autoAddDependsOn
+            // Enables/disables automatically adding the `dependsOn` information for upload files
+            autoAddDependsOn = true
+            autoAddDependsOn() // Alternative that sets it to true
 
             // Configures the dependencies
             dependencies {

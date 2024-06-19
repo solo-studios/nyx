@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxMinotaurExtension.kt is part of nyx
- * Last modified on 10-06-2024 03:24 p.m.
+ * Last modified on 19-06-2024 03:39 p.m.
  *
  * MIT License
  *
@@ -29,6 +29,8 @@ package ca.solostudios.nyx.plugin.minecraft
 
 import ca.solostudios.nyx.internal.HasProject
 import ca.solostudios.nyx.internal.InternalNyxExtension
+import ca.solostudios.nyx.internal.util.fileCollection
+import ca.solostudios.nyx.internal.util.fileProperty
 import ca.solostudios.nyx.internal.util.listProperty
 import ca.solostudios.nyx.internal.util.modrinth
 import ca.solostudios.nyx.internal.util.property
@@ -39,6 +41,8 @@ import com.modrinth.minotaur.dependencies.container.NamedDependencyContainer
 import masecla.modrinth4j.model.version.ProjectVersion
 import org.gradle.api.Action
 import org.gradle.api.Project
+import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.publish.plugins.PublishingPlugin
@@ -62,18 +66,46 @@ public class NyxMinotaurExtension(
      */
     public val changelog: Property<String> = property()
 
+    public val syncBody: Property<String> = property()
+
     /**
      * The project version type
      */
     public val versionType: Property<VersionType> = property()
 
+    public val file: RegularFileProperty = fileProperty()
+
+    public val additionalFiles: ConfigurableFileCollection = fileCollection()
+
     public val gameVersions: ListProperty<String> = listProperty()
+
+    public val loaders: ListProperty<String> = listProperty()
 
     public val failSilently: Property<Boolean> = property()
 
     public val detectLoaders: Property<Boolean> = property()
 
     public val autoAddDependsOn: Property<Boolean> = property()
+
+    public fun additionalFiles(action: ConfigurableFileCollection.() -> Unit) {
+        additionalFiles.apply(action)
+    }
+
+    public fun additionalFiles(action: Action<ConfigurableFileCollection>) {
+        action.execute(additionalFiles)
+    }
+
+    public fun failSilently() {
+        failSilently = true
+    }
+
+    public fun detectLoaders() {
+        detectLoaders = true
+    }
+
+    public fun autoAddDependsOn() {
+        autoAddDependsOn = true
+    }
 
     public fun dependencies(action: Action<DependenciesDsl>) {
         dependencies { action.execute(this) }
@@ -101,8 +133,14 @@ public class NyxMinotaurExtension(
         if (changelog.isPresent)
             modrinth.changelog = changelog
 
+        if (syncBody.isPresent)
+            modrinth.syncBodyFrom = syncBody
+
         if (gameVersions.isPresent)
             modrinth.gameVersions = gameVersions
+
+        if (loaders.isPresent)
+            modrinth.loaders = loaders
 
         if (failSilently.isPresent)
             modrinth.failSilently = failSilently
@@ -115,13 +153,32 @@ public class NyxMinotaurExtension(
 
         // currently only support loom
         // TODO: support neoforge
-        if (tasks.findByName("remapJar") != null) {
-            val remapJar by tasks.named<Jar>("remapJar")
-
-            modrinth.file = remapJar.archiveFile
-            tasks.named<TaskModrinthUpload>("modrinth").configure {
-                dependsOn(remapJar)
+        when {
+            file.isPresent -> {
+                modrinth.file = file
             }
+
+            tasks.findByName("remapJar") != null -> {
+                val remapJar by tasks.named<Jar>("remapJar")
+
+                modrinth.file = remapJar.archiveFile
+                tasks.named<TaskModrinthUpload>("modrinth").configure {
+                    dependsOn(remapJar)
+                }
+            }
+
+            tasks.findByName("jar") != null -> {
+                val jar by tasks.named<Jar>("jar")
+
+                modrinth.file = jar.archiveFile
+                tasks.named<TaskModrinthUpload>("modrinth").configure {
+                    dependsOn(jar)
+                }
+            }
+        }
+
+        if (!additionalFiles.isEmpty) {
+            modrinth.additionalFiles.addAll(additionalFiles.asFileTree.files)
         }
 
         project.plugins.withType<PublishingPlugin> {
