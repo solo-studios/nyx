@@ -1,8 +1,8 @@
 /*
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
- * The file MinecraftLoomExtension.kt is part of nyx
- * Last modified on 10-06-2024 03:24 p.m.
+ * The file NyxFabricLoomExtension.kt is part of nyx
+ * Last modified on 19-06-2024 03:09 p.m.
  *
  * MIT License
  *
@@ -29,14 +29,22 @@ package ca.solostudios.nyx.plugin.minecraft.loom
 
 import ca.solostudios.nyx.internal.util.fabricApi
 import ca.solostudios.nyx.internal.util.githubRelease
+import ca.solostudios.nyx.internal.util.isTrue
 import ca.solostudios.nyx.internal.util.loom
 import ca.solostudios.nyx.internal.util.nyx
+import ca.solostudios.nyx.internal.util.property
 import ca.solostudios.nyx.internal.util.publishing
 import ca.solostudios.nyx.internal.util.sourceSets
 import ca.solostudios.nyx.internal.util.tasks
 import ca.solostudios.nyx.plugin.minecraft.AbstractMinecraftExtension
+import net.fabricmc.loom.api.ModSettings
+import net.fabricmc.loom.api.decompilers.DecompilerOptions
 import net.fabricmc.loom.configuration.FabricApiExtension
+import net.fabricmc.loom.configuration.ide.RunConfigSettings
+import org.gradle.api.Action
+import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
+import org.gradle.api.provider.Property
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.get
@@ -55,16 +63,103 @@ public class NyxFabricLoomExtension(
 ) : AbstractMinecraftExtension(project) {
     private val logger by getLogger()
 
+    public val decompilers: NamedDomainObjectContainer<DecompilerOptions>
+        get() = loom.decompilerOptions
+
+    public val runs: NamedDomainObjectContainer<RunConfigSettings>
+        get() = loom.runs
+
+    public val mods: NamedDomainObjectContainer<ModSettings>
+        get() = loom.mods
+
+    public val interfaceInjection: Property<Boolean> = property()
+
+    public val transitiveAccessWideners: Property<Boolean> = property()
+
+    public val modProvidedJavadoc: Property<Boolean> = property()
+
+    public val runtimeOnlyLog4j: Property<Boolean> = property()
+
+    public val splitModDependencies: Property<Boolean> = property()
+
+    public val splitEnvironmentalSourceSet: Property<Boolean> = property()
+
+    public val serverOnlyMinecraftJar: Property<Boolean> = property()
+
+    public val clientOnlyMinecraftJar: Property<Boolean> = property()
+
+    public fun interfaceInjection() {
+        interfaceInjection = true
+    }
+
+    public fun transitiveAccessWideners() {
+        transitiveAccessWideners = true
+    }
+
+    public fun modProvidedJavadoc() {
+        modProvidedJavadoc = true
+    }
+
+    public fun runtimeOnlyLog4j() {
+        runtimeOnlyLog4j = true
+    }
+
+    public fun splitModDependencies() {
+        splitModDependencies = true
+    }
+
+    public fun splitEnvironmentalSourceSet() {
+        splitEnvironmentalSourceSet = true
+    }
+
+    public fun serverOnlyMinecraftJar() {
+        serverOnlyMinecraftJar = true
+    }
+
+    public fun clientOnlyMinecraftJar() {
+        clientOnlyMinecraftJar = true
+    }
+
     public fun configureDataGeneration() {
         fabricApi {
             configureDataGeneration()
         }
     }
 
-    public fun configureDataGeneration(block: FabricApiExtension.DataGenerationSettings.() -> Unit) {
+    public fun configureDataGeneration(action: FabricApiExtension.DataGenerationSettings.() -> Unit) {
         fabricApi {
-            configureDataGeneration(block)
+            configureDataGeneration(action)
         }
+    }
+
+    public fun configureDataGeneration(action: Action<FabricApiExtension.DataGenerationSettings>) {
+        fabricApi {
+            configureDataGeneration(action)
+        }
+    }
+
+    public fun decompilers(action: NamedDomainObjectContainer<DecompilerOptions>.() -> Unit) {
+        decompilers.apply(action)
+    }
+
+    public fun decompilers(action: Action<NamedDomainObjectContainer<DecompilerOptions>>) {
+        action.execute(decompilers)
+    }
+
+    public fun runs(action: NamedDomainObjectContainer<RunConfigSettings>.() -> Unit) {
+        runs.apply(action)
+    }
+
+    public fun runs(action: Action<NamedDomainObjectContainer<RunConfigSettings>>) {
+        action.execute(runs)
+    }
+
+    public fun mods(action: NamedDomainObjectContainer<ModSettings>.() -> Unit) {
+        mods.apply(action)
+    }
+
+    public fun mods(action: Action<NamedDomainObjectContainer<ModSettings>>) {
+        action.execute(mods)
     }
 
     /**
@@ -120,6 +215,30 @@ public class NyxFabricLoomExtension(
     }
 
     override fun configureProject() {
+        if (interfaceInjection.isPresent)
+            loom.interfaceInjection.getIsEnabled().set(interfaceInjection)
+
+        if (transitiveAccessWideners.isPresent)
+            loom.enableTransitiveAccessWideners = transitiveAccessWideners
+
+        if (modProvidedJavadoc.isPresent)
+            loom.enableModProvidedJavadoc = modProvidedJavadoc
+
+        if (runtimeOnlyLog4j.isPresent)
+            loom.runtimeOnlyLog4j = runtimeOnlyLog4j
+
+        if (splitModDependencies.isPresent)
+            loom.splitModDependencies = splitModDependencies
+
+        if (splitEnvironmentalSourceSet.isTrue)
+            loom.splitEnvironmentSourceSets()
+
+        if (serverOnlyMinecraftJar.isTrue)
+            loom.serverOnlyMinecraftJar()
+
+        if (clientOnlyMinecraftJar.isTrue)
+            loom.clientOnlyMinecraftJar()
+
         loom {
             runs.configureEach {
                 vmArg("-Xmx${allocatedMemory.get()}G")

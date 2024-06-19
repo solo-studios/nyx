@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file GradleUtil.kt is part of nyx
- * Last modified on 11-06-2024 05:21 p.m.
+ * Last modified on 19-06-2024 02:38 p.m.
  *
  * MIT License
  *
@@ -97,6 +97,8 @@ internal val HasProject.publishing: PublishingExtension
 internal fun HasProject.signing(block: SigningExtension.() -> Unit) = project.configure(block)
 
 internal fun HasProject.loom(block: LoomGradleExtensionAPI.() -> Unit) = project.configure(block)
+internal val HasProject.loom: LoomGradleExtensionAPI
+    get() = project.the<LoomGradleExtensionAPI>()
 
 internal fun HasProject.fabricApi(block: FabricApiExtension.() -> Unit) = project.configure(block)
 

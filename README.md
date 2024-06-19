@@ -570,8 +570,66 @@ then the `minecraft` extension is extended as follows:
 ```kotlin
 nyx {
     minecraft {
-        // Enables data generation
+        // Enables/disables interface injection
+        // See loom docs for more information
+        interfaceInjection = true
+        interfaceInjection() // Alternative that sets it to true
+
+        // Enables/disables transitive access wideners
+        // See loom docs for more information
+        transitiveAccessWideners = true
+        transitiveAccessWideners() // Alternative that sets it to true
+
+        // Enables/disables mod-provided javadoc
+        // See loom docs for more information
+        modProvidedJavadoc = true
+        modProvidedJavadoc() // Alternative that sets it to true
+
+        // Enables/disables runtime-only log4j
+        // See loom docs for more information
+        runtimeOnlyLog4j = true
+        runtimeOnlyLog4j() // Alternative that sets it to true
+
+        // Enables/disables split mod dependencies
+        splitModDependencies = true
+        splitModDependencies() // Alternative that sets it to true
+
+        // Enables/disables split environment sourcesets
+        // See loom docs for more information
+        splitEnvironmentalSourceSet = true
+        splitEnvironmentalSourceSet() // Alternative that sets it to true
+
+        // Enables/disables generation of only the minecraft server jar
+        // See loom docs for more information
+        serverOnlyMinecraftJar = true
+        serverOnlyMinecraftJar() // Alternative that sets it to true
+
+        // Enables/disables generation of only the minecraft client jar
+        // See loom docs for more information
+        clientOnlyMinecraftJar = true
+        clientOnlyMinecraftJar() // Alternative that sets it to true
+
+        // Enables data generation with default configuration
         configureDataGeneration()
+        // Configures data generation
+        configureDataGeneration {
+            // See the loom docs for more information
+        }
+
+        // Configures the decompilers
+        decompilers {
+            // See the loom docs for more information
+        }
+
+        // Configures the loom runs
+        runs {
+            // See the loom docs for more information
+        }
+
+        // Configures the defined mods
+        mods {
+            // See the loom docs for more information
+        }
 
         // Adds an access widener at `src/main/resources/${name}.accesswidener`
         // If the access widener does not exist, it will be created and a warning will be emitted
@@ -624,34 +682,56 @@ nyx {
             // Sets the mixin.hotSwap jvm property
             // Defaults to true
             hotswapMixins = true
+            hotswapMixins() // Alternative that sets it to true
 
             // Enables/disables *ALL* mixin debug features. this includes mixin.debug.verify
             // Note: enabling this can sometimes cause issues with other mods' mixins
             // Sets the mixin.debug jvm property
             // Defaults to false
             debug = true
+            debugMixins() // Alternative that sets it to true
 
             // Enables/disables mixin verbose logging
             // Sets the mixin.debug.verbose jvm property
             // Defaults to true
             verbose = true
+            verboseMixins() // Alternative that sets it to true
 
             // Enables/disables dumping the target class on failures
             // Sets the mixin.dumpTargetOnFailure jvm property
             // Defaults to true
             dumpTargetOnFailure = true
+            dumpTargetMixinsOnFailure() // Alternative that sets it to true
 
             // Enables/disables mixin checks
             // Note: enabling this can sometimes cause issues with other mods' mixins.
             // Sets the mixin.checks jvm property
             // Defaults to false
             checks = true
+            checkMixins() // Alternative that sets it to true
 
             // Enables/disables mixin debug verification
             // Note: enabling this can sometimes cause issues with other mods' mixins
             // Sets the mixin.debug.verify jvm property
             // Defaults to false
             verify = true
+            verifyMixins() // Alternative that sets it to true
+
+            // Enables/disables exporting the mixins after they have been applied
+            // This will export the classes in the `.mixin.out` dir under the run directory
+            // Defaults to true
+            export = true
+            exportMixins() // Alternative that sets it to true
+
+            // Selects the mixin config file to use
+            // This is relative to `src/main/resources/`
+            // NeoGradle ONLY
+            mixinConfig("my-project.mixins.json")
+
+            // Selects the default mixin refmap name to use
+            // This will set the default mixin refmap name to `mixins/${name}/refmap.json`.
+            // Loom-based plugins ONLY
+            mixinRefmapName("my-project")
         }
     }
 }

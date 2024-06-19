@@ -1,8 +1,8 @@
 /*
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
- * The file MixinExtension.kt is part of nyx
- * Last modified on 11-06-2024 06:38 p.m.
+ * The file NyxMixinExtension.kt is part of nyx
+ * Last modified on 19-06-2024 03:04 p.m.
  *
  * MIT License
  *
@@ -33,18 +33,48 @@ import ca.solostudios.nyx.internal.util.isTrue
 import ca.solostudios.nyx.internal.util.property
 import org.gradle.api.Project
 import org.gradle.api.provider.Property
+import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.getValue
 
 public class NyxMixinExtension(
     override val project: Project,
     private val minecraftExtension: AbstractMinecraftExtension,
 ) : InternalNyxExtension {
-    public val hotswapMixins: Property<Boolean> = property<Boolean>().convention(true)
+    public val hotswap: Property<Boolean> = property<Boolean>().convention(true)
     public val debug: Property<Boolean> = property<Boolean>().convention(false)
     public val verbose: Property<Boolean> = property<Boolean>().convention(true)
     public val dumpTargetOnFailure: Property<Boolean> = property<Boolean>().convention(true)
     public val checks: Property<Boolean> = property<Boolean>().convention(false)
     public val verify: Property<Boolean> = property<Boolean>().convention(false)
+    public val export: Property<Boolean> = property<Boolean>().convention(true)
+
+    public fun hotswapMixins() {
+        hotswap = true
+    }
+
+    public fun debugMixins() {
+        debug = true
+    }
+
+    public fun verboseMixins() {
+        verbose = true
+    }
+
+    public fun dumpTargetMixinOnFailure() {
+        dumpTargetOnFailure = true
+    }
+
+    public fun checkMixins() {
+        checks = true
+    }
+
+    public fun verifyMixins() {
+        verify = true
+    }
+
+    public fun exportMixins() {
+        export = true
+    }
 
     public fun mixinConfig(name: String) {
         minecraftExtension.addMixinConfig(name)
@@ -71,9 +101,10 @@ public class NyxMixinExtension(
             minecraftExtension.additionalJvmProperties.put("mixin.checks", checks.get().toString())
         if (verify.isPresent)
             minecraftExtension.additionalJvmProperties.put("mixin.debug.verify", verify.get().toString())
+        if (export.isPresent)
+            minecraftExtension.additionalJvmProperties.put("mixin.debug.export", export.get().toString())
 
-
-        if (hotswapMixins.isTrue) {
+        if (hotswap.isTrue) {
             minecraftExtension.additionalJvmProperties.put("mixin.hotSwap", "true")
 
             val runtimeClasspath by configurations.named("runtimeClasspath")
