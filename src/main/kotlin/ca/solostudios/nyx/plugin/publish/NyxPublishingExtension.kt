@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxPublishingExtension.kt is part of nyx
- * Last modified on 19-06-2024 05:00 p.m.
+ * Last modified on 11-07-2024 09:09 p.m.
  *
  * MIT License
  *
@@ -175,14 +175,14 @@ public class NyxPublishingExtension(
             publications {
 
                 when {
-                    project.plugins.hasPlugin(KotlinMultiplatformPlugin::class) -> {
+                    project.plugins.hasPlugin("org.jetbrains.kotlin.multiplatform") -> {
                         // when using kotlin multiplatform, publications will be created for you
                         withType<MavenPublication>().configureEach {
                             configurePublication(applyArtifactId = false)
                         }
                     }
 
-                    project.plugins.hasPlugin(JavaGradlePluginPlugin::class) -> {
+                    project.plugins.hasPlugin("org.gradle.java-gradle-plugin") -> {
                         withType<MavenPublication>().configureEach {
                             configurePublication(applyArtifactId = false, applyGroupId = false)
                         }
