@@ -2,7 +2,7 @@
  * Copyright (c) 2023-2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file build.gradle.kts is part of nyx
- * Last modified on 11-06-2024 06:34 p.m.
+ * Last modified on 11-07-2024 08:40 p.m.
  *
  * MIT License
  *
@@ -95,7 +95,6 @@ nyx {
 
                 val repositoryId: String? by project
                 url = when {
-                    isSnapshot           -> uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
                     repositoryId != null -> uri("https://s01.oss.sonatype.org/service/local/staging/deployByRepositoryId/$repositoryId/")
                     else                 -> uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
                 }
@@ -103,11 +102,19 @@ nyx {
                 credentials(PasswordCredentials::class)
             }
             maven {
-                name = "SoloStudios"
+                name = "SoloStudiosReleases"
 
-                val releasesUrl = uri("https://maven.solo-studios.ca/releases/")
-                val snapshotUrl = uri("https://maven.solo-studios.ca/snapshots/")
-                url = if (isSnapshot) snapshotUrl else releasesUrl
+                url = uri("https://maven.solo-studios.ca/releases/")
+
+                credentials(PasswordCredentials::class)
+                authentication { // publishing doesn't work without this for some reason
+                    create<BasicAuthentication>("basic")
+                }
+            }
+            maven {
+                name = "SoloStudiosSnapshots"
+
+                url = uri("https://maven.solo-studios.ca/snapshots/")
 
                 credentials(PasswordCredentials::class)
                 authentication { // publishing doesn't work without this for some reason

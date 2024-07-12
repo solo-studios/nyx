@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file Jenkinsfile is part of nyx
- * Last modified on 14-06-2024 03:18 p.m.
+ * Last modified on 11-07-2024 08:45 p.m.
  *
  * MIT License
  *
@@ -59,7 +59,13 @@ pipeline {
             }
         }
 
-        stage('Deploy Release to Solo Studios repository') {
+        stage('Deploy to snapshots repositories') {
+            when {
+                not {
+                    buildingTag()
+                }
+            }
+
             steps {
                 withCredentials([
                         string(credentialsId: 'maven-signing-key', variable: 'ORG_GRADLE_PROJECT_signingKey'),
@@ -67,20 +73,21 @@ pipeline {
                         string(credentialsId: 'maven-signing-key-password', variable: 'ORG_GRADLE_PROJECT_signingPassword'),
                         usernamePassword(
                                 credentialsId: 'solo-studios-maven',
-                                passwordVariable: 'ORG_GRADLE_PROJECT_SoloStudiosPassword',
-                                usernameVariable: 'ORG_GRADLE_PROJECT_SoloStudiosUsername'
+                                passwordVariable: 'ORG_GRADLE_PROJECT_SoloStudiosSnapshotsPassword',
+                                usernameVariable: 'ORG_GRADLE_PROJECT_SoloStudiosSnapshotsUsername'
                         )
                 ]) {
                     withGradle {
-                        sh './gradlew publishAllPublicationsToSoloStudiosRepository'
+                        sh './gradlew publishAllPublicationsToSoloStudiosSnapshotsRepository'
                     }
                 }
             }
+
         }
 
-        stage('Deploy Release to Sonatype Repository') {
+        stage('Deploy to releases repositories') {
             when {
-                expression { env.TAG_NAME != null && env.TAG_NAME.matches('v\\d+\\.\\d+\\.\\d+') }
+                buildingTag()
             }
 
             steps {
@@ -89,12 +96,18 @@ pipeline {
                         // string(credentialsId: 'maven-signing-key-id', variable: 'ORG_GRADLE_PROJECT_signingKeyId'),
                         string(credentialsId: 'maven-signing-key-password', variable: 'ORG_GRADLE_PROJECT_signingPassword'),
                         usernamePassword(
+                                credentialsId: 'solo-studios-maven',
+                                passwordVariable: 'ORG_GRADLE_PROJECT_SoloStudiosReleasesPassword',
+                                usernameVariable: 'ORG_GRADLE_PROJECT_SoloStudiosReleasesUsername'
+                        ),
+                        usernamePassword(
                                 credentialsId: 'sonatype-maven-credentials',
                                 passwordVariable: 'ORG_GRADLE_PROJECT_SonatypePassword',
                                 usernameVariable: 'ORG_GRADLE_PROJECT_SonatypeUsername'
                         )
                 ]) {
                     withGradle {
+                        sh './gradlew publishAllPublicationsToSoloStudiosReleasesRepository'
                         sh './gradlew publishAllPublicationsToSonatypeRepository'
                     }
                 }
