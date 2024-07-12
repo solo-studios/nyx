@@ -39,7 +39,7 @@ pluginManagement {
 
 ## Features
 
-The enabled features depends on which other plugins are loaded.
+The enabled features depend on which other plugins are loaded.
 
 ### Default
 
