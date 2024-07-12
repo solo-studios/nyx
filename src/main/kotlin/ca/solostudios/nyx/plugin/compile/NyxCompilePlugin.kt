@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxCompilePlugin.kt is part of nyx
- * Last modified on 10-06-2024 03:21 p.m.
+ * Last modified on 11-07-2024 08:20 p.m.
  *
  * MIT License
  *
@@ -52,12 +52,16 @@ internal class NyxCompilePlugin : InternalNyxPlugin {
             }
         }
 
-        project.plugins.withType<KotlinBasePlugin> {
+        try {
+            project.plugins.withType<KotlinBasePlugin> {
             val kotlinExtension = compileExtension.create<NyxKotlinExtension>(NyxKotlinExtension.NAME, project, compileExtension)
 
             project.afterEvaluate {
                 kotlinExtension.configureProject()
             }
+            }
+        } catch (_: NoClassDefFoundError) {
+            // ignore
         }
     }
 }
