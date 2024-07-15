@@ -335,6 +335,26 @@ nyx {
             suppressWarnings = true
             withSuppressWarnings() // Alternative that sets it to true
 
+            // If all javadoc warnings are enabled.
+            // Defaults to false
+            allJavadocWarnings = true
+            withAllJavadocWarnings() // Alternative that sets it to true
+
+            // If missing element javadoc warnings are enabled.
+            // Defaults to false
+            noMissingJavadocWarnings = true
+            withNoMissingJavadocWarnings() // Alternative that sets it to true
+
+            // If emitting javadoc warnings as errors is enabled
+            // Defaults to false
+            javadocWarningsAsErrors = true
+            withJavadocWarningsAsErrors() // Alternative that sets it to true
+
+            // If all javadoc warnings should be suppressed.
+            // Defaults to false
+            suppressJavadocWarnings = true
+            withSuppressJavadocWarnings() // Alternative that sets it to true
+
             // The jvm toolchain version to use
             // Note: this uses gradle toolchains: https://docs.gradle.org/current/userguide/toolchains.html
             // This will force gradle to use a specific jdk version, installing it if not found

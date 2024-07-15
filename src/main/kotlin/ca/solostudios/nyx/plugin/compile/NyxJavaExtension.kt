@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxJavaExtension.kt is part of nyx
- * Last modified on 14-07-2024 08:00 p.m.
+ * Last modified on 14-07-2024 08:25 p.m.
  *
  * MIT License
  *
@@ -88,7 +88,7 @@ public class NyxJavaExtension(
     public val allJavadocWarnings: Property<Boolean> = property<Boolean>().convention(false)
 
     /**
-     * If missing javadoc warnings are enabled.
+     * If missing element javadoc warnings are enabled.
      *
      * Adds the `-Xdoclint:-missing` flag to the javadoc task.
      */
@@ -102,7 +102,7 @@ public class NyxJavaExtension(
     public val javadocWarningsAsErrors: Property<Boolean> = property<Boolean>().convention(false)
 
     /**
-     * If all warnings should be suppressed.
+     * If all javadoc warnings should be suppressed.
      *
      * Adds the `-Xdoclint:none` flag to the javadoc task.
      */
@@ -181,6 +181,42 @@ public class NyxJavaExtension(
      */
     public fun withSuppressWarnings() {
         suppressWarnings = true
+    }
+
+    /**
+     * Enables all javadoc warnings.
+     *
+     * @see allJavadocWarnings
+     */
+    public fun withAllJavadocWarnings() {
+        allJavadocWarnings = true
+    }
+
+    /**
+     * Enables missing element javadoc warnings.
+     *
+     * @see noMissingJavadocWarnings
+     */
+    public fun withNoMissingJavadocWarnings() {
+        noMissingJavadocWarnings = true
+    }
+
+    /**
+     * Enables javadoc warnings as errors.
+     *
+     * @see javadocWarningsAsErrors
+     */
+    public fun withJavadocWarningsAsErrors() {
+        javadocWarningsAsErrors = true
+    }
+
+    /**
+     * Enables suppressing javadoc warnings.
+     *
+     * @see suppressJavadocWarnings
+     */
+    public fun withSuppressJavadocWarnings() {
+        suppressJavadocWarnings = true
     }
 
     /**
