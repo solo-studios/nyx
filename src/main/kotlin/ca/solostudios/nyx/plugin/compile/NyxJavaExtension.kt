@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxJavaExtension.kt is part of nyx
- * Last modified on 19-06-2024 05:12 p.m.
+ * Last modified on 14-07-2024 08:00 p.m.
  *
  * MIT License
  *
@@ -46,9 +46,13 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.compile.CompileOptions
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.javadoc.Javadoc
+import org.gradle.external.javadoc.StandardJavadocDocletOptions
+import org.gradle.external.javadoc.internal.AbstractListJavadocOptionFileOption
+import org.gradle.external.javadoc.internal.JavadocOptionFileWriterContext
 import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.gradle.jvm.toolchain.JavaToolchainSpec
 import org.gradle.kotlin.dsl.assign
+import org.gradle.kotlin.dsl.properties
 import org.gradle.kotlin.dsl.withType
 
 public class NyxJavaExtension(
@@ -75,6 +79,34 @@ public class NyxJavaExtension(
      * @see NyxCompileExtension.suppressWarnings
      */
     public val suppressWarnings: Property<Boolean> = property<Boolean>().convention(compile.suppressWarnings)
+
+    /**
+     * If all javadoc warnings are enabled.
+     *
+     * Adds the `-Xdoclint:all` flag to the javadoc task.
+     */
+    public val allJavadocWarnings: Property<Boolean> = property<Boolean>().convention(false)
+
+    /**
+     * If missing javadoc warnings are enabled.
+     *
+     * Adds the `-Xdoclint:-missing` flag to the javadoc task.
+     */
+    public val noMissingJavadocWarnings: Property<Boolean> = property<Boolean>().convention(false)
+
+    /**
+     * If emitting javadoc warnings as errors is enabled.
+     *
+     * Adds the `-Werror` flag to the javadoc task.
+     */
+    public val javadocWarningsAsErrors: Property<Boolean> = property<Boolean>().convention(false)
+
+    /**
+     * If all warnings should be suppressed.
+     *
+     * Adds the `-Xdoclint:none` flag to the javadoc task.
+     */
+    public val suppressJavadocWarnings: Property<Boolean> = property<Boolean>().convention(false)
 
     /**
      * The encoding to be used for all files.
@@ -240,6 +272,34 @@ public class NyxJavaExtension(
             withType<Javadoc>().configureEach {
                 if (encoding.isPresent)
                     options.encoding = encoding.get()
+
+                options {
+                    if (this !is StandardJavadocDocletOptions)
+                        return@options
+
+                    inputs.properties(
+                        "allJavadocWarnings" to allJavadocWarnings,
+                        "noMissingJavadocWarnings" to noMissingJavadocWarnings,
+                        "suppressJavadocWarnings" to suppressJavadocWarnings,
+                        "javadocWarningsAsErrors" to javadocWarningsAsErrors,
+                    )
+
+                    val doclintFlags = buildList {
+                        if (allJavadocWarnings.isTrue)
+                            add("all")
+
+                        if (noMissingJavadocWarnings.isTrue)
+                            add("-missing")
+
+                        if (suppressJavadocWarnings.isTrue)
+                            add("none")
+                    }
+
+                    addOption(DoclintJavadocFileOption(doclintFlags))
+
+                    if (javadocWarningsAsErrors.isTrue)
+                        addBooleanOption("-Werror")
+                }
             }
         }
     }
@@ -254,5 +314,18 @@ public class NyxJavaExtension(
 
     public companion object {
         public const val NAME: String = "java"
+    }
+
+    public class DoclintJavadocFileOption(value: List<String>) : AbstractListJavadocOptionFileOption<List<String>>("Xdoclint", value, ",") {
+        override fun duplicate(): DoclintJavadocFileOption = DoclintJavadocFileOption(value.toMutableList())
+        override fun writeCollectionValue(writerContext: JavadocOptionFileWriterContext) {
+            writerContext.apply {
+                write("-")
+                write(option)
+                write(":")
+                write(value.joinToString(separator = ","))
+                newLine()
+            }
+        }
     }
 }
