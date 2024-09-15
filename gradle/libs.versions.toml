@@ -1,48 +1,52 @@
 [versions]
-kotlin = "1.9.22"
+kotlin = "1.9.24"
+kotlin-plugin = "2.0.20"
 kotlinx-serialization = "1.6.3"
 
 dokka = "1.9.20"
 
-axion-release = "1.17.2"
+axion-release = "1.18.8"
 
-nyx = "0.1.9"
+nyx = "0.2.3"
 
-gradle-publish = "1.2.1"
+gradle-publish = "1.3.0"
 
 apache-commons-text = "1.12.0"
 
 guava = "32.1.3-jre"
 guava-kotlin = "0.1.0"
 
-slf4k = "0.5.2"
+slf4k = "0.5.3"
 
-quilt-loom = "1.6.8"
+quilt-loom = "1.7.4"
 
-fabric-loom = "1.6.12"
+fabric-loom = "1.7.4"
 
-architectury = "3.4.150"
-architectury-loom = "1.6.397"
+architectury = "3.4.159"
+architectury-loom = "1.7.413"
 
-neogradle = "7.0.142"
+neogradle = "7.0.163"
 
 github-release = "2.5.2"
 
 modrinth-minotaur = "2.8.7"
 
-gradleplugins = "1.6.11"
+gradleplugins = "1.9.0"
 
-maven = "3.9.6"
+maven = "3.9.9"
 
 fuel = "2.3.1"
 
 arrow = "1.2.4"
 
 [plugins]
-## Kotlin Plugins
+## Kotlin
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+## Kotlin all-open compiler plugin
 kotlin-allopen = { id = "org.jetbrains.kotlin.plugin.allopen", version.ref = "kotlin" }
+## Kotlin
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+## Dokka
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 
 ## Axion release plugin
@@ -52,16 +56,20 @@ axion-release = { id = "pl.allegro.tech.build.axion-release", version.ref = "axi
 gradle-plugin-java = { id = "dev.gradleplugins.java-gradle-plugin", version.ref = "gradleplugins" }
 gradle-plugin-development = { id = "dev.gradleplugins.gradle-plugin-development", version.ref = "gradleplugins" }
 
+## Nyx
 nyx = { id = "ca.solo-studios.nyx", version.ref = "nyx" }
 
+## Gradle publishing plugin
 gradle-publish = { id = "com.gradle.plugin-publish", version.ref = "gradle-publish" }
 
 [libraries]
 ## Kotlin stdlib
 kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlin" }
 
-kotlin-plugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
+## Kotlin gradle plugin
+kotlin-plugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin-plugin" }
 
+## kotlinx.serialization
 kotlinx-serialization-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-core", version.ref = "kotlinx-serialization" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 
@@ -76,27 +84,33 @@ guava-kotlin = { group = "ca.solo-studios", name = "guava-kotlin", version.ref =
 ## SLF4K is a set of kotlin extensions for SLF4J
 slf4k = { group = "ca.solo-studios", name = "slf4k", version.ref = "slf4k" }
 
+## fabric-loom & derivatives plugins
 fabric-loom = { group = "fabric-loom", name = "fabric-loom.gradle.plugin", version.ref = "fabric-loom" }
-
 quilt-loom = { group = "org.quiltmc.loom", name = "org.quiltmc.loom.gradle.plugin", version.ref = "quilt-loom" }
-
 architectury = { group = "architectury-plugin", name = "architectury-plugin.gradle.plugin", version.ref = "architectury" }
 architectury-loom = { group = "dev.architectury.loom", name = "dev.architectury.loom.gradle.plugin", version.ref = "architectury-loom" }
 
+## Neogradle plugin
 neogradle-userdev = { group = "net.neoforged.gradle.userdev", name = "net.neoforged.gradle.userdev.gradle.plugin", version.ref = "neogradle" }
 neogradle-mixin = { group = "net.neoforged.gradle.mixin", name = "net.neoforged.gradle.mixin.gradle.plugin", version.ref = "neogradle" }
 
+## Github release plugin
 github-release = { group = "com.github.breadmoirai", name = "github-release", version.ref = "github-release" }
 
+## Minotaur plugin
 modrinth-minotaur = { group = "com.modrinth.minotaur", name = "Minotaur", version.ref = "modrinth-minotaur" }
 
+## Dokka plugin
 dokka = { group = "org.jetbrains.dokka", name = "org.jetbrains.dokka.gradle.plugin", version.ref = "dokka" }
 
+## Maven artifact
 maven-artifact = { group = "org.apache.maven", name = "maven-artifact", version.ref = "maven" }
 maven-repository-metadata = { group = "org.apache.maven", name = "maven-repository-metadata", version.ref = "maven" }
 
+## Fuel
 fuel = { group = "com.github.kittinunf.fuel", name = "fuel", version.ref = "fuel" }
 
+## Arrow
 arrow-core = { group = "io.arrow-kt", name = "arrow-core", version.ref = "arrow" }
 arrow-serialization = { group = "io.arrow-kt", name = "arrow-core-serialization", version.ref = "arrow" }
 

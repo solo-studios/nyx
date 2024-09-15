@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file GradleUtil.kt is part of nyx
- * Last modified on 15-09-2024 07:10 a.m.
+ * Last modified on 15-09-2024 04:46 p.m.
  *
  * MIT License
  *
@@ -35,10 +35,10 @@ import com.github.breadmoirai.githubreleaseplugin.GithubReleaseExtension
 import com.modrinth.minotaur.ModrinthExtension
 import net.fabricmc.loom.api.LoomGradleExtensionAPI
 import net.fabricmc.loom.configuration.FabricApiExtension
-import net.neoforged.gradle.common.util.constants.RunsConstants
-import net.neoforged.gradle.dsl.common.runs.run.Run
+import net.neoforged.gradle.dsl.common.extensions.Minecraft
+import net.neoforged.gradle.dsl.common.runs.run.RunManager
+import net.neoforged.gradle.dsl.mixin.extension.Mixin
 import org.gradle.api.Named
-import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ConfigurationContainer
@@ -91,40 +91,39 @@ internal fun HasProject.tasks(block: TaskContainer.() -> Unit) = project.tasks.a
 internal val HasProject.tasks: TaskContainer
     get() = project.tasks
 
-internal fun HasProject.java(block: JavaPluginExtension.() -> Unit) = project.configure(block)
+internal fun HasProject.java(block: JavaPluginExtension.() -> Unit) = project.configure<JavaPluginExtension>(block)
 internal val HasProject.java: JavaPluginExtension
     get() = project.the<JavaPluginExtension>()
 
-internal fun HasProject.kotlin(block: KotlinProjectExtension.() -> Unit) = project.configure(block)
+internal fun HasProject.kotlin(block: KotlinProjectExtension.() -> Unit) = project.configure<KotlinProjectExtension>(block)
 internal val HasProject.kotlin: KotlinProjectExtension
     get() = project.the<KotlinProjectExtension>()
 
-internal fun HasProject.publishing(block: PublishingExtension.() -> Unit) = project.configure(block)
+internal fun HasProject.publishing(block: PublishingExtension.() -> Unit) = project.configure<PublishingExtension>(block)
 internal val HasProject.publishing: PublishingExtension
     get() = project.the<PublishingExtension>()
 
-internal fun HasProject.signing(block: SigningExtension.() -> Unit) = project.configure(block)
+internal fun HasProject.signing(block: SigningExtension.() -> Unit) = project.configure<SigningExtension>(block)
 internal val HasProject.signing: SigningExtension
     get() = project.the<SigningExtension>()
 
-internal fun HasProject.loom(block: LoomGradleExtensionAPI.() -> Unit) = project.configure(block)
+internal fun HasProject.loom(block: LoomGradleExtensionAPI.() -> Unit) = project.configure<LoomGradleExtensionAPI>(block)
 internal val HasProject.loom: LoomGradleExtensionAPI
     get() = project.the<LoomGradleExtensionAPI>()
 
-internal fun HasProject.fabricApi(block: FabricApiExtension.() -> Unit) = project.configure(block)
+internal fun HasProject.fabricApi(block: FabricApiExtension.() -> Unit) = project.configure<FabricApiExtension>(block)
 internal val HasProject.fabricApi: FabricApiExtension
     get() = project.the<FabricApiExtension>()
 
-internal fun HasProject.neoMinecraft(block: NeoMinecraft.() -> Unit) = project.configure(block)
+internal fun HasProject.neoMinecraft(block: NeoMinecraft.() -> Unit) = project.configure<Minecraft>(block)
 internal val HasProject.neoMinecraft: NeoMinecraft
     get() = project.the<NeoMinecraft>()
 
-internal fun HasProject.neoRuns(block: NamedDomainObjectContainer<Run>.() -> Unit) = project.extensions.configure<NamedDomainObjectContainer<Run>>(RunsConstants.Extensions.RUNS) { block(this) }
-@Suppress("UNCHECKED_CAST")
-internal val HasProject.neoRuns: NamedDomainObjectContainer<Run>
-    get() = project.extensions.getByName(RunsConstants.Extensions.RUNS) as NamedDomainObjectContainer<Run>
+internal fun HasProject.neoRuns(block: RunManager.() -> Unit) = project.extensions.configure<RunManager>(block)
+internal val HasProject.neoRuns: RunManager
+    get() = project.the<RunManager>()
 
-internal fun HasProject.neoMixins(block: NeoMixin.() -> Unit) = project.configure(block)
+internal fun HasProject.neoMixins(block: NeoMixin.() -> Unit) = project.configure<Mixin>(block)
 internal val HasProject.neoMixins: NeoMixin
     get() = project.the<NeoMixin>()
 
@@ -141,25 +140,25 @@ internal fun Project.configurations(block: ConfigurationContainer.() -> Unit) = 
 internal val HasProject.configurations: ConfigurationContainer
     get() = project.configurations
 
-internal fun HasProject.modrinth(block: ModrinthExtension.() -> Unit) = project.configure(block)
+internal fun HasProject.modrinth(block: ModrinthExtension.() -> Unit) = project.configure<ModrinthExtension>(block)
 internal val HasProject.modrinth: ModrinthExtension
     get() = project.the<ModrinthExtension>()
 
-internal fun HasProject.githubRelease(block: GithubReleaseExtension.() -> Unit) = project.configure(block)
+internal fun HasProject.githubRelease(block: GithubReleaseExtension.() -> Unit) = project.configure<GithubReleaseExtension>(block)
 internal val HasProject.githubRelease: GithubReleaseExtension
     get() = project.the<GithubReleaseExtension>()
 
-internal fun HasProject.nyx(block: NyxExtension.() -> Unit) = project.configure(block)
+internal fun HasProject.nyx(block: NyxExtension.() -> Unit) = project.configure<NyxExtension>(block)
 internal val HasProject.nyx: NyxExtension
     get() = project.the<NyxExtension>()
 internal val Project.nyx: NyxExtension
     get() = project.the<NyxExtension>()
 
-internal fun NyxExtension.publishing(block: NyxPublishingExtension.() -> Unit) = project.configure(block)
+internal fun NyxExtension.publishing(block: NyxPublishingExtension.() -> Unit) = project.configure<NyxPublishingExtension>(block)
 internal val NyxExtension.publishing: NyxPublishingExtension
     get() = (this as ExtensionAware).the<NyxPublishingExtension>()
 
-internal fun NyxPublishingExtension.githubRelease(block: NyxGithubReleaseExtension.() -> Unit) = project.configure(block)
+internal fun NyxPublishingExtension.githubRelease(block: NyxGithubReleaseExtension.() -> Unit) = project.configure<NyxGithubReleaseExtension>(block)
 internal val NyxPublishingExtension.githubRelease: NyxGithubReleaseExtension
     get() = (this as ExtensionAware).the<NyxGithubReleaseExtension>()
 
