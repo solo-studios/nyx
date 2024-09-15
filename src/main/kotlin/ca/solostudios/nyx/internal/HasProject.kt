@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file HasProject.kt is part of nyx
- * Last modified on 06-09-2024 03:05 p.m.
+ * Last modified on 15-09-2024 06:47 p.m.
  *
  * MIT License
  *
@@ -29,9 +29,13 @@ package ca.solostudios.nyx.internal
 
 import org.gradle.api.Project
 import org.gradle.api.model.ObjectFactory
+import org.gradle.api.tasks.Internal
 
 internal interface HasProject : HasObjectFactory {
+    @get:Internal
     val project: Project
+
+    @get:Internal
     override val objects: ObjectFactory
         get() = project.objects
 }

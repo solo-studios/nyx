@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file GenerateFabricModJson.kt is part of nyx
- * Last modified on 15-09-2024 07:45 a.m.
+ * Last modified on 15-09-2024 07:16 p.m.
  *
  * MIT License
  *
@@ -27,6 +27,7 @@
 
 package ca.solostudios.nyx.plugin.minecraft.loom.tasks
 
+import ca.solostudios.nyx.internal.AllOpen
 import ca.solostudios.nyx.internal.SerialFabricModJson
 import ca.solostudios.nyx.internal.SerialFabricModJson.Entrypoint.AdaptedEntrypoint
 import ca.solostudios.nyx.internal.SerialFabricModJson.Entrypoint.StringEntrypoint
@@ -45,10 +46,10 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
-import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
-import kotlin.io.path.createDirectories
+import org.gradle.work.DisableCachingByDefault
 import kotlin.io.path.outputStream
 import ca.solostudios.nyx.internal.SerialFabricModJson.Environment as SerialEnvironment
 import ca.solostudios.nyx.internal.SerialFabricModJson.MixinConfig.EnvironmentMixinConfig as SerialEnvironmentMixinConfig
@@ -57,8 +58,11 @@ import ca.solostudios.nyx.internal.SerialFabricModJson.ModIcon.ModIconMap as Ser
 import ca.solostudios.nyx.internal.SerialFabricModJson.Person.ContactablePerson as SerialContactablePerson
 import ca.solostudios.nyx.internal.SerialFabricModJson.Person.NamedPerson as SerialNamedPerson
 
+@AllOpen
+@DisableCachingByDefault(because = "Not worth caching")
 public class GenerateFabricModJson : DefaultTask() {
-    @Input
+    // @Input
+    @Nested
     public val fabricModJson: Property<FabricModJson> = property()
 
     @OutputDirectory
@@ -69,15 +73,14 @@ public class GenerateFabricModJson : DefaultTask() {
     private fun generateJson() {
         val serialModJson = fabricModJson.get().toSerial()
 
-        val output = outputPath("fabric.mod.json").apply { parent.createDirectories() }
-
-        json.encodeToStream(serialModJson, output.outputStream().buffered())
+        outputPath("fabric.mod.json").outputStream().buffered().use { outputStream ->
+            json.encodeToStream(serialModJson, outputStream)
+        }
     }
 
     private fun outputPath(path: String) = outputDirectory.get().asFile.toPath().resolve(path)
 
     private fun FabricModJson.toSerial(): SerialFabricModJson {
-
         val entrypoints = this.entrypoints.takeIf { it.isNotEmpty() }?.associate { container ->
             container.target to container.entrypoints.get().map {
                 if (it.adapter.isPresent)
@@ -122,8 +125,7 @@ public class GenerateFabricModJson : DefaultTask() {
 
         val modmenu = with(this.modmenu) {
             buildJsonObject {
-                if (badges.isPresent)
-                    put("badges", badges.get().toJsonElement())
+                badges.orNull?.takeIf { it.isNotEmpty() }?.let { badges -> put("badges", badges.toJsonElement()) }
 
                 buildMap {
                     links.buyMeACoffee.orNull?.let { buyMeACoffee -> put("modmenu.buymeacoffee", buyMeACoffee) }
@@ -190,13 +192,13 @@ public class GenerateFabricModJson : DefaultTask() {
             suggests = this.suggests.toSerial(),
             conflicts = this.conflicts.toSerial(),
             breaks = this.breaks.toSerial(),
-            description = this.description.orNull,
+            description = this.description.orNull?.takeIf { it.isNotBlank() },
             authors = this.authors.toSerial(),
             contributors = this.contributors.toSerial(),
             contact = contact,
             license = this.licenses.orNull?.takeIf { it.isNotEmpty() },
             icon = icons,
-            languageAdapters = this.languageAdapters.get(),
+            languageAdapters = this.languageAdapters.orNull?.takeIf { it.isNotEmpty() },
             custom = custom
         )
     }

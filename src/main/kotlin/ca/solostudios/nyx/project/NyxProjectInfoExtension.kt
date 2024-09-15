@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxProjectInfoExtension.kt is part of nyx
- * Last modified on 19-06-2024 05:12 p.m.
+ * Last modified on 15-09-2024 07:06 p.m.
  *
  * MIT License
  *
@@ -28,10 +28,10 @@
 package ca.solostudios.nyx.project
 
 import ca.solostudios.nyx.internal.InternalNyxExtension
-import ca.solostudios.nyx.internal.util.convention
 import ca.solostudios.nyx.internal.util.formatAsName
 import ca.solostudios.nyx.internal.util.listProperty
 import ca.solostudios.nyx.internal.util.property
+import ca.solostudios.nyx.internal.util.provider
 import ca.solostudios.nyx.internal.util.tasks
 import ca.solostudios.nyx.internal.util.toStringOrEmpty
 import org.gradle.api.Action
@@ -48,17 +48,14 @@ public class NyxProjectInfoExtension(override val project: Project) : InternalNy
     /**
      * The name of the project to be used when publishing.
      *
-     * Defaults to the `project.name`, formatted in "Title Case"
-     * eg.
+     * Defaults to the `project.name`, formatted in "Title Case" eg.
      * - `my-project` -> "My Project"
      * - `some-project-name` -> "Some Project Name"
      *
      * Note:
      * - `-kt` is replaced with "Kotlin"
      */
-    public val name: Property<String> = property<String>().convention(project) {
-        project.name.formatAsName()
-    }
+    public val name: Property<String> = property<String>().convention(provider { project.name.formatAsName() })
 
     /**
      * The group id used when publishing.
@@ -78,9 +75,7 @@ public class NyxProjectInfoExtension(override val project: Project) : InternalNy
      *
      * Defaults to `project.name`
      */
-    public val module: Property<String> = property<String>().convention(project) {
-        project.name
-    }
+    public val module: Property<String> = property<String>().convention(provider { project.name })
 
     /**
      * The version used when publishing.
@@ -151,28 +146,28 @@ public class NyxProjectInfoExtension(override val project: Project) : InternalNy
     }
 
     /**
-     * Configures the repository info
+     * Configures the repository info.
      */
     public fun repository(action: Action<NyxRepositoryInfo>) {
         action.execute(repository)
     }
 
     /**
-     * Configures the repository info
+     * Configures the repository info.
      */
     public fun repository(action: (NyxRepositoryInfo).() -> Unit) {
         repository.apply(action)
     }
 
     /**
-     * Configures the license info
+     * Configures the license info.
      */
     public fun license(action: Action<NyxLicenseInfoExtension>) {
         action.execute(license)
     }
 
     /**
-     * Configures the license info
+     * Configures the license info.
      */
     public fun license(action: (NyxLicenseInfoExtension).() -> Unit) {
         license.apply(action)

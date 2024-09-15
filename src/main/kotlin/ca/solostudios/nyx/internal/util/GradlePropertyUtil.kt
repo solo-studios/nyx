@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file GradlePropertyUtil.kt is part of nyx
- * Last modified on 15-09-2024 07:05 a.m.
+ * Last modified on 15-09-2024 07:00 p.m.
  *
  * MIT License
  *
@@ -28,6 +28,7 @@
 package ca.solostudios.nyx.internal.util
 
 import ca.solostudios.nyx.internal.HasObjectFactory
+import ca.solostudios.nyx.internal.HasProject
 import org.gradle.api.DefaultTask
 import org.gradle.api.DomainObjectSet
 import org.gradle.api.NamedDomainObjectContainer
@@ -53,6 +54,9 @@ import org.gradle.kotlin.dsl.setProperty
 internal fun <T> Property<T>.convention(project: Project, provider: () -> T): Property<T> = convention(project.provider(provider))
 
 // @formatter:off
+internal fun <T> HasProject.provider(provider: () -> T?): Provider<T> = project.provider(provider)
+internal fun <T> DefaultTask.provider(provider: () -> T?): Provider<T> = project.provider(provider)
+
 internal inline fun <reified T> Project.property(): Property<T> = objects.property()
 internal inline fun <reified T> HasObjectFactory.property(): Property<T> = objects.property()
 internal inline fun <reified T> DefaultTask.property(): Property<T> = project.objects.property()
