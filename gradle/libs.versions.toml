@@ -1,5 +1,6 @@
 [versions]
 kotlin = "1.9.22"
+kotlinx-serialization = "1.6.3"
 
 dokka = "1.9.20"
 
@@ -35,10 +36,13 @@ maven = "3.9.6"
 
 fuel = "2.3.1"
 
+arrow = "1.2.4"
+
 [plugins]
 ## Kotlin Plugins
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-allopen = { id = "org.jetbrains.kotlin.plugin.allopen", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 
 ## Axion release plugin
@@ -57,6 +61,9 @@ gradle-publish = { id = "com.gradle.plugin-publish", version.ref = "gradle-publi
 kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlin" }
 
 kotlin-plugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
+
+kotlinx-serialization-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-core", version.ref = "kotlinx-serialization" }
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 
 ## Apache Commons Text
 apache-commons = { group = "org.apache.commons", name = "commons-text", version.ref = "apache-commons-text" }
@@ -90,8 +97,21 @@ maven-repository-metadata = { group = "org.apache.maven", name = "maven-reposito
 
 fuel = { group = "com.github.kittinunf.fuel", name = "fuel", version.ref = "fuel" }
 
+arrow-core = { group = "io.arrow-kt", name = "arrow-core", version.ref = "arrow" }
+arrow-serialization = { group = "io.arrow-kt", name = "arrow-core-serialization", version.ref = "arrow" }
+
 [bundles]
+kotlinx-serialization = [
+    "kotlinx-serialization-core",
+    "kotlinx-serialization-json",
+]
+
 maven = [
     "maven-artifact",
     "maven-repository-metadata",
+]
+
+arrow = [
+    "arrow-core",
+    "arrow-serialization",
 ]

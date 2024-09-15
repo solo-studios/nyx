@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxPublishingExtension.kt is part of nyx
- * Last modified on 11-07-2024 09:09 p.m.
+ * Last modified on 08-09-2024 03:24 p.m.
  *
  * MIT License
  *
@@ -51,7 +51,6 @@ import org.gradle.kotlin.dsl.withType
 import org.gradle.plugin.devel.plugins.JavaGradlePluginPlugin
 import org.gradle.plugins.signing.Sign
 import org.gradle.plugins.signing.SigningPlugin
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinMultiplatformPlugin
 
 public class NyxPublishingExtension(
     override val project: Project,

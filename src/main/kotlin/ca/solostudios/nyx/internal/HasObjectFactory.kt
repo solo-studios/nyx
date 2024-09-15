@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
- * The file InternalNyxExtension.kt is part of nyx
+ * The file HasObjectFactory.kt is part of nyx
  * Last modified on 06-09-2024 03:20 p.m.
  *
  * MIT License
@@ -27,4 +27,9 @@
 
 package ca.solostudios.nyx.internal
 
-internal interface InternalNyxExtension : HasProject, ConfiguresProject
+import org.gradle.api.model.ObjectFactory
+
+@AllOpen
+internal interface HasObjectFactory {
+    val objects: ObjectFactory
+}

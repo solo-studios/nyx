@@ -2,7 +2,7 @@
  * Copyright (c) 2023-2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file build.gradle.kts is part of nyx
- * Last modified on 11-07-2024 08:40 p.m.
+ * Last modified on 14-09-2024 10:37 p.m.
  *
  * MIT License
  *
@@ -34,6 +34,7 @@ plugins {
 
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.allopen)
+    alias(libs.plugins.kotlin.serialization)
 
     alias(libs.plugins.gradle.plugin.development)
 
@@ -134,6 +135,7 @@ repositories {
 dependencies {
     // compileOnly(gradleApi())
     api(libs.kotlin.stdlib)
+    implementation(libs.bundles.kotlinx.serialization)
 
     compileOnly(gradleApi("8.6"))
 
@@ -144,6 +146,8 @@ dependencies {
     implementation(libs.bundles.maven)
 
     implementation(libs.fuel)
+
+    implementation(libs.bundles.arrow)
 
     // Kotlin stuff
     compileOnly(libs.kotlin.plugin)

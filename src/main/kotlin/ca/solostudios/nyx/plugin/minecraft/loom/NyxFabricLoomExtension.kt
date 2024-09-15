@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxFabricLoomExtension.kt is part of nyx
- * Last modified on 19-06-2024 04:44 p.m.
+ * Last modified on 15-09-2024 07:14 a.m.
  *
  * MIT License
  *
@@ -30,6 +30,7 @@ package ca.solostudios.nyx.plugin.minecraft.loom
 import ca.solostudios.nyx.internal.util.fabricApi
 import ca.solostudios.nyx.internal.util.githubRelease
 import ca.solostudios.nyx.internal.util.isTrue
+import ca.solostudios.nyx.internal.util.layout
 import ca.solostudios.nyx.internal.util.loom
 import ca.solostudios.nyx.internal.util.nyx
 import ca.solostudios.nyx.internal.util.property
@@ -37,6 +38,7 @@ import ca.solostudios.nyx.internal.util.publishing
 import ca.solostudios.nyx.internal.util.sourceSets
 import ca.solostudios.nyx.internal.util.tasks
 import ca.solostudios.nyx.plugin.minecraft.AbstractMinecraftExtension
+import ca.solostudios.nyx.plugin.minecraft.loom.tasks.GenerateFabricModJson
 import net.fabricmc.loom.api.InterfaceInjectionExtensionAPI
 import net.fabricmc.loom.api.LoomGradleExtensionAPI
 import net.fabricmc.loom.api.ModSettings
@@ -47,12 +49,14 @@ import org.gradle.api.Action
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Nested
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.getValue
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.provideDelegate
+import org.gradle.kotlin.dsl.registering
 import org.slf4j.kotlin.getLogger
 import org.slf4j.kotlin.warn
 import kotlin.io.path.createDirectories
@@ -88,6 +92,9 @@ public class NyxFabricLoomExtension(
      */
     public val mods: NamedDomainObjectContainer<ModSettings>
         get() = loom.mods
+
+    @Nested
+    public val fabricModJson: FabricModJson = FabricModJson(project)
 
     /**
      * If interface injection is enabled.
@@ -144,6 +151,8 @@ public class NyxFabricLoomExtension(
      * @see LoomGradleExtensionAPI.clientOnlyMinecraftJar
      */
     public val clientOnlyMinecraftJar: Property<Boolean> = property()
+
+    public val generateFabricModJson: Property<Boolean> = property()
 
     /**
      * Enables interface injection.
@@ -216,6 +225,11 @@ public class NyxFabricLoomExtension(
     public fun withClientOnlyMinecraftJar() {
         clientOnlyMinecraftJar = true
     }
+
+    public fun withGenerateFabricModJson() {
+        generateFabricModJson = true
+    }
+
 
     /**
      * Enables data generation.
@@ -305,6 +319,16 @@ public class NyxFabricLoomExtension(
         action.execute(mods)
     }
 
+    public fun fabricModJson(action: FabricModJson.() -> Unit) {
+        generateFabricModJson = true
+        fabricModJson.apply(action)
+    }
+
+    public fun fabricModJson(action: Action<FabricModJson>) {
+        generateFabricModJson = true
+        action.execute(fabricModJson)
+    }
+
     /**
      * Adds an access widener at `src/main/resources/`[name]`.accesswidener`.
      *
@@ -387,6 +411,18 @@ public class NyxFabricLoomExtension(
                 vmArg("-Xmx${allocatedMemory.get()}G")
                 vmArgs(additionalJvmArgs.get())
                 properties(additionalJvmProperties.get())
+            }
+        }
+
+        if (generateFabricModJson.isTrue) {
+            sourceSets.named("main") {
+                val generateFabricModJson by tasks.registering(GenerateFabricModJson::class) {
+                    fabricModJson = this@NyxFabricLoomExtension.fabricModJson
+                    outputDirectory = layout.buildDirectory.dir("fabricModJson")
+                }
+                resources {
+                    srcDir(generateFabricModJson.map { it.outputDirectory })
+                }
             }
         }
 

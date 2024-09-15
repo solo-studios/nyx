@@ -2,7 +2,7 @@
  * Copyright (c) 2023-2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxExtension.kt is part of nyx
- * Last modified on 19-06-2024 05:00 p.m.
+ * Last modified on 14-09-2024 10:17 p.m.
  *
  * MIT License
  *
@@ -38,7 +38,6 @@ public class NyxExtension(override val project: Project) : InternalNyxExtension 
      * The project's metadata.
      */
     @Nested
-    @Suppress("LeakingThis")
     public val info: NyxProjectInfoExtension = NyxProjectInfoExtension(project)
 
     /**

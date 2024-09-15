@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxKotlinExtension.kt is part of nyx
- * Last modified on 19-06-2024 04:33 p.m.
+ * Last modified on 08-09-2024 03:24 p.m.
  *
  * MIT License
  *
@@ -24,6 +24,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
+@file:Suppress("DEPRECATION")
 
 package ca.solostudios.nyx.plugin.compile
 
@@ -270,6 +272,7 @@ public class NyxKotlinExtension(
             compilation.kotlinOptions.jvmTarget = /* evil */ if (jvmTarget.get() == 8) "1.8" else jvmTarget.get().toString()
     }
 
+    @Suppress("DEPRECATION")
     private fun configureCommonCompilations(target: KotlinTarget) {
         target.compilations.configureEach {
             if (apiVersion.isPresent)
