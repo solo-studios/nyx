@@ -11,6 +11,8 @@ nyx = "0.2.3"
 
 gradle-publish = "1.3.0"
 
+allure-gradle = "2.12.0"
+
 apache-commons-text = "1.12.0"
 
 guava = "32.1.3-jre"
@@ -39,6 +41,12 @@ fuel = "2.3.1"
 
 arrow = "1.2.4"
 
+junit-jupiter = "5.11.0"
+junit-launcher = "1.11.0"
+
+kotest = "5.9.1"
+kotest-allure = "1.4.0"
+
 [plugins]
 ## Kotlin
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
@@ -55,12 +63,16 @@ axion-release = { id = "pl.allegro.tech.build.axion-release", version.ref = "axi
 
 gradle-plugin-java = { id = "dev.gradleplugins.java-gradle-plugin", version.ref = "gradleplugins" }
 gradle-plugin-development = { id = "dev.gradleplugins.gradle-plugin-development", version.ref = "gradleplugins" }
+gradle-plugin-unit-test = { id = "dev.gradleplugins.gradle-plugin-unit-test", version.ref = "gradleplugins" }
+gradle-plugin-functional-test = { id = "dev.gradleplugins.gradle-plugin-functional-test", version.ref = "gradleplugins" }
 
 ## Nyx
 nyx = { id = "ca.solo-studios.nyx", version.ref = "nyx" }
 
 ## Gradle publishing plugin
 gradle-publish = { id = "com.gradle.plugin-publish", version.ref = "gradle-publish" }
+
+allure-gradle = { id = "io.qameta.allure", version.ref = "allure-gradle" }
 
 [libraries]
 ## Kotlin stdlib
@@ -114,10 +126,29 @@ fuel = { group = "com.github.kittinunf.fuel", name = "fuel", version.ref = "fuel
 arrow-core = { group = "io.arrow-kt", name = "arrow-core", version.ref = "arrow" }
 arrow-serialization = { group = "io.arrow-kt", name = "arrow-core-serialization", version.ref = "arrow" }
 
+junit-jupiter-api = { group = "org.junit.jupiter", name = "junit-jupiter-api", version.ref = "junit-jupiter" }
+junit-jupiter-engine = { group = "org.junit.jupiter", name = "junit-jupiter-engine", version.ref = "junit-jupiter" }
+junit-platform-launcher = { group = "org.junit.platform", name = "junit-platform-launcher", version.ref = "junit-launcher" }
+
+kotest-runner-junit5 = { group = "io.kotest", name = "kotest-runner-junit5", version.ref = "kotest" }
+kotest-framework-datatest = { group = "io.kotest", name = "kotest-framework-datatest", version.ref = "kotest" }
+kotest-assertions-core = { group = "io.kotest", name = "kotest-assertions-core", version.ref = "kotest" }
+kotest-assertions-json = { group = "io.kotest", name = "kotest-assertions-json", version.ref = "kotest" }
+kotest-property = { group = "io.kotest", name = "kotest-property", version.ref = "kotest" }
+kotest-extensions-jvm = { group = "io.kotest", name = "kotest-extensions-jvm", version.ref = "kotest" }
+kotest-extensions-htmlreporter = { group = "io.kotest", name = "kotest-extensions-htmlreporter", version.ref = "kotest" }
+kotest-extensions-junitxml = { group = "io.kotest", name = "kotest-extensions-junitxml", version.ref = "kotest" }
+kotest-extensions-allure = { group = "io.kotest.extensions", name = "kotest-extensions-allure", version.ref = "kotest-allure" }
+
 [bundles]
 kotlinx-serialization = [
     "kotlinx-serialization-core",
     "kotlinx-serialization-json",
+]
+
+neogradle = [
+    "neogradle-mixin",
+    "neogradle-userdev",
 ]
 
 maven = [
@@ -128,4 +159,22 @@ maven = [
 arrow = [
     "arrow-core",
     "arrow-serialization",
+]
+
+junit = [
+    "junit-jupiter-api",
+    "junit-jupiter-engine",
+    "junit-platform-launcher",
+]
+
+kotest = [
+    "kotest-runner-junit5",
+    "kotest-framework-datatest",
+    "kotest-assertions-core",
+    "kotest-assertions-json",
+    "kotest-property",
+    "kotest-extensions-jvm",
+    "kotest-extensions-htmlreporter",
+    "kotest-extensions-junitxml",
+    "kotest-extensions-allure",
 ]

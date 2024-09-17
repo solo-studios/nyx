@@ -1,38 +1,8 @@
 /*
- * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
- *
- * The file build.gradle.kts is part of nyx
- * Last modified on 15-09-2024 05:57 p.m.
- *
- * MIT License
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * GRADLE-CONVENTIONS-PLUGIN IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
-import ca.solostudios.nyx.util.architectury
-import ca.solostudios.nyx.util.soloStudios
-
-/*
  * Copyright (c) 2023-2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file build.gradle.kts is part of nyx
- * Last modified on 14-09-2024 10:37 p.m.
+ * Last modified on 17-09-2024 12:44 a.m.
  *
  * MIT License
  *
@@ -54,6 +24,8 @@ import ca.solostudios.nyx.util.soloStudios
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
+import ca.solostudios.nyx.util.soloStudios
 
 plugins {
     `kotlin-dsl`
@@ -62,18 +34,25 @@ plugins {
 
     `java-gradle-plugin`
 
+    `jvm-test-suite`
+    `java-test-fixtures`
+
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.allopen)
     alias(libs.plugins.kotlin.serialization)
 
     alias(libs.plugins.gradle.plugin.development)
+    alias(libs.plugins.gradle.plugin.functional.test)
+    alias(libs.plugins.gradle.plugin.unit.test)
 
     alias(libs.plugins.dokka)
     alias(libs.plugins.axion.release)
 
-    alias(libs.plugins.nyx)
-
     alias(libs.plugins.gradle.publish)
+
+    alias(libs.plugins.allure.gradle)
+
+    alias(libs.plugins.nyx)
 }
 
 nyx {
@@ -192,8 +171,13 @@ dependencies {
     compileOnly(libs.github.release)
     compileOnly(libs.modrinth.minotaur)
 
-    compileOnly(libs.neogradle.userdev)
-    compileOnly(libs.neogradle.mixin)
+    compileOnly(libs.bundles.neogradle)
+
+    // testFixtures("")
+    testFixturesApi(libs.bundles.junit)
+    testFixturesApi(libs.bundles.kotest)
+
+    testFixturesCompileOnly(gradleTestKit())
 }
 
 gradlePlugin {
@@ -222,6 +206,49 @@ gradlePlugin {
     }
 }
 
+allure {
+    version = "2.29.0"
+    adapter.autoconfigure = false
+    adapter.autoconfigureListeners = false
+    adapter.frameworks {
+        this.junit5.enabled = false
+    }
+}
+
+functionalTest {
+    testingStrategies = strategies.coverageForLatestGlobalAvailableVersionOfEachSupportedMajorVersions
+    dependencies {
+        implementation(gradleTestKit())
+        implementation(testFixtures(project()))
+    }
+}
+
+tasks {
+    withType<Test>().configureEach {
+        finalizedBy(allureReport)
+
+        useJUnitPlatform()
+
+        reports {
+            html.required.set(false)
+            junitXml.required.set(false)
+        }
+
+        systemProperty("nyx.test.work.tmp", temporaryDir.resolve("work"))
+        systemProperty("gradle.build.dir", layout.buildDirectory.get().asFile)
+        systemProperty("kotest.framework.classpath.scanning.config.disable", true)
+        systemProperty("kotest.framework.config.fqn", "ca.solostudios.nyx.kotest.KotestConfig")
+        systemProperty("kotest.framework.classpath.scanning.autoscan.disable", true)
+    }
+
+    allureReport {
+        clean = true
+    }
+
+    check {
+        dependsOn(withType<Test>())
+    }
+}
 
 val Project.isSnapshot: Boolean
     get() = version.toString().endsWith("-SNAPSHOT")

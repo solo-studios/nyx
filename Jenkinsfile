@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file Jenkinsfile is part of nyx
- * Last modified on 11-07-2024 08:45 p.m.
+ * Last modified on 17-09-2024 01:21 a.m.
  *
  * MIT License
  *
@@ -55,6 +55,22 @@ pipeline {
                     archiveArtifacts artifacts: '**/build/libs/*.jar', fingerprint: true, onlyIfSuccessful: true
 
                     javadoc javadocDir: 'build/dokka/html/', keepAll: true
+                }
+            }
+        }
+
+        stage('Tests') {
+            steps {
+                withGradle {
+                    sh './gradlew test'
+                }
+            }
+        }
+
+        stage('Integration Tests') {
+            steps {
+                withGradle {
+                    sh './gradlew functionalTest'
                 }
             }
         }
@@ -117,6 +133,10 @@ pipeline {
 
     post {
         always {
+            junit testResults: '**/build/test-results/*/TEST-*.xml'
+            recordIssues enabledForFailure: true, tools: [kotlin()]
+            allure includeProperties: false, jdk: '', results: [[path: 'build/allure-results']]
+
             cleanWs()
         }
     }
