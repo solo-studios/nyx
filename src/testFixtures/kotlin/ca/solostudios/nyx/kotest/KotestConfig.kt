@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file KotestConfig.kt is part of nyx
- * Last modified on 17-09-2024 01:36 a.m.
+ * Last modified on 17-09-2024 01:42 a.m.
  *
  * MIT License
  *
@@ -38,7 +38,10 @@ import io.kotest.extensions.htmlreporter.HtmlReporter
 import io.kotest.extensions.junitxml.JunitXmlReporter
 
 object KotestConfig : AbstractProjectConfig() {
-    override val parallelism = (Runtime.getRuntime().availableProcessors() - 1).coerceAtLeast(1)
+    override val parallelism = if (isIntegrationTest)
+        (Runtime.getRuntime().availableProcessors() - 1).coerceAtLeast(1).coerceAtMost(4)
+    else
+        (Runtime.getRuntime().availableProcessors() - 1).coerceAtLeast(1)
 
     override val testCaseOrder = TestCaseOrder.Sequential
     override val duplicateTestNameMode = DuplicateTestNameMode.Error
@@ -61,5 +64,9 @@ object KotestConfig : AbstractProjectConfig() {
         )
     )
 
-    private val taskName = System.getProperty("gradle.task.name")
+    private val taskName: String
+        get() = System.getProperty("gradle.task.name")
+
+    private val isIntegrationTest: Boolean
+        get() = taskName.contains("functional", ignoreCase = true)
 }
