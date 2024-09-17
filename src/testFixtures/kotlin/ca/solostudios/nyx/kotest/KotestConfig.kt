@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file KotestConfig.kt is part of nyx
- * Last modified on 15-09-2024 11:05 p.m.
+ * Last modified on 17-09-2024 01:36 a.m.
  *
  * MIT License
  *
@@ -52,9 +52,14 @@ object KotestConfig : AbstractProjectConfig() {
             includeContainers = false
         ),
         JunitXmlReporter(
-            includeContainers = true,
+            includeContainers = false,
             useTestPathAsName = true,
+            outputDir = "test-results/$taskName"
         ),
-        HtmlReporter()
+        HtmlReporter(
+            outputDir = "reports/tests/$taskName"
+        )
     )
+
+    private val taskName = System.getProperty("gradle.task.name")
 }

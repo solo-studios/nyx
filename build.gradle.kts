@@ -2,7 +2,7 @@
  * Copyright (c) 2023-2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file build.gradle.kts is part of nyx
- * Last modified on 17-09-2024 12:44 a.m.
+ * Last modified on 17-09-2024 01:37 a.m.
  *
  * MIT License
  *
@@ -234,8 +234,11 @@ tasks {
             junitXml.required.set(false)
         }
 
+        this.options
+
         systemProperty("nyx.test.work.tmp", temporaryDir.resolve("work"))
         systemProperty("gradle.build.dir", layout.buildDirectory.get().asFile)
+        systemProperty("gradle.task.name", name)
         systemProperty("kotest.framework.classpath.scanning.config.disable", true)
         systemProperty("kotest.framework.config.fqn", "ca.solostudios.nyx.kotest.KotestConfig")
         systemProperty("kotest.framework.classpath.scanning.autoscan.disable", true)
