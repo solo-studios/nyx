@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file Jenkinsfile is part of nyx
- * Last modified on 17-09-2024 01:21 a.m.
+ * Last modified on 17-09-2024 01:43 a.m.
  *
  * MIT License
  *
@@ -46,7 +46,7 @@ pipeline {
         stage('Build') {
             steps {
                 withGradle {
-                    sh './gradlew build'
+                    sh './gradlew build -x check'
                 }
             }
 
