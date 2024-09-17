@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file Jenkinsfile is part of nyx
- * Last modified on 17-09-2024 01:43 a.m.
+ * Last modified on 17-09-2024 01:52 a.m.
  *
  * MIT License
  *
@@ -52,7 +52,7 @@ pipeline {
 
             post {
                 success {
-                    archiveArtifacts artifacts: '**/build/libs/*.jar', fingerprint: true, onlyIfSuccessful: true
+                    archiveArtifacts artifacts: '**/build/libs/*.jar', excludes: '**/tmp/**', fingerprint: true, onlyIfSuccessful: true
 
                     javadoc javadocDir: 'build/dokka/html/', keepAll: true
                 }
