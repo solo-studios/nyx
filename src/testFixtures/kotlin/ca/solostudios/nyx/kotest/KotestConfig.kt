@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file KotestConfig.kt is part of nyx
- * Last modified on 17-09-2024 01:42 a.m.
+ * Last modified on 17-09-2024 11:15 p.m.
  *
  * MIT License
  *
@@ -48,7 +48,7 @@ object KotestConfig : AbstractProjectConfig() {
     override val testNameCase = TestNameCase.Lowercase
     override val specExecutionOrder = SpecExecutionOrder.Lexicographic
 
-    override val isolationMode = IsolationMode.SingleInstance
+    override val isolationMode = IsolationMode.InstancePerTest
 
     override fun extensions() = listOf(
         AllureTestReporter(

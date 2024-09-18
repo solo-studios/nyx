@@ -1,8 +1,8 @@
 /*
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
- * The file NyxCompilePluginTest.kt is part of nyx
- * Last modified on 18-09-2024 12:15 a.m.
+ * The file ProviderMatchers.kt is part of nyx
+ * Last modified on 17-09-2024 11:35 p.m.
  *
  * MIT License
  *
@@ -25,32 +25,28 @@
  * SOFTWARE.
  */
 
-package ca.solostudios.nyx.plugin.compile
+package ca.solostudios.nyx.kotest.matchers
 
-import ca.solostudios.nyx.NyxPlugin
-import ca.solostudios.nyx.internal.util.nyx
-import ca.solostudios.nyx.kotest.spec.NyxSpec
-import ca.solostudios.nyx.util.project
-import ca.solostudios.nyx.util.shouldHavePlugin
-import io.kotest.matchers.nulls.shouldNotBeNull
-import org.gradle.api.plugins.ExtensionAware
-import org.gradle.kotlin.dsl.apply
-import org.gradle.kotlin.dsl.findByType
+import io.kotest.assertions.print.print
+import io.kotest.matchers.MatcherResult
+import io.kotest.matchers.neverNullMatcher
+import io.kotest.matchers.should
+import io.kotest.matchers.shouldNot
+import org.gradle.api.provider.Provider
 
-class NyxCompilePluginTest : NyxSpec({
-    feature("the nyx compile plugin") {
-        upon("applying the nyx plugin") {
-            val project = project {}
+fun <T> Provider<T>.shouldBePresent(): Provider<T> {
+    this should bePresent()
+    return this
+}
 
-            project.apply<NyxPlugin>()
+fun <T> Provider<T>.shouldNotBePresent(): Provider<T> {
+    this shouldNot bePresent()
+    return this
+}
 
-            should("apply it") {
-                project.shouldHavePlugin<NyxCompilePlugin>()
-            }
-
-            should("add the extension") {
-                (project.nyx as ExtensionAware).extensions.findByType<NyxCompileExtension>().shouldNotBeNull()
-            }
-        }
-    }
-})
+fun <T> bePresent() = neverNullMatcher<Provider<T>> { value ->
+    MatcherResult(
+        value.isPresent,
+        { "${value.print().value} should be present" },
+        { "${value.print().value} should not be present" })
+}

@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file ProjectBuilderUtil.kt is part of nyx
- * Last modified on 17-09-2024 12:39 a.m.
+ * Last modified on 17-09-2024 11:56 p.m.
  *
  * MIT License
  *
@@ -31,11 +31,15 @@ import ca.solostudios.nyx.kotest.createTmpDir
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 
-fun project(block: ProjectBuilder.() -> Unit = {}): Project {
+fun project(name: String? = null, parent: Project? = null, block: Project.() -> Unit = {}): Project {
     return ProjectBuilder.builder()
         .apply {
             this.withProjectDir(createTmpDir("gradle-worker-", delete = false).toFile())
+            if (name != null)
+                withName(name)
+            if (parent != null)
+                withParent(parent)
         }
-        .apply(block)
         .build()
+        .apply(block)
 }
