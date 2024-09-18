@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file SonatypePublishExtension.kt is part of nyx
- * Last modified on 19-06-2024 05:12 p.m.
+ * Last modified on 18-09-2024 12:22 a.m.
  *
  * MIT License
  *
@@ -28,7 +28,6 @@
 package ca.solostudios.nyx.sonatype
 
 import ca.solostudios.nyx.internal.InternalNyxExtension
-import ca.solostudios.nyx.internal.util.create
 import ca.solostudios.nyx.internal.util.property
 import org.gradle.api.Project
 import org.gradle.api.provider.Property
@@ -80,8 +79,6 @@ public class SonatypePublishExtension(override val project: Project) : InternalN
 
     public companion object {
         public const val NAME: String = "sonatype"
-
-        public fun create(project: Project): SonatypePublishExtension = project.create<SonatypePublishExtension>(NAME, project)
     }
 
     override fun configureProject() {}

@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file SonatypePublishPlugin.kt is part of nyx
- * Last modified on 10-06-2024 03:21 p.m.
+ * Last modified on 18-09-2024 12:22 a.m.
  *
  * MIT License
  *
@@ -27,6 +27,8 @@
 
 package ca.solostudios.nyx.sonatype
 
+import ca.solostudios.nyx.internal.util.create
+import ca.solostudios.nyx.sonatype.SonatypePublishExtension.Companion.NAME
 import ca.solostudios.nyx.sonatype.publishing.PublishToSonatypeMavenRepository
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.builder.EqualsBuilder
@@ -55,6 +57,8 @@ import org.gradle.util.GradleVersion
 
 public open class SonatypePublishPlugin : Plugin<Project> {
     public override fun apply(project: Project) {
+        project.create<SonatypePublishExtension>(NAME, project)
+
         project.pluginManager.apply(PublishingPlugin::class.java)
         project.pluginManager.apply(MavenPublishPlugin::class.java)
 
