@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxCompileExtension.kt is part of nyx
- * Last modified on 19-06-2024 04:35 p.m.
+ * Last modified on 22-09-2024 05:12 p.m.
  *
  * MIT License
  *
@@ -225,8 +225,8 @@ public class NyxCompileExtension(override val project: Project) : InternalNyxExt
 
                 if (license != null) {
                     withType<Jar>().configureEach {
-                        from(license) {
-                            rename { "${it}_${project.rootProject.name}" }
+                        metaInf {
+                            from(license)
                         }
                     }
                 }
