@@ -1,8 +1,8 @@
 /*
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
- * The file NyxPublishingPluginTest.kt is part of nyx
- * Last modified on 20-09-2024 03:33 p.m.
+ * The file NyxMinecraftPluginTest.kt is part of nyx
+ * Last modified on 20-09-2024 03:30 p.m.
  *
  * MIT License
  *
@@ -25,11 +25,12 @@
  * SOFTWARE.
  */
 
-package ca.solostudios.nyx.plugin.publish
+package ca.solostudios.nyx.plugin.minecraft
 
 import ca.solostudios.nyx.NyxPlugin
 import ca.solostudios.nyx.internal.util.nyx
 import ca.solostudios.nyx.kotest.spec.NyxSpec
+import ca.solostudios.nyx.kotest.spec.NyxSpecFeatureContainerScope
 import ca.solostudios.nyx.util.project
 import ca.solostudios.nyx.util.shouldHavePlugin
 import io.kotest.matchers.nulls.shouldNotBeNull
@@ -37,22 +38,32 @@ import org.gradle.api.plugins.ExtensionAware
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.findByType
 
-class NyxPublishingPluginTest : NyxSpec({
-    feature("the nyx publishing plugin") {
-        given("a project") {
-            val project = project {}
+class NyxMinecraftPluginTest : NyxSpec({
+    feature("the nyx minecraft plugin") {
+        givenMinecraftPluginIdShouldApply("fabric-loom")
+        givenMinecraftPluginIdShouldApply("dev.architectury.loom")
+        givenMinecraftPluginIdShouldApply("org.quiltmc.loom")
+        // negradle breaks testing for some reason
+        // givenMinecraftPluginIdShouldApply("net.neoforged.gradle.userdev")
+    }
+})
 
-            upon("applying the nyx plugin") {
-                project.apply<NyxPlugin>()
+private suspend fun NyxSpecFeatureContainerScope.givenMinecraftPluginIdShouldApply(id: String) {
+    given("a project with the $id plugin applied") {
+        val project = project {
+            plugins.apply(id)
+        }
 
-                should("apply it") {
-                    project.shouldHavePlugin<NyxPublishingPlugin>()
-                }
+        upon("applying the nyx plugin") {
+            project.apply<NyxPlugin>()
 
-                should("add the extension") {
-                    (project.nyx as ExtensionAware).extensions.findByType<NyxPublishingExtension>().shouldNotBeNull()
-                }
+            should("apply it") {
+                project.shouldHavePlugin<NyxMinecraftPlugin>()
+            }
+
+            should("add the extension") {
+                (project.nyx as ExtensionAware).extensions.findByType<AbstractMinecraftExtension>().shouldNotBeNull()
             }
         }
     }
-})
+}

@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxCompilePluginTest.kt is part of nyx
- * Last modified on 18-09-2024 12:15 a.m.
+ * Last modified on 20-09-2024 03:32 p.m.
  *
  * MIT License
  *
@@ -36,20 +36,55 @@ import io.kotest.matchers.nulls.shouldNotBeNull
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.findByType
+import org.gradle.kotlin.dsl.getByType
 
 class NyxCompilePluginTest : NyxSpec({
     feature("the nyx compile plugin") {
-        upon("applying the nyx plugin") {
+        given("a project") {
             val project = project {}
 
-            project.apply<NyxPlugin>()
+            upon("applying the nyx plugin") {
+                project.apply<NyxPlugin>()
 
-            should("apply it") {
-                project.shouldHavePlugin<NyxCompilePlugin>()
+                should("apply it") {
+                    project.shouldHavePlugin<NyxCompilePlugin>()
+                }
+
+                should("add the extension") {
+                    (project.nyx as ExtensionAware).extensions.findByType<NyxCompileExtension>().shouldNotBeNull()
+                }
+            }
+        }
+
+        given("a project with the java plugin") {
+            val project = project {
+                plugins.apply("java")
             }
 
-            should("add the extension") {
-                (project.nyx as ExtensionAware).extensions.findByType<NyxCompileExtension>().shouldNotBeNull()
+            upon("applying the nyx plugin") {
+                project.apply<NyxPlugin>()
+
+                val compile = (project.nyx as ExtensionAware).extensions.getByType<NyxCompileExtension>()
+
+                should("add the java extension") {
+                    (compile as ExtensionAware).extensions.findByType<NyxJavaExtension>().shouldNotBeNull()
+                }
+            }
+        }
+
+        given("a project with the kotlin plugin") {
+            val project = project {
+                plugins.apply("org.jetbrains.kotlin.jvm")
+            }
+
+            upon("applying the nyx plugin") {
+                project.apply<NyxPlugin>()
+
+                val compile = (project.nyx as ExtensionAware).extensions.getByType<NyxCompileExtension>()
+
+                should("add the kotlin extension") {
+                    (compile as ExtensionAware).extensions.findByType<NyxKotlinExtension>().shouldNotBeNull()
+                }
             }
         }
     }

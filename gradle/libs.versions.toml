@@ -113,7 +113,7 @@ github-release = { group = "com.github.breadmoirai", name = "github-release", ve
 modrinth-minotaur = { group = "com.modrinth.minotaur", name = "Minotaur", version.ref = "modrinth-minotaur" }
 
 ## Dokka plugin
-dokka = { group = "org.jetbrains.dokka", name = "org.jetbrains.dokka.gradle.plugin", version.ref = "dokka" }
+dokka-plugin = { group = "org.jetbrains.dokka", name = "org.jetbrains.dokka.gradle.plugin", version.ref = "dokka" }
 
 ## Maven artifact
 maven-artifact = { group = "org.apache.maven", name = "maven-artifact", version.ref = "maven" }
@@ -144,6 +144,13 @@ kotest-extensions-allure = { group = "io.kotest.extensions", name = "kotest-exte
 kotlinx-serialization = [
     "kotlinx-serialization-core",
     "kotlinx-serialization-json",
+]
+
+loom = [
+    "fabric-loom",
+    "quilt-loom",
+    "architectury",
+    "architectury-loom",
 ]
 
 neogradle = [

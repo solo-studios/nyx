@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file SonatypePublishPluginTest.kt is part of nyx
- * Last modified on 18-09-2024 12:15 a.m.
+ * Last modified on 20-09-2024 03:09 p.m.
  *
  * MIT License
  *
@@ -38,9 +38,9 @@ import org.gradle.kotlin.dsl.findByType
 class SonatypePublishPluginTest : NyxSpec({
     feature("the sonatype publish plugin") {
         given("the class") {
-            upon("applying") {
-                val project = project {}
+            val project = project {}
 
+            upon("applying") {
                 shouldNotThrowAny {
                     project.apply<SonatypePublishPlugin>()
                 }
@@ -57,9 +57,9 @@ class SonatypePublishPluginTest : NyxSpec({
         }
 
         given("the nyx id") {
-            upon("applying") {
-                val project = project {}
+            val project = project {}
 
+            upon("applying") {
                 shouldNotThrowAny {
                     project.plugins.apply("ca.solo-studios.sonatype-publish")
                 }

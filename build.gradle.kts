@@ -2,7 +2,7 @@
  * Copyright (c) 2023-2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file build.gradle.kts is part of nyx
- * Last modified on 17-09-2024 01:37 a.m.
+ * Last modified on 22-09-2024 05:05 p.m.
  *
  * MIT License
  *
@@ -160,20 +160,21 @@ dependencies {
 
     // Kotlin stuff
     compileOnly(libs.kotlin.plugin)
-    compileOnly(libs.dokka)
+    testApi(libs.kotlin.plugin)
+    compileOnly(libs.dokka.plugin)
+    testApi(libs.dokka.plugin)
 
     // Minecraft plugins
-    compileOnly(libs.fabric.loom)
-    compileOnly(libs.quilt.loom)
-    compileOnly(libs.architectury)
-    compileOnly(libs.architectury.loom)
+    compileOnly(libs.bundles.loom)
+    testApi(libs.bundles.loom)
 
     compileOnly(libs.github.release)
+    testApi(libs.github.release)
     compileOnly(libs.modrinth.minotaur)
+    testApi(libs.modrinth.minotaur)
 
     compileOnly(libs.bundles.neogradle)
 
-    // testFixtures("")
     testFixturesApi(libs.bundles.junit)
     testFixturesApi(libs.bundles.kotest)
 
@@ -211,12 +212,16 @@ allure {
     adapter.autoconfigure = false
     adapter.autoconfigureListeners = false
     adapter.frameworks {
-        this.junit5.enabled = false
+        junit5.enabled = false
     }
 }
 
 functionalTest {
-    testingStrategies = strategies.coverageForLatestGlobalAvailableVersionOfEachSupportedMajorVersions
+    testingStrategies = buildSet {
+        add(strategies.coverageForGradleVersion("8.6"))
+        add(strategies.coverageForGradleVersion("8.7"))
+        add(strategies.coverageForGradleVersion("8.10"))
+    }
     dependencies {
         implementation(gradleTestKit())
         implementation(testFixtures(project()))
@@ -224,6 +229,12 @@ functionalTest {
 }
 
 tasks {
+    val functionalTest by registering {
+        group = JavaBasePlugin.VERIFICATION_GROUP
+        description = "Runs the functional test suite."
+        dependsOn(functionalTest.testTasks.elements)
+    }
+
     withType<Test>().configureEach {
         finalizedBy(allureReport)
 
@@ -233,8 +244,6 @@ tasks {
             html.required.set(false)
             junitXml.required.set(false)
         }
-
-        this.options
 
         systemProperty("nyx.test.work.tmp", temporaryDir.resolve("work"))
         systemProperty("gradle.build.dir", layout.buildDirectory.get().asFile)
@@ -249,7 +258,7 @@ tasks {
     }
 
     check {
-        dependsOn(withType<Test>())
+        dependsOn(withType<Test>(), functionalTest)
     }
 }
 
