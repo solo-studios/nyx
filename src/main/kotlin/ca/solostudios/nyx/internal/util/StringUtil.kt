@@ -2,7 +2,7 @@
  * Copyright (c) 2023-2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file StringUtil.kt is part of nyx
- * Last modified on 10-06-2024 03:21 p.m.
+ * Last modified on 22-09-2024 11:42 p.m.
  *
  * MIT License
  *
@@ -35,4 +35,13 @@ public fun String.formatAsName(): String {
     return split("-").map {
         it.takeIf { it != "kt" } ?: "Kotlin"
     }.joinToString(separator = " ") { it.capitalizeWord() }
+}
+
+internal fun lowerCamelCaseName(vararg nameParts: String?): String {
+    val nonEmptyParts = nameParts.mapNotNull { it?.takeIf(String::isNotEmpty) }
+    return nonEmptyParts.drop(1).joinToString(
+        separator = "",
+        prefix = nonEmptyParts.firstOrNull().orEmpty(),
+        transform = String::capitalizeWord
+    )
 }

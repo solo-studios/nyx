@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxFabricLoomExtension.kt is part of nyx
- * Last modified on 15-09-2024 07:14 a.m.
+ * Last modified on 22-09-2024 11:49 p.m.
  *
  * MIT License
  *
@@ -32,6 +32,7 @@ import ca.solostudios.nyx.internal.util.githubRelease
 import ca.solostudios.nyx.internal.util.isTrue
 import ca.solostudios.nyx.internal.util.layout
 import ca.solostudios.nyx.internal.util.loom
+import ca.solostudios.nyx.internal.util.lowerCamelCaseName
 import ca.solostudios.nyx.internal.util.nyx
 import ca.solostudios.nyx.internal.util.property
 import ca.solostudios.nyx.internal.util.publishing
@@ -45,24 +46,29 @@ import net.fabricmc.loom.api.ModSettings
 import net.fabricmc.loom.api.decompilers.DecompilerOptions
 import net.fabricmc.loom.configuration.FabricApiExtension
 import net.fabricmc.loom.configuration.ide.RunConfigSettings
+import net.fabricmc.loom.configuration.providers.minecraft.MinecraftSourceSets
 import org.gradle.api.Action
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Nested
+import org.gradle.api.tasks.SourceSet
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.getValue
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.provideDelegate
-import org.gradle.kotlin.dsl.registering
+import org.gradle.kotlin.dsl.register
+import org.gradle.kotlin.dsl.withType
 import org.slf4j.kotlin.getLogger
 import org.slf4j.kotlin.warn
 import kotlin.io.path.createDirectories
 import kotlin.io.path.createFile
 import kotlin.io.path.exists
 import kotlin.io.path.writeText
+import net.fabricmc.loom.configuration.providers.minecraft.MinecraftSourceSets.Split as SplitMinecraftSourceSet
+import net.fabricmc.loom.util.Constants as LoomConstants
 
 public class NyxFabricLoomExtension(
     override val project: Project,
@@ -382,6 +388,9 @@ public class NyxFabricLoomExtension(
     }
 
     override fun configureProject() {
+        if (project.plugins.hasPlugin("org.jetbrains.kotlin.jvm")) // kotlin sources jar task breaks the normal sources jar
+            tasks.withType<Jar>().named { it == "kotlinSourcesJar" }.configureEach { enabled = false }
+
         if (interfaceInjection.isPresent)
             loom.interfaceInjection.getIsEnabled().set(interfaceInjection)
 
@@ -416,12 +425,15 @@ public class NyxFabricLoomExtension(
 
         if (generateFabricModJson.isTrue) {
             sourceSets.named("main") {
-                val generateFabricModJson by tasks.registering(GenerateFabricModJson::class) {
-                    fabricModJson = this@NyxFabricLoomExtension.fabricModJson
-                    outputDirectory = layout.buildDirectory.dir("fabricModJson")
-                }
-                resources {
-                    srcDir(generateFabricModJson.map { it.outputDirectory })
+                configureSourceSet(this)
+            }
+
+            if (loom.areEnvironmentSourceSetsSplit()) {
+                val minecraftSourceSets = MinecraftSourceSets.get(project)
+                val clientSourceSetName = minecraftSourceSets.getSourceSetForEnv(SplitMinecraftSourceSet.CLIENT_ONLY_SOURCE_SET_NAME)
+
+                sourceSets.named { it == clientSourceSetName }.configureEach {
+                    configureSourceSet(this)
                 }
             }
         }
@@ -429,6 +441,23 @@ public class NyxFabricLoomExtension(
         project.plugins.withId("com.github.breadmoirai.github-release") {
             val remapJar by tasks.named<Jar>("remapJar")
             nyx.publishing.githubRelease.releaseAssets.from(remapJar)
+        }
+    }
+
+    private fun configureSourceSet(sourceSet: SourceSet) {
+        val sourceSetName = sourceSet.name
+
+        val generateFabricModJson by tasks.register<GenerateFabricModJson>(lowerCamelCaseName("generate", sourceSetName, "FabricModJson")) {
+            group = LoomConstants.TaskGroup.FABRIC
+            description = "Generate the fabric.mod.json file"
+
+            fabricModJson = this@NyxFabricLoomExtension.fabricModJson
+            outputDirectory = layout.buildDirectory.dir("fabricModJson")
+        }
+        sourceSet.compiledBy(generateFabricModJson)
+
+        tasks.withType<Jar>().named { it == sourceSet.sourcesJarTaskName }.configureEach {
+            from(generateFabricModJson)
         }
     }
 }
