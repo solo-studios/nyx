@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxFabricLoomExtension.kt is part of nyx
- * Last modified on 22-09-2024 11:49 p.m.
+ * Last modified on 23-09-2024 11:08 p.m.
  *
  * MIT License
  *
@@ -361,11 +361,12 @@ public class NyxFabricLoomExtension(
 
                 firstAccessWidener.parent.createDirectories()
                 firstAccessWidener.createFile()
+                // language=Access Widener
                 firstAccessWidener.writeText(
                     """
-                        |# Auto-generated access widener
                         |accessWidener v2 named
                         |
+                        |# Auto-generated access widener
                         |
                     """.trimMargin("|")
                 )
