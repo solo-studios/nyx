@@ -2,7 +2,7 @@
  * Copyright (c) 2023-2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file StringUtil.kt is part of nyx
- * Last modified on 22-09-2024 11:42 p.m.
+ * Last modified on 23-09-2024 11:13 p.m.
  *
  * MIT License
  *
@@ -27,11 +27,11 @@
 
 package ca.solostudios.nyx.internal.util
 
-public fun String.capitalizeWord(): String = replaceFirstChar { if (it.isLowerCase()) it.uppercase() else it.toString() }
+internal fun String.capitalizeWord(): String = replaceFirstChar { if (it.isLowerCase()) it.uppercase() else it.toString() }
 
-public fun Any?.toStringOrEmpty(): String = this as? String ?: this?.toString() ?: ""
+internal fun Any?.toStringOrEmpty(): String = this as? String ?: this?.toString() ?: ""
 
-public fun String.formatAsName(): String {
+internal fun String.formatAsName(): String {
     return split("-").map {
         it.takeIf { it != "kt" } ?: "Kotlin"
     }.joinToString(separator = " ") { it.capitalizeWord() }
