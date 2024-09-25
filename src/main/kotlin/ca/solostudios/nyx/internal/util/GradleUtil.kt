@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file GradleUtil.kt is part of nyx
- * Last modified on 15-09-2024 04:46 p.m.
+ * Last modified on 25-09-2024 05:39 p.m.
  *
  * MIT License
  *
@@ -39,8 +39,12 @@ import net.neoforged.gradle.dsl.common.extensions.Minecraft
 import net.neoforged.gradle.dsl.common.runs.run.RunManager
 import net.neoforged.gradle.dsl.mixin.extension.Mixin
 import org.gradle.api.Named
+import org.gradle.api.NamedDomainObjectContainer
+import org.gradle.api.NamedDomainObjectProvider
 import org.gradle.api.Plugin
+import org.gradle.api.PolymorphicDomainObjectContainer
 import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.api.artifacts.ConfigurationContainer
 import org.gradle.api.artifacts.dsl.ArtifactHandler
 import org.gradle.api.file.ProjectLayout
@@ -50,15 +54,18 @@ import org.gradle.api.plugins.PluginContainer
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.api.tasks.TaskContainer
+import org.gradle.kotlin.dsl.ExistingDomainObjectDelegate
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.newInstance
+import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.the
 import org.gradle.kotlin.dsl.withType
 import org.gradle.plugins.signing.SigningExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import kotlin.reflect.KClass
+import kotlin.reflect.KProperty
 import net.neoforged.gradle.dsl.common.extensions.Minecraft as NeoMinecraft
 import net.neoforged.gradle.dsl.mixin.extension.Mixin as NeoMixin
 
@@ -88,6 +95,7 @@ internal val HasProject.layout: ProjectLayout
     get() = project.layout
 
 internal fun HasProject.tasks(block: TaskContainer.() -> Unit) = project.tasks.apply(block)
+internal fun Task.tasks(block: TaskContainer.() -> Unit) = project.tasks.apply(block)
 internal val HasProject.tasks: TaskContainer
     get() = project.tasks
 
@@ -100,6 +108,7 @@ internal val HasProject.kotlin: KotlinProjectExtension
     get() = project.the<KotlinProjectExtension>()
 
 internal fun HasProject.publishing(block: PublishingExtension.() -> Unit) = project.configure<PublishingExtension>(block)
+internal fun Project.publishing(block: PublishingExtension.() -> Unit) = project.configure<PublishingExtension>(block)
 internal val HasProject.publishing: PublishingExtension
     get() = project.the<PublishingExtension>()
 
@@ -162,6 +171,79 @@ internal fun NyxPublishingExtension.githubRelease(block: NyxGithubReleaseExtensi
 internal val NyxPublishingExtension.githubRelease: NyxGithubReleaseExtension
     get() = (this as ExtensionAware).the<NyxGithubReleaseExtension>()
 
+internal fun <T : Any> NamedDomainObjectContainer<T>.maybeRegister(name: String, action: T.() -> Unit = {}) = when {
+    findByName(name) != null -> named(name, action)
+    else -> register(name, action)
+}
+
+internal fun <U : T, T : Any> PolymorphicDomainObjectContainer<T>.maybeRegister(name: String, type: KClass<U>, action: T.() -> Unit = {}) = when {
+    findByName(name) != null -> named(name, type, action)
+    else -> register(name, type, action)
+}
+
+internal val <T : Any> NamedDomainObjectContainer<T>.maybeRegistering
+    get() = maybeRegistering {  }
+internal fun <T : Any> NamedDomainObjectContainer<T>.maybeRegistering(configuration: T.() -> Unit) = MaybeCreatingDomainObjectDelegate.of(this, configuration)
+internal fun <T : Any, U : T> PolymorphicDomainObjectContainer<T>.maybeRegistering(type: KClass<U>) = MaybeCreatingDomainObjectDelegateWithType.of(this, type) {  }
+internal fun <T : Any, U : T> PolymorphicDomainObjectContainer<T>.maybeRegistering(type: Class<U>) = maybeRegistering(type.kotlin) {  }
+internal fun <T : Any, U : T> PolymorphicDomainObjectContainer<T>.maybeRegistering(type: KClass<U>, configuration: U.() -> Unit) = MaybeCreatingDomainObjectDelegateWithType.of(this, type, configuration)
+internal fun <T : Any, U : T> PolymorphicDomainObjectContainer<T>.maybeRegistering(type: Class<U>, configuration: U.() -> Unit) = maybeRegistering(type.kotlin, configuration)
+
 // @formatter:on
+
+internal class MaybeCreatingDomainObjectDelegate<T : Any> private constructor(
+    val container: NamedDomainObjectContainer<T>,
+    val action: T.() -> Unit,
+) {
+    operator fun provideDelegate(
+        receiver: Any?,
+        property: KProperty<*>,
+    ): ExistingDomainObjectDelegate<NamedDomainObjectProvider<T>> {
+        val name = property.name
+        val found = container.findByName(name) != null
+        return ExistingDomainObjectDelegate.of(
+            when {
+                found -> container.named(name, action)
+                else -> container.register(name, action)
+            }
+        )
+    }
+
+    companion object {
+        fun <T : Any> of(
+            container: NamedDomainObjectContainer<T>,
+            action: T.() -> Unit,
+        ) = MaybeCreatingDomainObjectDelegate(container, action)
+    }
+}
+
+
+internal class MaybeCreatingDomainObjectDelegateWithType<T : Any, U : T> private constructor(
+    val container: PolymorphicDomainObjectContainer<T>,
+    val type: KClass<U>,
+    val action: U.() -> Unit,
+) {
+    operator fun provideDelegate(
+        receiver: Any?,
+        property: KProperty<*>,
+    ): ExistingDomainObjectDelegate<NamedDomainObjectProvider<U>> {
+        val name = property.name
+        val found = container.findByName(name) != null
+        return ExistingDomainObjectDelegate.of(
+            when {
+                found -> container.named(property.name, type, action)
+                else -> container.register(property.name, type, action)
+            }
+        )
+    }
+
+    companion object {
+        fun <T : Any, U : T> of(
+            container: PolymorphicDomainObjectContainer<T>,
+            type: KClass<U>,
+            action: U.() -> Unit,
+        ) = MaybeCreatingDomainObjectDelegateWithType(container, type, action)
+    }
+}
 
 internal inline fun <reified T> HasProject.newInstance(vararg parameters: Any): T = project.objects.newInstance(*parameters)
