@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxKotlinExtension.kt is part of nyx
- * Last modified on 08-09-2024 03:24 p.m.
+ * Last modified on 25-09-2024 06:17 p.m.
  *
  * MIT License
  *
@@ -32,6 +32,7 @@ package ca.solostudios.nyx.plugin.compile
 import ca.solostudios.nyx.internal.InternalNyxExtension
 import ca.solostudios.nyx.internal.util.addDokkaJavadocJarTask
 import ca.solostudios.nyx.internal.util.isTrue
+import ca.solostudios.nyx.internal.util.java
 import ca.solostudios.nyx.internal.util.kotlin
 import ca.solostudios.nyx.internal.util.listProperty
 import ca.solostudios.nyx.internal.util.property
@@ -232,6 +233,8 @@ public class NyxKotlinExtension(
             when (this) {
                 is KotlinJvmProjectExtension -> {
                     configureCommonCompilations(target)
+                    if (sourcesJar.isTrue)
+                        java.withSourcesJar()
 
                     target.compilations.configureEach {
                         configureJvmCompilation(this)
