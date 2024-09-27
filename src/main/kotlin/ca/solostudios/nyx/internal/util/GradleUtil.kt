@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file GradleUtil.kt is part of nyx
- * Last modified on 25-09-2024 05:39 p.m.
+ * Last modified on 27-09-2024 02:42 p.m.
  *
  * MIT License
  *
@@ -29,6 +29,7 @@ package ca.solostudios.nyx.internal.util
 
 import ca.solostudios.nyx.NyxExtension
 import ca.solostudios.nyx.internal.HasProject
+import ca.solostudios.nyx.plugin.minecraft.AbstractMinecraftExtension
 import ca.solostudios.nyx.plugin.publish.NyxPublishingExtension
 import ca.solostudios.nyx.plugin.publish.release.NyxGithubReleaseExtension
 import com.github.breadmoirai.githubreleaseplugin.GithubReleaseExtension
@@ -162,6 +163,10 @@ internal val HasProject.nyx: NyxExtension
     get() = project.the<NyxExtension>()
 internal val Project.nyx: NyxExtension
     get() = project.the<NyxExtension>()
+
+internal fun NyxExtension.minecraft(block: AbstractMinecraftExtension.() -> Unit) = project.configure<AbstractMinecraftExtension>(block)
+internal val NyxExtension.minecraft: AbstractMinecraftExtension
+    get() = (this as ExtensionAware).the<AbstractMinecraftExtension>()
 
 internal fun NyxExtension.publishing(block: NyxPublishingExtension.() -> Unit) = project.configure<NyxPublishingExtension>(block)
 internal val NyxExtension.publishing: NyxPublishingExtension

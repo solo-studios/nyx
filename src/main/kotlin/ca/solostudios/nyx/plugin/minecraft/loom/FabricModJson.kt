@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file FabricModJson.kt is part of nyx
- * Last modified on 15-09-2024 07:24 p.m.
+ * Last modified on 27-09-2024 02:46 p.m.
  *
  * MIT License
  *
@@ -31,7 +31,9 @@ import ca.solostudios.nyx.internal.HasProject
 import ca.solostudios.nyx.internal.InjectedObjectFactory
 import ca.solostudios.nyx.internal.util.domainObjectContainer
 import ca.solostudios.nyx.internal.util.listProperty
+import ca.solostudios.nyx.internal.util.loom
 import ca.solostudios.nyx.internal.util.mapProperty
+import ca.solostudios.nyx.internal.util.minecraft
 import ca.solostudios.nyx.internal.util.nyx
 import ca.solostudios.nyx.internal.util.property
 import ca.solostudios.nyx.internal.util.provider
@@ -67,8 +69,7 @@ public class FabricModJson(override val project: Project) : HasProject {
      * The version of the mod.
      */
     @Input
-    public val version: Property<String> =
-        property<String>().convention(provider { nyx.info.version })
+    public val version: Property<String> = property<String>().convention(provider { nyx.info.version })
 
     /**
      * The description of this mod.
@@ -88,7 +89,16 @@ public class FabricModJson(override val project: Project) : HasProject {
      */
     @Input
     @Optional
-    public val environment: Property<Environment> = property()
+    public val environment: Property<Environment> = property<Environment>().convention(provider {
+        val minecraft = nyx.minecraft
+        when {
+            minecraft !is NyxFabricLoomExtension -> null
+            minecraft.clientOnlyMinecraftJar -> Environment.CLIENT
+            minecraft.serverOnlyMinecraftJar -> Environment.SERVER
+            minecraft.splitMinecraftJar || minecraft.mergedMinecraftJar -> Environment.UNIVERSAL
+            else -> Environment.UNIVERSAL
+        }
+    })
 
     /**
      * The entrypoints to this mod.
@@ -121,7 +131,7 @@ public class FabricModJson(override val project: Project) : HasProject {
      */
     @Input
     @Optional
-    public val accessWidener: Property<String> = property()
+    public val accessWidener: Property<String> = property<String>().convention(loom.accessWidenerPath.map { it.asFile.name })
 
     /**
      * A list of mods that this mod depends on.

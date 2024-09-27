@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxFabricLoomExtension.kt is part of nyx
- * Last modified on 23-09-2024 11:08 p.m.
+ * Last modified on 27-09-2024 02:46 p.m.
  *
  * MIT License
  *
@@ -46,6 +46,7 @@ import net.fabricmc.loom.api.ModSettings
 import net.fabricmc.loom.api.decompilers.DecompilerOptions
 import net.fabricmc.loom.configuration.FabricApiExtension
 import net.fabricmc.loom.configuration.ide.RunConfigSettings
+import net.fabricmc.loom.configuration.providers.minecraft.MinecraftJarConfiguration
 import net.fabricmc.loom.configuration.providers.minecraft.MinecraftSourceSets
 import org.gradle.api.Action
 import org.gradle.api.NamedDomainObjectContainer
@@ -107,57 +108,105 @@ public class NyxFabricLoomExtension(
      *
      * @see InterfaceInjectionExtensionAPI.getIsEnabled
      */
-    public val interfaceInjection: Property<Boolean> = property()
+    public var interfaceInjection: Boolean
+        get() = loom.interfaceInjection.getIsEnabled().isTrue
+        set(value) = loom.interfaceInjection.getIsEnabled().set(value)
 
     /**
      * If transitive access wideners are enabled.
      *
      * @see LoomGradleExtensionAPI.getEnableTransitiveAccessWideners
      */
-    public val transitiveAccessWideners: Property<Boolean> = property()
+    public var transitiveAccessWideners: Boolean
+        get() = loom.enableTransitiveAccessWideners.isTrue
+        set(value) = loom.enableTransitiveAccessWideners.set(value)
 
     /**
      * If mod provided javadocs is enabled.
      *
      * @see LoomGradleExtensionAPI.getEnableModProvidedJavadoc
      */
-    public val modProvidedJavadoc: Property<Boolean> = property()
+    public var modProvidedJavadoc: Boolean
+        get() = loom.enableModProvidedJavadoc.isTrue
+        set(value) = loom.enableModProvidedJavadoc.set(value)
 
     /**
      * If runtime only log4j is enabled.
      *
      * @see LoomGradleExtensionAPI.getRuntimeOnlyLog4j
      */
-    public val runtimeOnlyLog4j: Property<Boolean> = property()
+    public var runtimeOnlyLog4j: Boolean
+        get() = loom.runtimeOnlyLog4j.isTrue
+        set(value) = loom.runtimeOnlyLog4j.set(value)
 
     /**
      * If splitting mod dependencies is enabled.
      *
      * @see LoomGradleExtensionAPI.getSplitModDependencies
      */
-    public val splitModDependencies: Property<Boolean> = property()
+    public var splitModDependencies: Boolean
+        get() = loom.splitModDependencies.isTrue
+        set(value) = loom.splitModDependencies.set(value)
 
     /**
      * If split environment sourcesets is enabled.
      *
      * @see LoomGradleExtensionAPI.splitEnvironmentSourceSets
      */
-    public val splitEnvironmentalSourceSet: Property<Boolean> = property()
+    public var splitEnvironmentalSourceSet: Boolean
+        get() = loom.areEnvironmentSourceSetsSplit()
+        set(value) {
+            if (value) loom.splitEnvironmentSourceSets()
+        }
 
     /**
      * If the generation of only the minecraft server jar is enabled.
      *
      * @see LoomGradleExtensionAPI.serverOnlyMinecraftJar
      */
-    public val serverOnlyMinecraftJar: Property<Boolean> = property()
+    public var serverOnlyMinecraftJar: Boolean
+        get() = loom.minecraftJarConfiguration.orNull == MinecraftJarConfiguration.SERVER_ONLY
+        set(value) {
+            if (value) loom.serverOnlyMinecraftJar()
+        }
 
     /**
      * If the generation of only the minecraft client jar is enabled.
      *
      * @see LoomGradleExtensionAPI.clientOnlyMinecraftJar
      */
-    public val clientOnlyMinecraftJar: Property<Boolean> = property()
+    public var clientOnlyMinecraftJar: Boolean
+        get() = loom.minecraftJarConfiguration.orNull == MinecraftJarConfiguration.CLIENT_ONLY
+        set(value) {
+            if (value) loom.clientOnlyMinecraftJar()
+        }
 
+    /**
+     * If the generation of the minecraft should be split into client and
+     * server jars.
+     *
+     * @see LoomGradleExtensionAPI.splitMinecraftJar
+     */
+    public var splitMinecraftJar: Boolean
+        get() = loom.minecraftJarConfiguration.orNull == MinecraftJarConfiguration.SPLIT
+        set(value) {
+            if (value) loom.splitMinecraftJar()
+        }
+
+    /**
+     * If the generation of the minecraft should be merged into one.
+     *
+     * @see LoomGradleExtensionAPI.getMinecraftJarConfiguration
+     */
+    public var mergedMinecraftJar: Boolean
+        get() = loom.minecraftJarConfiguration.orNull == MinecraftJarConfiguration.MERGED
+        set(value) {
+            if (value) loom.minecraftJarConfiguration.set(MinecraftJarConfiguration.MERGED)
+        }
+
+    /**
+     * If the generation of the `fabric.mod.json` file is enabled.
+     */
     public val generateFabricModJson: Property<Boolean> = property()
 
     /**
@@ -232,10 +281,22 @@ public class NyxFabricLoomExtension(
         clientOnlyMinecraftJar = true
     }
 
+    /**
+     * Enables the generation of the minecraft to be split into client and
+     * server jars.
+     *
+     * @see splitMinecraftJar
+     */
+    public fun withSplitMinecraftJar() {
+        splitMinecraftJar = true
+    }
+
+    /**
+     * Enables generation of the `fabric.mod.json` file.
+     */
     public fun withGenerateFabricModJson() {
         generateFabricModJson = true
     }
-
 
     /**
      * Enables data generation.
@@ -345,7 +406,9 @@ public class NyxFabricLoomExtension(
     public fun accessWidener(name: String = project.name) {
         loom {
             // src/main/resources/$name.accesswidener
-            val accessWidenerPaths = sourceSets["main"].resources.srcDirs.map { it.resolve("$name.accesswidener").toPath() }
+            val accessWidenerPaths = sourceSets[SourceSet.MAIN_SOURCE_SET_NAME].resources.srcDirs.map {
+                it.resolve("$name.accesswidener").toPath()
+            }
             if (accessWidenerPaths.none { it.exists() }) {
                 // try creating access widener file
                 val firstAccessWidener = accessWidenerPaths.first()
@@ -391,30 +454,6 @@ public class NyxFabricLoomExtension(
     override fun configureProject() {
         if (project.plugins.hasPlugin("org.jetbrains.kotlin.jvm")) // kotlin sources jar task breaks the normal sources jar
             tasks.withType<Jar>().named { it == "kotlinSourcesJar" }.configureEach { enabled = false }
-
-        if (interfaceInjection.isPresent)
-            loom.interfaceInjection.getIsEnabled().set(interfaceInjection)
-
-        if (transitiveAccessWideners.isPresent)
-            loom.enableTransitiveAccessWideners = transitiveAccessWideners
-
-        if (modProvidedJavadoc.isPresent)
-            loom.enableModProvidedJavadoc = modProvidedJavadoc
-
-        if (runtimeOnlyLog4j.isPresent)
-            loom.runtimeOnlyLog4j = runtimeOnlyLog4j
-
-        if (splitModDependencies.isPresent)
-            loom.splitModDependencies = splitModDependencies
-
-        if (splitEnvironmentalSourceSet.isTrue)
-            loom.splitEnvironmentSourceSets()
-
-        if (serverOnlyMinecraftJar.isTrue)
-            loom.serverOnlyMinecraftJar()
-
-        if (clientOnlyMinecraftJar.isTrue)
-            loom.clientOnlyMinecraftJar()
 
         loom {
             runs.configureEach {
