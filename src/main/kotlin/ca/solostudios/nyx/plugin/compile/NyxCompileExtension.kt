@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxCompileExtension.kt is part of nyx
- * Last modified on 22-09-2024 05:12 p.m.
+ * Last modified on 28-09-2024 12:20 a.m.
  *
  * MIT License
  *
@@ -41,6 +41,7 @@ import org.gradle.jvm.tasks.Jar
 import org.gradle.jvm.toolchain.JavaToolchainSpec
 import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.named
+import org.gradle.kotlin.dsl.support.listFilesOrdered
 import org.gradle.kotlin.dsl.withType
 import java.io.File
 
@@ -221,13 +222,25 @@ public class NyxCompileExtension(override val project: Project) : InternalNyxExt
     override fun configureProject() {
         tasks {
             if (distributeLicense.isTrue) {
-                val license = project.findNearestLicense()
+                val licenseFile = project.firstFileMatchingInParents { it.nameWithoutExtension.contains("LICENSE", ignoreCase = true) }
+                val copyingFile = project.firstFileMatchingInParents {
+                    it.nameWithoutExtension.equals("COPYING", ignoreCase = true) && !it.name.contains("LESSER", ignoreCase = true)
+                }
+                val lesserCopyingFile = project.firstFileMatchingInParents {
+                    it.name.contains("COPYING", ignoreCase = true) && it.name.contains("LESSER", ignoreCase = true)
+                }
+                val noticeFile = project.firstFileMatchingInParents { it.nameWithoutExtension.equals("NOTICE", ignoreCase = true) }
 
-                if (license != null) {
-                    withType<Jar>().configureEach {
-                        metaInf {
-                            from(license)
-                        }
+                withType<Jar>().configureEach {
+                    metaInf {
+                        if (licenseFile != null)
+                            from(licenseFile)
+                        if (copyingFile != null)
+                            from(copyingFile)
+                        if (lesserCopyingFile != null)
+                            from(lesserCopyingFile)
+                        if (noticeFile != null)
+                            from(noticeFile)
                     }
                 }
             }
@@ -253,21 +266,17 @@ public class NyxCompileExtension(override val project: Project) : InternalNyxExt
         }
     }
 
-    internal fun Project.findNearestLicense(): File? {
-        var project: Project? = this
-        while (project != null) {
-            // Sort for consistent ordering (order is not guaranteed)
-            val licenseFile = project.projectDir.listFiles()?.sortedBy { it.name }?.firstOrNull {
-                it.nameWithoutExtension == "LICENSE" && it.exists()
+    private fun Project.firstFileMatchingInParents(filter: (File) -> Boolean): File? {
+        val projectIterable = Iterable {
+            object : Iterator<Project> {
+                val project = this@firstFileMatchingInParents.project
+                override fun hasNext(): Boolean = project.parent != null
+                override fun next(): Project = project.parent!!
             }
-
-            if (licenseFile != null)
-                return licenseFile
-
-            project = project.parent
         }
-
-        return null
+        return projectIterable.firstNotNullOfOrNull {
+            project.projectDir.listFilesOrdered { it.isFile }.firstOrNull(filter)
+        }
     }
 
     public companion object {
