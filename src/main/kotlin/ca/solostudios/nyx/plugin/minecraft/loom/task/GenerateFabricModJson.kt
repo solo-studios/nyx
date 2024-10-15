@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file GenerateFabricModJson.kt is part of nyx
- * Last modified on 15-09-2024 07:16 p.m.
+ * Last modified on 15-10-2024 07:36 p.m.
  *
  * MIT License
  *
@@ -25,7 +25,7 @@
  * SOFTWARE.
  */
 
-package ca.solostudios.nyx.plugin.minecraft.loom.tasks
+package ca.solostudios.nyx.plugin.minecraft.loom.task
 
 import ca.solostudios.nyx.internal.AllOpen
 import ca.solostudios.nyx.internal.SerialFabricModJson
@@ -68,12 +68,14 @@ public class GenerateFabricModJson : DefaultTask() {
     @OutputDirectory
     public val outputDirectory: DirectoryProperty = directoryProperty()
 
+    public val outputFilename: Property<String> = property<String>().convention("fabric.mod.json")
+
     @TaskAction
     @OptIn(ExperimentalSerializationApi::class)
     private fun generateJson() {
         val serialModJson = fabricModJson.get().toSerial()
 
-        outputPath("fabric.mod.json").outputStream().buffered().use { outputStream ->
+        outputPath(outputFilename.get()).outputStream().buffered().use { outputStream ->
             json.encodeToStream(serialModJson, outputStream)
         }
     }

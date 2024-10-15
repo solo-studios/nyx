@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxFabricLoomExtension.kt is part of nyx
- * Last modified on 27-09-2024 02:46 p.m.
+ * Last modified on 15-10-2024 07:36 p.m.
  *
  * MIT License
  *
@@ -39,7 +39,7 @@ import ca.solostudios.nyx.internal.util.publishing
 import ca.solostudios.nyx.internal.util.sourceSets
 import ca.solostudios.nyx.internal.util.tasks
 import ca.solostudios.nyx.plugin.minecraft.AbstractMinecraftExtension
-import ca.solostudios.nyx.plugin.minecraft.loom.tasks.GenerateFabricModJson
+import ca.solostudios.nyx.plugin.minecraft.loom.task.GenerateFabricModJson
 import net.fabricmc.loom.api.InterfaceInjectionExtensionAPI
 import net.fabricmc.loom.api.LoomGradleExtensionAPI
 import net.fabricmc.loom.api.ModSettings
