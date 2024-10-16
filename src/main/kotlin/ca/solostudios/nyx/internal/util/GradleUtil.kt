@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file GradleUtil.kt is part of nyx
- * Last modified on 27-09-2024 02:42 p.m.
+ * Last modified on 15-10-2024 09:17 p.m.
  *
  * MIT License
  *
@@ -42,6 +42,7 @@ import net.neoforged.gradle.dsl.mixin.extension.Mixin
 import org.gradle.api.Named
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.NamedDomainObjectProvider
+import org.gradle.api.NamedDomainObjectSet
 import org.gradle.api.Plugin
 import org.gradle.api.PolymorphicDomainObjectContainer
 import org.gradle.api.Project
@@ -185,6 +186,8 @@ internal fun <U : T, T : Any> PolymorphicDomainObjectContainer<T>.maybeRegister(
     findByName(name) != null -> named(name, type, action)
     else -> register(name, type, action)
 }
+
+internal operator fun <T> NamedDomainObjectSet<T>.contains(name: String) = findByName(name) != null
 
 internal val <T : Any> NamedDomainObjectContainer<T>.maybeRegistering
     get() = maybeRegistering {  }

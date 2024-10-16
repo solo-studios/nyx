@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file DokkaUtil.kt is part of nyx
- * Last modified on 25-09-2024 06:14 p.m.
+ * Last modified on 15-10-2024 09:17 p.m.
  *
  * MIT License
  *
@@ -46,6 +46,7 @@ import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.dokka.gradle.DokkaTask
+import org.jetbrains.dokka.gradle.tasks.DokkaGenerateTask
 
 private val UNPUBLISHABLE_VARIANT_ARTIFACTS = listOf(
     ArtifactTypeDefinition.JVM_CLASS_DIRECTORY,
@@ -55,13 +56,22 @@ private val UNPUBLISHABLE_VARIANT_ARTIFACTS = listOf(
 
 internal fun HasProject.addDokkaJavadocJarTask() {
     tasks {
-        val dokkaHtml by named<DokkaTask>("dokkaHtml")
+        val dokkaHtml by when {
+            "dokkaGenerateHtml" in tasks -> named<DokkaGenerateTask>("dokkaGenerateHtml")
+            "dokkaHtml" in tasks -> named<DokkaTask>("dokkaHtml")
+            else -> error("Could not find dokka task. Both 'dokkaGenerateHtml' and 'dokkaHtml' are null.")
+        }
 
         val javadocJar by maybeRegistering(Jar::class) {
-            configureJavadocJar(dokkaHtml)
+            when (val dokkaHtmlTask = dokkaHtml) {
+                is DokkaGenerateTask -> configureJavadocJar(dokkaHtmlTask)
+                is DokkaTask -> configureJavadocJarLegacyDokka(dokkaHtmlTask)
+            }
         }
+
         val javadocArtifact = project.artifacts.add("archives", javadocJar)
 
+        // magic shit
         if (sourceSets.names.contains("main")) {
             sourceSets.named("main") {
                 val javadocConfiguration by configurations.maybeRegister(javadocElementsConfigurationName) {
@@ -103,7 +113,15 @@ private fun Configuration.configureConfiguration(project: Project, javadocArtifa
     }
 }
 
-private fun Jar.configureJavadocJar(dokkaHtml: DokkaTask) {
+private fun Jar.configureJavadocJar(dokkaHtml: DokkaGenerateTask) {
+    dependsOn(dokkaHtml)
+    from(dokkaHtml.outputDirectory)
+    archiveClassifier = "javadoc"
+    description = "Assembles a jar archive containing the main dokka javadocs."
+    group = JavaBasePlugin.DOCUMENTATION_GROUP
+}
+
+private fun Jar.configureJavadocJarLegacyDokka(dokkaHtml: DokkaTask) {
     dependsOn(dokkaHtml)
     from(dokkaHtml.outputDirectory)
     archiveClassifier = "javadoc"
