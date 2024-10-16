@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file GradlePropertyUtil.kt is part of nyx
- * Last modified on 15-09-2024 07:00 p.m.
+ * Last modified on 15-10-2024 07:56 p.m.
  *
  * MIT License
  *
@@ -38,7 +38,10 @@ import org.gradle.api.NamedDomainObjectSet
 import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.ConfigurableFileTree
+import org.gradle.api.file.Directory
 import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.FileTree
+import org.gradle.api.file.RegularFile
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.provider.ListProperty
@@ -50,10 +53,13 @@ import org.gradle.kotlin.dsl.listProperty
 import org.gradle.kotlin.dsl.mapProperty
 import org.gradle.kotlin.dsl.property
 import org.gradle.kotlin.dsl.setProperty
+import java.io.File
+import java.nio.file.Path
 
 internal fun <T> Property<T>.convention(project: Project, provider: () -> T): Property<T> = convention(project.provider(provider))
 
 // @formatter:off
+
 internal fun <T> HasProject.provider(provider: () -> T?): Provider<T> = project.provider(provider)
 internal fun <T> DefaultTask.provider(provider: () -> T?): Provider<T> = project.provider(provider)
 
@@ -129,6 +135,19 @@ internal operator fun <T> ListProperty<in T>.plusAssign(elements: Provider<Itera
 internal operator fun <T> ListProperty<in T>.plusAssign(elements: Provider<Array<T>>) = addAll(elements.map { it.toList() })
 @JvmName("plusAssignSequence")
 internal operator fun <T> ListProperty<in T>.plusAssign(elements: Provider<Sequence<T>>) = addAll(elements.map { it.toList() })
+
+@JvmName("directoryAsFile")
+internal fun Provider<Directory>.asFile(): File = get().asFile
+@JvmName("directoryAsFileTree")
+internal fun Provider<Directory>.asFileTree(): FileTree = get().asFileTree
+@JvmName("directoryAsPath")
+internal fun Provider<Directory>.asPath(): Path = get().asFile.toPath()
+
+@JvmName("regularFileAsFile")
+internal fun Provider<RegularFile>.asFile(): File = get().asFile
+@JvmName("regularFileAsPath")
+internal fun Provider<RegularFile>.asPath(): Path = get().asFile.toPath()
+
 // @formatter:on
 
 internal val Property<Boolean>.isTrue: Boolean

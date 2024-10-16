@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file GenerateFabricModJson.kt is part of nyx
- * Last modified on 15-10-2024 07:36 p.m.
+ * Last modified on 15-10-2024 08:05 p.m.
  *
  * MIT License
  *
@@ -31,6 +31,7 @@ import ca.solostudios.nyx.internal.AllOpen
 import ca.solostudios.nyx.internal.SerialFabricModJson
 import ca.solostudios.nyx.internal.SerialFabricModJson.Entrypoint.AdaptedEntrypoint
 import ca.solostudios.nyx.internal.SerialFabricModJson.Entrypoint.StringEntrypoint
+import ca.solostudios.nyx.internal.util.asPath
 import ca.solostudios.nyx.internal.util.directoryProperty
 import ca.solostudios.nyx.internal.util.property
 import ca.solostudios.nyx.internal.util.toJsonElement
@@ -46,6 +47,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
@@ -58,16 +60,28 @@ import ca.solostudios.nyx.internal.SerialFabricModJson.ModIcon.ModIconMap as Ser
 import ca.solostudios.nyx.internal.SerialFabricModJson.Person.ContactablePerson as SerialContactablePerson
 import ca.solostudios.nyx.internal.SerialFabricModJson.Person.NamedPerson as SerialNamedPerson
 
+/**
+ * Serializes a [FabricModJson] to a file.
+ */
 @AllOpen
 @DisableCachingByDefault(because = "Not worth caching")
 public class GenerateFabricModJson : DefaultTask() {
-    // @Input
+    /**
+     * The [FabricModJson] that is serialized by this task.
+     */
     @Nested
     public val fabricModJson: Property<FabricModJson> = property()
 
+    /**
+     * The output directory for this task.
+     */
     @OutputDirectory
     public val outputDirectory: DirectoryProperty = directoryProperty()
 
+    /**
+     * The output filename for this task.
+     */
+    @Input
     public val outputFilename: Property<String> = property<String>().convention("fabric.mod.json")
 
     @TaskAction
@@ -75,12 +89,10 @@ public class GenerateFabricModJson : DefaultTask() {
     private fun generateJson() {
         val serialModJson = fabricModJson.get().toSerial()
 
-        outputPath(outputFilename.get()).outputStream().buffered().use { outputStream ->
+        outputDirectory.file(outputFilename).asPath().outputStream().buffered().use { outputStream ->
             json.encodeToStream(serialModJson, outputStream)
         }
     }
-
-    private fun outputPath(path: String) = outputDirectory.get().asFile.toPath().resolve(path)
 
     private fun FabricModJson.toSerial(): SerialFabricModJson {
         val entrypoints = this.entrypoints.takeIf { it.isNotEmpty() }?.associate { container ->
@@ -130,27 +142,30 @@ public class GenerateFabricModJson : DefaultTask() {
                 badges.orNull?.takeIf { it.isNotEmpty() }?.let { badges -> put("badges", badges.toJsonElement()) }
 
                 buildMap {
-                    links.buyMeACoffee.orNull?.let { buyMeACoffee -> put("modmenu.buymeacoffee", buyMeACoffee) }
-                    links.coindrop.orNull?.let { coindrop -> put("modmenu.coindrop", coindrop) }
-                    links.crowdin.orNull?.let { crowdin -> put("modmenu.crowdin", crowdin) }
-                    links.curseforge.orNull?.let { curseforge -> put("modmenu.curseforge", curseforge) }
-                    links.discord.orNull?.let { discord -> put("modmenu.discord", discord) }
-                    links.donate.orNull?.let { donate -> put("modmenu.donate", donate) }
-                    links.flattr.orNull?.let { flattr -> put("modmenu.flattr", flattr) }
-                    links.githubReleases.orNull?.let { githubReleases -> put("modmenu.github_releases", githubReleases) }
-                    links.githubSponsors.orNull?.let { githubSponsors -> put("modmenu.github_sponsors", githubSponsors) }
-                    links.kofi.orNull?.let { kofi -> put("modmenu.kofi", kofi) }
-                    links.liberapay.orNull?.let { liberapay -> put("modmenu.liberapay", liberapay) }
-                    links.mastodon.orNull?.let { mastodon -> put("modmenu.mastodon", mastodon) }
-                    links.modrinth.orNull?.let { modrinth -> put("modmenu.modrinth", modrinth) }
-                    links.openCollective.orNull?.let { openCollective -> put("modmenu.opencollective", openCollective) }
-                    links.patreon.orNull?.let { patreon -> put("modmenu.patreon", patreon) }
-                    links.paypal.orNull?.let { paypal -> put("modmenu.paypal", paypal) }
-                    links.reddit.orNull?.let { reddit -> put("modmenu.reddit", reddit) }
-                    links.twitch.orNull?.let { twitch -> put("modmenu.twitch", twitch) }
-                    links.twitter.orNull?.let { twitter -> put("modmenu.twitter", twitter) }
-                    links.wiki.orNull?.let { wiki -> put("modmenu.wiki", wiki) }
-                    links.youtube.orNull?.let { youtube -> put("modmenu.youtube", youtube) }
+                    fun putModMenu(key: String, value: String) {
+                        put("modmenu.$key", value)
+                    }
+                    links.buyMeACoffee.orNull?.let { buyMeACoffee -> putModMenu("buymeacoffee", buyMeACoffee) }
+                    links.coindrop.orNull?.let { coindrop -> putModMenu("coindrop", coindrop) }
+                    links.crowdin.orNull?.let { crowdin -> putModMenu("crowdin", crowdin) }
+                    links.curseforge.orNull?.let { curseforge -> putModMenu("curseforge", curseforge) }
+                    links.discord.orNull?.let { discord -> putModMenu("discord", discord) }
+                    links.donate.orNull?.let { donate -> putModMenu("donate", donate) }
+                    links.flattr.orNull?.let { flattr -> putModMenu("flattr", flattr) }
+                    links.githubReleases.orNull?.let { githubReleases -> putModMenu("github_releases", githubReleases) }
+                    links.githubSponsors.orNull?.let { githubSponsors -> putModMenu("github_sponsors", githubSponsors) }
+                    links.kofi.orNull?.let { kofi -> putModMenu("kofi", kofi) }
+                    links.liberapay.orNull?.let { liberapay -> putModMenu("liberapay", liberapay) }
+                    links.mastodon.orNull?.let { mastodon -> putModMenu("mastodon", mastodon) }
+                    links.modrinth.orNull?.let { modrinth -> putModMenu("modrinth", modrinth) }
+                    links.openCollective.orNull?.let { openCollective -> putModMenu("opencollective", openCollective) }
+                    links.patreon.orNull?.let { patreon -> putModMenu("patreon", patreon) }
+                    links.paypal.orNull?.let { paypal -> putModMenu("paypal", paypal) }
+                    links.reddit.orNull?.let { reddit -> putModMenu("reddit", reddit) }
+                    links.twitch.orNull?.let { twitch -> putModMenu("twitch", twitch) }
+                    links.twitter.orNull?.let { twitter -> putModMenu("twitter", twitter) }
+                    links.wiki.orNull?.let { wiki -> putModMenu("wiki", wiki) }
+                    links.youtube.orNull?.let { youtube -> putModMenu("youtube", youtube) }
 
                     links.other.get().takeIf { it.isNotEmpty() }?.let { other ->
                         for ((key, value) in other)
