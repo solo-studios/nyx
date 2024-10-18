@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file GenerateFabricModJson.kt is part of nyx
- * Last modified on 15-10-2024 08:05 p.m.
+ * Last modified on 18-10-2024 02:40 a.m.
  *
  * MIT License
  *
@@ -96,19 +96,19 @@ public class GenerateFabricModJson : DefaultTask() {
 
     private fun FabricModJson.toSerial(): SerialFabricModJson {
         val entrypoints = this.entrypoints.takeIf { it.isNotEmpty() }?.associate { container ->
-            container.target to container.entrypoints.get().map {
+            container.target to container.entrypoints.map {
                 if (it.adapter.isPresent)
-                    AdaptedEntrypoint(it.adapter.get(), it.value.get())
+                    AdaptedEntrypoint(it.adapter.get(), it.value)
                 else
-                    StringEntrypoint(it.value.get())
+                    StringEntrypoint(it.value)
             }
         }
 
         val mixins = this.mixins.takeIf { it.isNotEmpty() }?.map { config ->
             if (config.environment.isPresent)
-                SerialEnvironmentMixinConfig(config.entrypoint, config.environment.map { it.toSerial() }.get())
+                SerialEnvironmentMixinConfig(config.config, config.environment.map { it.toSerial() }.get())
             else
-                SerialStringMixinConfig(config.entrypoint)
+                SerialStringMixinConfig(config.config)
         }
 
         val contact = with(this.contact) {
