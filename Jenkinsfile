@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file Jenkinsfile is part of nyx
- * Last modified on 17-09-2024 01:52 a.m.
+ * Last modified on 17-10-2024 11:49 p.m.
  *
  * MIT License
  *
@@ -77,8 +77,9 @@ pipeline {
 
         stage('Deploy to snapshots repositories') {
             when {
-                not {
-                    buildingTag()
+                allOf {
+                    not { buildingTag() }
+                    not { expression { env.TAG_NAME != null && env.TAG_NAME.matches('v\\d+\\.\\d+\\.\\d+') } }
                 }
             }
 
@@ -103,7 +104,10 @@ pipeline {
 
         stage('Deploy to releases repositories') {
             when {
-                buildingTag()
+                allOf {
+                    buildingTag()
+                    expression { env.TAG_NAME != null && env.TAG_NAME.matches('v\\d+\\.\\d+\\.\\d+') }
+                }
             }
 
             steps {
