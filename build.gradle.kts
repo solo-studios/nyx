@@ -2,7 +2,7 @@
  * Copyright (c) 2023-2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file build.gradle.kts is part of nyx
- * Last modified on 22-09-2024 05:05 p.m.
+ * Last modified on 18-10-2024 01:48 a.m.
  *
  * MIT License
  *
@@ -25,7 +25,19 @@
  * SOFTWARE.
  */
 
+@file:Suppress("UnstableApiUsage")
+
+
 import ca.solostudios.nyx.util.soloStudios
+import com.sass_lang.embedded_protocol.OutputStyle
+import groovy.text.SimpleTemplateEngine
+import io.freefair.gradle.plugins.sass.SassCompile
+import org.apache.tools.ant.filters.ReplaceTokens
+import org.jetbrains.dokka.gradle.engine.parameters.VisibilityModifier
+import org.jetbrains.dokka.gradle.engine.plugins.DokkaPluginParametersBuilder
+import org.jetbrains.dokka.gradle.tasks.DokkaGenerateTask
+import java.io.StringWriter
+import java.time.Year
 
 plugins {
     `kotlin-dsl`
@@ -41,18 +53,21 @@ plugins {
     alias(libs.plugins.kotlin.allopen)
     alias(libs.plugins.kotlin.serialization)
 
+    alias(libs.plugins.dokka)
+
+    alias(libs.plugins.axion.release)
+
     alias(libs.plugins.gradle.plugin.development)
     alias(libs.plugins.gradle.plugin.functional.test)
     alias(libs.plugins.gradle.plugin.unit.test)
 
-    alias(libs.plugins.dokka)
-    alias(libs.plugins.axion.release)
+    alias(libs.plugins.nyx)
 
     alias(libs.plugins.gradle.publish)
 
     alias(libs.plugins.allure.gradle)
 
-    alias(libs.plugins.nyx)
+    alias(libs.plugins.sass.base)
 }
 
 nyx {
@@ -142,7 +157,6 @@ repositories {
 }
 
 dependencies {
-    // compileOnly(gradleApi())
     api(libs.kotlin.stdlib)
     implementation(libs.bundles.kotlinx.serialization)
 
@@ -228,7 +242,117 @@ functionalTest {
     }
 }
 
+sass {
+    omitSourceMapUrl = true
+    outputStyle = OutputStyle.COMPRESSED
+    sourceMapContents = false
+    sourceMapEmbed = false
+    sourceMapEnabled = false
+}
+
+val dokkaDir = project.layout.projectDirectory.dir("dokka")
+val dokkaBuildDir = dokka.dokkaPublicationDirectory
+val dokkaTemplates = dokkaDir.dir("templates")
+
+val processDokkaIncludes by tasks.registering(ProcessResources::class) {
+    group = JavaBasePlugin.DOCUMENTATION_GROUP
+
+    val includes = dokkaDir.dir("includes")
+    val projectInfo = mapOf(
+        "group" to nyx.info.group,
+        "module" to nyx.info.module.get(),
+        "version" to nyx.info.version
+    )
+
+    into(dokkaBuildDir.dir("includes"))
+    inputs.properties(projectInfo)
+    inputs.files(includes)
+
+    from(includes) {
+        exclude { it.name.startsWith("_") }
+    }
+
+    doFirst {
+        val dependencyInformation = processTemplate(includes.file("_dependency.md").asFile, mapOf("project" to projectInfo))
+        filter<ReplaceTokens>(
+            "tokens" to mapOf("dependencies" to dependencyInformation),
+            "beginToken" to "{{",
+            "endToken" to "}}"
+        )
+    }
+}
+
+val compileDokkaSass by tasks.registering(SassCompile::class) {
+    group = BasePlugin.BUILD_GROUP
+    source = fileTree(dokkaDir.dir("styles"))
+    destinationDir = dokkaBuildDir.dir("styles")
+}
+
+dokka {
+    moduleName = nyx.info.name
+    moduleVersion = nyx.info.version
+    dokkaSourceSets.configureEach {
+        includes.from(fileTree(processDokkaIncludes.map { it.destinationDir }))
+        reportUndocumented = true
+        documentedVisibilities = setOf(VisibilityModifier.Public, VisibilityModifier.Protected)
+
+        externalDocumentationLinks {
+            val gradle by registering {
+                // https://docs.gradle.org/current/kotlin-dsl/index.html
+                url("https://docs.gradle.org/${gradle.gradleVersion}/kotlin-dsl/")
+                packageListUrl("https://docs.gradle.org/${gradle.gradleVersion}/kotlin-dsl/gradle/package-list")
+            }
+        }
+
+        sourceLink {
+            localDirectory = projectDir.resolve("src")
+            remoteUrl = nyx.info.repository.projectUrl.map { uri("$it/blob/${scmVersion.scmPosition.revision}/src") }
+            remoteLineSuffix = "#L"
+        }
+    }
+
+    pluginsConfiguration {
+        registerFactory(DokkaPluginParametersBuilder::class.java) { name ->
+            objects.newInstance<DokkaPluginParametersBuilder>(name, name)
+        }
+
+        html {
+            homepageLink = nyx.info.repository.projectUrl
+            footerMessage = "© ${Year.now()} Copyright solo-studios"
+
+            separateInheritedMembers = false
+
+            templatesDir = dokkaTemplates
+
+            customStyleSheets.from(fileTree(compileDokkaSass.flatMap { it.destinationDir }))
+        }
+
+        // TODO: configuring custom plugins is currently broken
+        // register<DokkaScriptsPluginParameters>("scripts") {
+        //     scripts.from(fileTree(dokkaScripts))
+        // }
+        // register<DokkaStyleTweaksPluginParameters>("scripts") {
+        //     minimalScrollbar = true
+        //     darkPurpleHighlight = true
+        //     darkColorSchemeFix = true
+        //     improvedBlockquoteBorder = true
+        //     lighterBlockquoteText = true
+        //     improvedSectionTabBorder = true
+        //     sectionTabFontWeight = "500"
+        //     sectionTabTransition = true
+        //     disableCodeWrapping = true
+        //     sidebarWidth = "340px"
+        // }
+    }
+}
+
 tasks {
+    withType<DokkaGenerateTask>().configureEach {
+        inputs.files(dokkaBuildDir.dir("styles"), dokkaTemplates)
+
+        dependsOn(compileDokkaSass, processDokkaIncludes)
+    }
+
     val functionalTest by registering {
         group = JavaBasePlugin.VERIFICATION_GROUP
         description = "Runs the functional test suite."
@@ -260,6 +384,17 @@ tasks {
     check {
         dependsOn(withType<Test>(), functionalTest)
     }
+}
+
+fun processTemplate(templateFile: File, templateProperties: Map<String, Any?>): String {
+    val engine = SimpleTemplateEngine()
+    val template = engine.createTemplate(templateFile)
+    val writer = StringWriter()
+
+    // SimpleTemplateEngine expects to be able to mutate the map internally.
+    template.make(templateProperties.toMutableMap())
+        .writeTo(writer)
+    return writer.toString()
 }
 
 val Project.isSnapshot: Boolean

@@ -13,6 +13,8 @@ gradle-publish = "1.3.0"
 
 allure-gradle = "2.12.0"
 
+freefair-sass = "8.10.2"
+
 apache-commons-text = "1.12.0"
 
 guava = "32.1.3-jre"
@@ -73,6 +75,8 @@ nyx = { id = "ca.solo-studios.nyx", version.ref = "nyx" }
 gradle-publish = { id = "com.gradle.plugin-publish", version.ref = "gradle-publish" }
 
 allure-gradle = { id = "io.qameta.allure", version.ref = "allure-gradle" }
+
+sass-base = { id = "io.freefair.sass-base", version.ref = "freefair-sass" }
 
 [libraries]
 ## Kotlin stdlib
