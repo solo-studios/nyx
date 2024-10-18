@@ -7,7 +7,7 @@ dokka = "2.0.0-Beta"
 
 axion-release = "1.18.8"
 
-nyx = "0.2.3"
+nyx = "0.3.0-SNAPSHOT"
 
 gradle-publish = "1.3.0"
 

@@ -2,7 +2,7 @@
  * Copyright (c) 2023-2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file settings.gradle.kts is part of nyx
- * Last modified on 10-06-2024 03:21 p.m.
+ * Last modified on 18-10-2024 12:04 a.m.
  *
  * MIT License
  *
@@ -29,6 +29,7 @@
 pluginManagement {
     repositories {
         maven("https://maven.solo-studios.ca/releases/")
+        maven("https://maven.solo-studios.ca/snapshots/")
         mavenCentral()
         gradlePluginPortal()
         maven("https://repo.nokee.dev/release")
