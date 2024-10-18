@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file DokkaUtil.kt is part of nyx
- * Last modified on 15-10-2024 09:17 p.m.
+ * Last modified on 17-10-2024 11:00 p.m.
  *
  * MIT License
  *
@@ -57,7 +57,7 @@ private val UNPUBLISHABLE_VARIANT_ARTIFACTS = listOf(
 internal fun HasProject.addDokkaJavadocJarTask() {
     tasks {
         val dokkaHtml by when {
-            "dokkaGenerateHtml" in tasks -> named<DokkaGenerateTask>("dokkaGenerateHtml")
+            "dokkaGeneratePublicationHtml" in tasks -> named<DokkaGenerateTask>("dokkaGeneratePublicationHtml")
             "dokkaHtml" in tasks -> named<DokkaTask>("dokkaHtml")
             else -> error("Could not find dokka task. Both 'dokkaGenerateHtml' and 'dokkaHtml' are null.")
         }
@@ -69,7 +69,7 @@ internal fun HasProject.addDokkaJavadocJarTask() {
             }
         }
 
-        val javadocArtifact = project.artifacts.add("archives", javadocJar)
+        val javadocArtifact = artifacts.add("archives", javadocJar)
 
         // magic shit
         if (sourceSets.names.contains("main")) {
