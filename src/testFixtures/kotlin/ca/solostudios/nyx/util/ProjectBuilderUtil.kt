@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file ProjectBuilderUtil.kt is part of nyx
- * Last modified on 25-10-2024 07:03 p.m.
+ * Last modified on 25-10-2024 07:40 p.m.
  *
  * MIT License
  *
@@ -29,8 +29,13 @@ package ca.solostudios.nyx.util
 
 import ca.solostudios.nyx.kotest.createTmpDir
 import io.kotest.core.spec.Spec
+import io.kotest.core.spec.style.scopes.AbstractContainerScope
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
+
+fun AbstractContainerScope.project(name: String? = null, parent: Project? = null, block: Project.() -> Unit = {}): Project {
+    return this.testCase.spec.project(name, parent, block)
+}
 
 fun Spec.project(name: String? = null, parent: Project? = null, block: Project.() -> Unit = {}): Project {
     return ProjectBuilder.builder()
