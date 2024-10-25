@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file FabricModJson.kt is part of nyx
- * Last modified on 25-10-2024 12:20 p.m.
+ * Last modified on 25-10-2024 06:52 p.m.
  *
  * MIT License
  *
@@ -105,7 +105,7 @@ public class FabricModJson(override val project: Project) : HasProject {
     /**
      * The entrypoints to this mod.
      */
-    @get:Input
+    @get:Nested
     public val entrypoints: NamedDomainObjectContainer<EntrypointContainer> = domainObjectContainer { target ->
         EntrypointContainer(project, target)
     }.also { entrypoints ->
@@ -117,19 +117,19 @@ public class FabricModJson(override val project: Project) : HasProject {
     /**
      * A list of people who authored this mod.
      */
-    @get:Input
+    @get:Nested
     public val authors: NamedDomainObjectContainer<Person> = domainObjectContainer { name -> Person(project, name) }
 
     /**
      * A list of people who contributed to this mod.
      */
-    @get:Input
+    @get:Nested
     public val contributors: NamedDomainObjectContainer<Person> = domainObjectContainer { name -> Person(project, name) }
 
     /**
      * The mixin configs for this mod.
      */
-    @get:Input
+    @get:Nested
     public val mixins: NamedDomainObjectContainer<MixinConfig> = domainObjectContainer { name -> MixinConfig(project, name) }
 
     /**
@@ -142,19 +142,19 @@ public class FabricModJson(override val project: Project) : HasProject {
     /**
      * A list of mods that this mod depends on.
      */
-    @get:Input
+    @get:Nested
     public val depends: NamedDomainObjectContainer<Dependency> = domainObjectContainer { mod -> Dependency(project, mod) }
 
     /**
      * A list of mods that this mod recommends.
      */
-    @get:Input
+    @get:Nested
     public val recommends: NamedDomainObjectContainer<Dependency> = domainObjectContainer { mod -> Dependency(project, mod) }
 
     /**
      * A list of mods that this mod suggests.
      */
-    @get:Input
+    @get:Nested
     public val suggests: NamedDomainObjectContainer<Dependency> = domainObjectContainer { mod -> Dependency(project, mod) }
 
     /**
@@ -163,7 +163,7 @@ public class FabricModJson(override val project: Project) : HasProject {
      * A conflicting mod does not cause the game launch to fail, but instead
      * logs a warning at startup.
      */
-    @get:Input
+    @get:Nested
     public val conflicts: NamedDomainObjectContainer<Dependency> = domainObjectContainer { mod -> Dependency(project, mod) }
 
     /**
@@ -171,7 +171,7 @@ public class FabricModJson(override val project: Project) : HasProject {
      *
      * A breaking mod will cause the game to fail to launch.
      */
-    @get:Input
+    @get:Nested
     public val breaks: NamedDomainObjectContainer<Dependency> = domainObjectContainer { mod -> Dependency(project, mod) }
 
     /**
@@ -214,7 +214,7 @@ public class FabricModJson(override val project: Project) : HasProject {
     /**
      * A list of icons for this mod.
      */
-    @get:Input
+    @get:Nested
     public val icons: ListProperty<ModIcon> = listProperty()
 
     /**
@@ -228,7 +228,7 @@ public class FabricModJson(override val project: Project) : HasProject {
      *
      * This creates an object under the `custom.modmenu` key.
      */
-    @Nested
+    @get:Nested
     public val modmenu: ModMenu = ModMenu(project)
 
     /**
@@ -542,7 +542,7 @@ public class FabricModJson(override val project: Project) : HasProject {
         /**
          * A list of entrypoints.
          */
-        @get:Input
+        @get:Nested
         public val entrypoints: NamedDomainObjectContainer<Entrypoint> = domainObjectContainer { value -> Entrypoint(project, value) }
 
         @JvmOverloads
@@ -659,6 +659,7 @@ public class FabricModJson(override val project: Project) : HasProject {
         @get:Input
         public val file: String,
         @get:Input
+        @get:Optional
         public val size: Int? = null,
     )
 
