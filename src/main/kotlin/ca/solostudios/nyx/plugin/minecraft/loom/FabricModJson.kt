@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file FabricModJson.kt is part of nyx
- * Last modified on 25-10-2024 12:01 p.m.
+ * Last modified on 25-10-2024 12:20 p.m.
  *
  * MIT License
  *
@@ -684,7 +684,7 @@ public class FabricModJson(override val project: Project) : HasProject {
             links.action()
         }
 
-        public fun breaks(action: Action<ModMenuLinks>) {
+        public fun links(action: Action<ModMenuLinks>) {
             action.execute(links)
         }
 
