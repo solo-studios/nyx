@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file GradleUtil.kt is part of nyx
- * Last modified on 15-10-2024 09:17 p.m.
+ * Last modified on 25-10-2024 11:58 a.m.
  *
  * MIT License
  *
@@ -39,6 +39,7 @@ import net.fabricmc.loom.configuration.FabricApiExtension
 import net.neoforged.gradle.dsl.common.extensions.Minecraft
 import net.neoforged.gradle.dsl.common.runs.run.RunManager
 import net.neoforged.gradle.dsl.mixin.extension.Mixin
+import org.gradle.api.Action
 import org.gradle.api.Named
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.NamedDomainObjectProvider
@@ -178,6 +179,11 @@ internal val NyxPublishingExtension.githubRelease: NyxGithubReleaseExtension
     get() = (this as ExtensionAware).the<NyxGithubReleaseExtension>()
 
 internal fun <T : Any> NamedDomainObjectContainer<T>.maybeRegister(name: String, action: T.() -> Unit = {}) = when {
+    findByName(name) != null -> named(name, action)
+    else -> register(name, action)
+}
+
+internal fun <T : Any> NamedDomainObjectContainer<T>.maybeRegister(name: String, action: Action<T>) = when {
     findByName(name) != null -> named(name, action)
     else -> register(name, action)
 }

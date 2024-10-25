@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file FabricModJson.kt is part of nyx
- * Last modified on 18-10-2024 02:42 a.m.
+ * Last modified on 25-10-2024 12:01 p.m.
  *
  * MIT License
  *
@@ -32,6 +32,7 @@ import ca.solostudios.nyx.internal.util.domainObjectContainer
 import ca.solostudios.nyx.internal.util.listProperty
 import ca.solostudios.nyx.internal.util.loom
 import ca.solostudios.nyx.internal.util.mapProperty
+import ca.solostudios.nyx.internal.util.maybeRegister
 import ca.solostudios.nyx.internal.util.minecraft
 import ca.solostudios.nyx.internal.util.nyx
 import ca.solostudios.nyx.internal.util.property
@@ -107,6 +108,10 @@ public class FabricModJson(override val project: Project) : HasProject {
     @get:Input
     public val entrypoints: NamedDomainObjectContainer<EntrypointContainer> = domainObjectContainer { target ->
         EntrypointContainer(project, target)
+    }.also { entrypoints ->
+        entrypoints.register("main")
+        entrypoints.register("client")
+        entrypoints.register("server")
     }
 
     /**
@@ -247,17 +252,17 @@ public class FabricModJson(override val project: Project) : HasProject {
 
     @JvmOverloads
     public fun NamedDomainObjectContainer<EntrypointContainer>.entry(name: String, entrypoint: String, adapter: String? = null) {
-        register(name) {
+        maybeRegister(name) {
             entrypoint(entrypoint, adapter)
         }
     }
 
     public fun NamedDomainObjectContainer<EntrypointContainer>.entry(name: String, action: EntrypointContainer.() -> Unit) {
-        register(name, action)
+        maybeRegister(name, action)
     }
 
     public fun NamedDomainObjectContainer<EntrypointContainer>.entry(name: String, action: Action<EntrypointContainer>) {
-        register(name, action)
+        maybeRegister(name, action)
     }
 
     // region Main Entrypoints
@@ -374,10 +379,9 @@ public class FabricModJson(override val project: Project) : HasProject {
         }
     }
 
-    public fun depends(mod: String, versions: List<String>? = null) {
+    public fun depends(mod: String, versions: List<String>) {
         depends.register(mod) {
-            if (versions != null)
-                this.versions = versions
+            this.versions = versions
         }
     }
 
@@ -397,10 +401,9 @@ public class FabricModJson(override val project: Project) : HasProject {
         }
     }
 
-    public fun recommends(mod: String, versions: List<String>? = null) {
+    public fun recommends(mod: String, versions: List<String>) {
         recommends.register(mod) {
-            if (versions != null)
-                this.versions = versions
+            this.versions = versions
         }
     }
 
@@ -420,10 +423,9 @@ public class FabricModJson(override val project: Project) : HasProject {
         }
     }
 
-    public fun suggests(mod: String, versions: List<String>? = null) {
+    public fun suggests(mod: String, versions: List<String>) {
         suggests.register(mod) {
-            if (versions != null)
-                this.versions = versions
+            this.versions = versions
         }
     }
 
@@ -443,10 +445,9 @@ public class FabricModJson(override val project: Project) : HasProject {
         }
     }
 
-    public fun conflicts(mod: String, versions: List<String>? = null) {
+    public fun conflicts(mod: String, versions: List<String>) {
         conflicts.register(mod) {
-            if (versions != null)
-                this.versions = versions
+            this.versions = versions
         }
     }
 
@@ -466,10 +467,9 @@ public class FabricModJson(override val project: Project) : HasProject {
         }
     }
 
-    public fun breaks(mod: String, versions: List<String>? = null) {
+    public fun breaks(mod: String, versions: List<String>) {
         breaks.register(mod) {
-            if (versions != null)
-                this.versions = versions
+            this.versions = versions
         }
     }
 
