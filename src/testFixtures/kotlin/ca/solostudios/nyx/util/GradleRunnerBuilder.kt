@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file GradleRunnerBuilder.kt is part of nyx
- * Last modified on 17-09-2024 12:52 a.m.
+ * Last modified on 25-10-2024 07:05 p.m.
  *
  * MIT License
  *
@@ -28,29 +28,40 @@
 
 package ca.solostudios.nyx.util
 
+import ca.solostudios.nyx.kotest.TMP_DIR
 import ca.solostudios.nyx.kotest.createTmpDir
+import io.kotest.core.spec.Spec
+import io.kotest.core.spec.style.scopes.AbstractContainerScope
 import org.gradle.testkit.runner.GradleRunner
 import org.intellij.lang.annotations.Language
 import java.nio.file.Path
 import kotlin.io.path.ExperimentalPathApi
-import kotlin.io.path.appendText
 import kotlin.io.path.copyToRecursively
 import kotlin.io.path.createFile
 import kotlin.io.path.exists
 import kotlin.io.path.notExists
 import kotlin.io.path.writeText
-import kotlin.time.Duration.Companion.seconds
 
-fun gradleKtsProject(
-    baseDir: Path = createTmpDir("gradle-project-template-", delete = false),
+fun AbstractContainerScope.gradleKtsProject(
+    baseDir: Path = testCase.spec.createTmpDir("templates", "gradle-project-", delete = false),
+    withPluginClasspath: Boolean = false,
+    build: GradleRunnerBuilder.() -> Unit,
+) = testCase.spec.gradleKtsProject(baseDir, withPluginClasspath, build)
+
+fun Spec.gradleKtsProject(
+    baseDir: Path = createTmpDir("templates", "gradle-project-", delete = false),
+    withPluginClasspath: Boolean = false,
     build: GradleRunnerBuilder.() -> Unit,
 ): GradleRunnerBuilder {
-    return GradleRunnerBuilder(baseDir).apply(build)
+    return GradleRunnerBuilder(baseDir, this).also { it.withPluginClasspath = withPluginClasspath }.apply(build)
 }
 
 class GradleRunnerBuilder(
     val projectDir: Path,
+    private val spec: Spec,
 ) {
+    var withPluginClasspath = false
+
     fun writeBuildGradleKts(@Language("kts") contents: String) {
         resolve("build.gradle.kts").writeText(contents)
     }
@@ -59,11 +70,15 @@ class GradleRunnerBuilder(
         resolve("settings.gradle.kts").writeText(contents)
     }
 
+    fun writeGradleProperties(@Language("properties") contents: String) {
+        resolve("gradle.properties").writeText(contents)
+    }
+
     fun resolve(path: String): Path = projectDir.resolve(path)
 
     @OptIn(ExperimentalPathApi::class)
     suspend fun gradleRunner(action: suspend GradleRunner.() -> Unit): GradleRunner {
-        val gradleRunnerDir = createTmpDir("gradle-runner", delete = false)
+        val gradleRunnerDir = spec.createTmpDir("runner", "gradle-runner-", delete = false)
         projectDir.copyToRecursively(gradleRunnerDir, followLinks = false, overwrite = true)
 
         val gradleProperties = gradleRunnerDir.resolve("gradle.properties")
@@ -76,16 +91,20 @@ class GradleRunnerBuilder(
         if (settingsGradleKts.notExists())
             settingsGradleKts.createFile()
 
-        // language=Properties
-        gradleProperties.appendText(
-            """
-                |
-                |org.gradle.daemon.idletimeout=${30.seconds.inWholeMilliseconds}
-            """.trimMargin()
-        )
+        // // language=Properties
+        // gradleProperties.appendText(
+        //     """
+        //         |
+        //         |org.gradle.daemon.idletimeout=${30.seconds.inWholeMilliseconds}
+        //     """.trimMargin()
+        // )
 
         val runner = GradleRunner.create()
             .withProjectDir(gradleRunnerDir.toFile())
+            .withTestKitDir(TMP_DIR.resolve(".gradle-test-kit").toFile())
+
+        if (withPluginClasspath)
+            runner.withPluginClasspath()
 
         action(runner)
 

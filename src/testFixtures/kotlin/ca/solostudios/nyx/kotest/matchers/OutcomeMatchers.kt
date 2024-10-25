@@ -1,8 +1,8 @@
 /*
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
- * The file TempFiles.kt is part of nyx
- * Last modified on 25-10-2024 07:03 p.m.
+ * The file OutcomeMatchers.kt is part of nyx
+ * Last modified on 25-10-2024 07:36 p.m.
  *
  * MIT License
  *
@@ -27,32 +27,26 @@
 
 @file:Suppress("unused")
 
-package ca.solostudios.nyx.kotest
+package ca.solostudios.nyx.kotest.matchers
 
-import io.kotest.core.spec.Spec
-import java.nio.file.Path
-import kotlin.io.path.Path
-import kotlin.io.path.createDirectories
-import kotlin.io.path.createTempDirectory
-import kotlin.io.path.createTempFile
-import kotlin.io.path.deleteExisting
+import io.kotest.matchers.MatcherResult
+import io.kotest.matchers.neverNullMatcher
+import io.kotest.matchers.should
+import org.gradle.testkit.runner.BuildTask
+import org.gradle.testkit.runner.TaskOutcome
 
-const val TMP_DIR_PROPERTY = "nyx.test.tmp"
-val TMP_DIR = Path(System.getProperty(TMP_DIR_PROPERTY))
+infix fun BuildTask?.shouldBe(outcome: TaskOutcome) = this should beOutcome(outcome)
 
-fun Spec.createTmpDir(directory: String = "", prefix: String? = null, delete: Boolean = true): Path {
-    val tempDir = createTempDirectory(TMP_DIR.resolve(directory).createDirectories(), prefix)
+fun BuildTask?.shouldHaveSucceeded() = this should beOutcome(TaskOutcome.SUCCESS)
+fun BuildTask?.shouldHaveFailed() = this should beOutcome(TaskOutcome.FAILED)
+fun BuildTask?.shouldBeUpToDate() = this should beOutcome(TaskOutcome.UP_TO_DATE)
+fun BuildTask?.shouldBeSkipped() = this should beOutcome(TaskOutcome.SKIPPED)
+fun BuildTask?.shouldBeFromCache() = this should beOutcome(TaskOutcome.FROM_CACHE)
+fun BuildTask?.shouldHaveNoSource() = this should beOutcome(TaskOutcome.NO_SOURCE)
 
-    afterSpec {
-        if (delete)
-            tempDir.deleteExisting()
-    }
-
-    return tempDir
-}
-
-fun createTmpFile(prefix: String? = null, suffix: String? = null, delete: Boolean = true): Path {
-    return createTempFile(TMP_DIR.also { it.parent.createDirectories() }, prefix, suffix).also {
-        if (delete) it.toFile().deleteOnExit()
-    }
+fun beOutcome(outcome: TaskOutcome) = neverNullMatcher<BuildTask> { task ->
+    MatcherResult(
+        task.outcome == outcome,
+        { "The task ${task.path} should be $outcome but was ${task.outcome}" },
+        { "The task ${task.path} should not be $outcome but was ${task.outcome}" })
 }

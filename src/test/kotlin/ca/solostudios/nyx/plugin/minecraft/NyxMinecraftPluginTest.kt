@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxMinecraftPluginTest.kt is part of nyx
- * Last modified on 20-09-2024 03:30 p.m.
+ * Last modified on 25-10-2024 07:36 p.m.
  *
  * MIT License
  *
@@ -43,8 +43,8 @@ class NyxMinecraftPluginTest : NyxSpec({
         givenMinecraftPluginIdShouldApply("fabric-loom")
         givenMinecraftPluginIdShouldApply("dev.architectury.loom")
         givenMinecraftPluginIdShouldApply("org.quiltmc.loom")
-        // negradle breaks testing for some reason
-        // givenMinecraftPluginIdShouldApply("net.neoforged.gradle.userdev")
+        // neogradle breaks testing for some reason
+        givenMinecraftPluginIdShouldApply("net.neoforged.gradle.userdev")
     }
 })
 

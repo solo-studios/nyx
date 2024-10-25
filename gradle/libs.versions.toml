@@ -22,14 +22,14 @@ guava-kotlin = "0.1.0"
 
 slf4k = "0.5.3"
 
-quilt-loom = "1.7.4"
+quilt-loom = "1.7.3"
 
-fabric-loom = "1.7.4"
+fabric-loom = "1.8.10"
 
 architectury = "3.4.159"
 architectury-loom = "1.7.413"
 
-neogradle = "7.0.163"
+neogradle = "7.0.165"
 
 github-release = "2.5.2"
 
@@ -88,6 +88,7 @@ kotlin-plugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin",
 ## kotlinx.serialization
 kotlinx-serialization-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-core", version.ref = "kotlinx-serialization" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
+kotlinx-serialization-properties = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-properties", version.ref = "kotlinx-serialization" }
 
 ## Apache Commons Text
 apache-commons = { group = "org.apache.commons", name = "commons-text", version.ref = "apache-commons-text" }

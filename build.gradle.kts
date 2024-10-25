@@ -2,7 +2,7 @@
  * Copyright (c) 2023-2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file build.gradle.kts is part of nyx
- * Last modified on 18-10-2024 01:48 a.m.
+ * Last modified on 25-10-2024 07:21 p.m.
  *
  * MIT License
  *
@@ -26,7 +26,6 @@
  */
 
 @file:Suppress("UnstableApiUsage")
-
 
 import ca.solostudios.nyx.util.soloStudios
 import com.sass_lang.embedded_protocol.OutputStyle
@@ -159,6 +158,8 @@ repositories {
 dependencies {
     api(libs.kotlin.stdlib)
     implementation(libs.bundles.kotlinx.serialization)
+    testFixturesApi(libs.bundles.kotlinx.serialization)
+    testFixturesApi(libs.kotlinx.serialization.properties)
 
     compileOnly(gradleApi("8.6"))
 
@@ -174,25 +175,23 @@ dependencies {
 
     // Kotlin stuff
     compileOnly(libs.kotlin.plugin)
-    testApi(libs.kotlin.plugin)
     compileOnly(libs.dokka.plugin)
-    testApi(libs.dokka.plugin)
 
     // Minecraft plugins
     compileOnly(libs.bundles.loom)
-    testApi(libs.bundles.loom)
 
     compileOnly(libs.github.release)
-    testApi(libs.github.release)
     compileOnly(libs.modrinth.minotaur)
-    testApi(libs.modrinth.minotaur)
 
     compileOnly(libs.bundles.neogradle)
 
     testFixturesApi(libs.bundles.junit)
     testFixturesApi(libs.bundles.kotest)
 
-    testFixturesCompileOnly(gradleTestKit())
+    api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
+
+    testFixturesCompileOnly(gradleApi("8.6"))
+    testFixturesCompileOnly(gradleTestKit("8.6"))
 }
 
 gradlePlugin {
@@ -231,14 +230,17 @@ allure {
 }
 
 functionalTest {
-    testingStrategies = buildSet {
-        add(strategies.coverageForGradleVersion("8.6"))
-        add(strategies.coverageForGradleVersion("8.7"))
-        add(strategies.coverageForGradleVersion("8.10"))
-    }
+    // currently they all just execute using gradle 8.10
+    // TODO fix this
+    // testingStrategies = buildSet {
+    //     add(strategies.coverageForGradleVersion("8.6"))
+    //     add(strategies.coverageForGradleVersion("8.7"))
+    //     add(strategies.coverageForGradleVersion("8.10"))
+    //     add(strategies.coverageForLatestNightlyVersion)
+    // }
     dependencies {
-        implementation(gradleTestKit())
-        implementation(testFixtures(project()))
+        implementation(testFixtures.modify(project))
+        pluginUnderTestMetadata(libs.fabric.loom)
     }
 }
 
@@ -346,6 +348,59 @@ dokka {
     }
 }
 
+testing.suites {
+    withType<JvmTestSuite>().configureEach {
+        useJUnitJupiter()
+
+        dependencies {
+            implementation(gradleTestKit())
+
+            implementation(testFixtures(project()))
+
+            implementation(libs.kotlin.plugin)
+            implementation(libs.dokka.plugin)
+            implementation(libs.fabric.loom)
+            implementation(libs.github.release)
+            implementation(libs.modrinth.minotaur)
+
+            // the version of org.codehause.groovy included by neogradle breaks tests
+            implementation(libs.neogradle.mixin) {
+                exclude(group = "org.codehaus.groovy")
+            }
+            implementation(libs.neogradle.userdev) {
+                exclude(group = "org.codehaus.groovy")
+            }
+        }
+
+        targets.configureEach {
+            testTask.configure {
+                useJUnitPlatform()
+
+                failFast = false
+                finalizedBy(tasks.allureReport)
+
+                reports {
+                    html.required = false
+                    junitXml.required = false
+                }
+            }
+        }
+    }
+
+    val test by getting(JvmTestSuite::class)
+
+    // val integrationTest by registering(JvmTestSuite::class) {
+    //     gradlePlugin.testSourceSet(this.sources)
+    //     testType = TestSuiteType.INTEGRATION_TEST
+    //
+    //     targets.configureEach {
+    //         testTask.configure {
+    //             shouldRunAfter(test)
+    //         }
+    //     }
+    // }
+}
+
 tasks {
     withType<DokkaGenerateTask>().configureEach {
         inputs.files(dokkaBuildDir.dir("styles"), dokkaTemplates)
@@ -353,11 +408,11 @@ tasks {
         dependsOn(compileDokkaSass, processDokkaIncludes)
     }
 
-    val functionalTest by registering {
-        group = JavaBasePlugin.VERIFICATION_GROUP
-        description = "Runs the functional test suite."
-        dependsOn(functionalTest.testTasks.elements)
-    }
+    // val functionalTest by registering {
+    //     group = JavaBasePlugin.VERIFICATION_GROUP
+    //     description = "Runs the functional test suite."
+    //     dependsOn(functionalTest.testTasks.elements)
+    // }
 
     withType<Test>().configureEach {
         finalizedBy(allureReport)
@@ -365,16 +420,20 @@ tasks {
         useJUnitPlatform()
 
         reports {
-            html.required.set(false)
-            junitXml.required.set(false)
+            html.required = false
+            junitXml.required = false
         }
 
-        systemProperty("nyx.test.work.tmp", temporaryDir.resolve("work"))
+        systemProperty("nyx.test.tmp", temporaryDir)
         systemProperty("gradle.build.dir", layout.buildDirectory.get().asFile)
         systemProperty("gradle.task.name", name)
-        systemProperty("kotest.framework.classpath.scanning.config.disable", true)
         systemProperty("kotest.framework.config.fqn", "ca.solostudios.nyx.kotest.KotestConfig")
+        systemProperty("kotest.framework.classpath.scanning.config.disable", true)
         systemProperty("kotest.framework.classpath.scanning.autoscan.disable", true)
+    }
+
+    validatePlugins {
+        enableStricterValidation = true
     }
 
     allureReport {

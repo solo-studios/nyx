@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxSpec.kt is part of nyx
- * Last modified on 16-09-2024 11:49 p.m.
+ * Last modified on 25-10-2024 11:40 a.m.
  *
  * MIT License
  *
@@ -24,6 +24,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
+@file:Suppress("unused")
 
 package ca.solostudios.nyx.kotest.spec
 
@@ -52,7 +54,7 @@ import io.kotest.core.spec.style.scopes.addContainer
 import io.kotest.core.test.TestScope
 
 
-fun uponSpec(block: NyxSpecTestFactoryConfiguration.() -> Unit): TestFactory = NyxSpecTestFactoryConfiguration().apply(block).build()
+fun nyxSpec(block: NyxSpecTestFactoryConfiguration.() -> Unit): TestFactory = NyxSpecTestFactoryConfiguration().apply(block).build()
 
 interface NyxSpecRootScope : RootScope {
     fun feature(name: String, test: suspend NyxSpecFeatureContainerScope.() -> Unit) = addFeature(name, false, test)

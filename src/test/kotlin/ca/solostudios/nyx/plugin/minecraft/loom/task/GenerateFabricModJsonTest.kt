@@ -1,8 +1,8 @@
 /*
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
- * The file TempFiles.kt is part of nyx
- * Last modified on 25-10-2024 07:03 p.m.
+ * The file GenerateFabricModJsonTest.kt is part of nyx
+ * Last modified on 22-10-2024 02:34 p.m.
  *
  * MIT License
  *
@@ -25,34 +25,26 @@
  * SOFTWARE.
  */
 
-@file:Suppress("unused")
+package ca.solostudios.nyx.plugin.minecraft.loom.task
 
-package ca.solostudios.nyx.kotest
+import ca.solostudios.nyx.NyxPlugin
+import ca.solostudios.nyx.kotest.spec.NyxSpec
+import ca.solostudios.nyx.util.project
+import io.kotest.matchers.collections.shouldBeEmpty
+import org.gradle.kotlin.dsl.apply
+import org.gradle.kotlin.dsl.withType
 
-import io.kotest.core.spec.Spec
-import java.nio.file.Path
-import kotlin.io.path.Path
-import kotlin.io.path.createDirectories
-import kotlin.io.path.createTempDirectory
-import kotlin.io.path.createTempFile
-import kotlin.io.path.deleteExisting
+class GenerateFabricModJsonTest : NyxSpec({
+    feature("the nyx GenerateFabricModJson task") {
+        given("a project with the fabric-loom and nyx plugins") {
+            val project = project {
+                plugins.apply("fabric-loom")
+                plugins.apply(NyxPlugin::class)
+            }
 
-const val TMP_DIR_PROPERTY = "nyx.test.tmp"
-val TMP_DIR = Path(System.getProperty(TMP_DIR_PROPERTY))
-
-fun Spec.createTmpDir(directory: String = "", prefix: String? = null, delete: Boolean = true): Path {
-    val tempDir = createTempDirectory(TMP_DIR.resolve(directory).createDirectories(), prefix)
-
-    afterSpec {
-        if (delete)
-            tempDir.deleteExisting()
+            should("not have a GenerateFabricModJson task by default") {
+                project.tasks.withType<GenerateFabricModJson>().shouldBeEmpty()
+            }
+        }
     }
-
-    return tempDir
-}
-
-fun createTmpFile(prefix: String? = null, suffix: String? = null, delete: Boolean = true): Path {
-    return createTempFile(TMP_DIR.also { it.parent.createDirectories() }, prefix, suffix).also {
-        if (delete) it.toFile().deleteOnExit()
-    }
-}
+})
