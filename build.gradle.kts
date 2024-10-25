@@ -2,7 +2,7 @@
  * Copyright (c) 2023-2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file build.gradle.kts is part of nyx
- * Last modified on 25-10-2024 07:21 p.m.
+ * Last modified on 25-10-2024 07:43 p.m.
  *
  * MIT License
  *
@@ -360,6 +360,8 @@ testing.suites {
             implementation(libs.kotlin.plugin)
             implementation(libs.dokka.plugin)
             implementation(libs.fabric.loom)
+            implementation(libs.quilt.loom)
+            implementation(libs.architectury.loom)
             implementation(libs.github.release)
             implementation(libs.modrinth.minotaur)
 
