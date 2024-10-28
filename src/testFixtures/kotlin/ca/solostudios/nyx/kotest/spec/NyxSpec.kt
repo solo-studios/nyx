@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxSpec.kt is part of nyx
- * Last modified on 25-10-2024 11:40 a.m.
+ * Last modified on 28-10-2024 01:58 a.m.
  *
  * MIT License
  *
@@ -56,12 +56,27 @@ import io.kotest.core.test.TestScope
 
 fun nyxSpec(block: NyxSpecTestFactoryConfiguration.() -> Unit): TestFactory = NyxSpecTestFactoryConfiguration().apply(block).build()
 
-interface NyxSpecRootScope : RootScope {
+interface NyxGivenScope {
+    suspend fun given(name: String, test: suspend NyxSpecGivenContainerScope.() -> Unit)
+    suspend fun xgiven(name: String, test: suspend NyxSpecGivenContainerScope.() -> Unit)
+}
+
+interface NyxShouldScope {
+    suspend fun should(name: String, test: suspend TestScope.() -> Unit)
+    suspend fun xshould(name: String, test: suspend TestScope.() -> Unit)
+}
+
+interface NyxUponScope {
+    suspend fun upon(name: String, test: suspend NyxSpecUponContainerScope.() -> Unit)
+    suspend fun xupon(name: String, test: suspend NyxSpecUponContainerScope.() -> Unit)
+}
+
+interface NyxSpecRootScope : RootScope, NyxGivenScope {
     fun feature(name: String, test: suspend NyxSpecFeatureContainerScope.() -> Unit) = addFeature(name, false, test)
     fun xfeature(name: String, test: suspend NyxSpecFeatureContainerScope.() -> Unit) = addFeature(name, true, test)
 
-    fun given(name: String, test: suspend NyxSpecGivenContainerScope.() -> Unit) = addGiven(name, false, test)
-    fun xgiven(name: String, test: suspend NyxSpecGivenContainerScope.() -> Unit) = addGiven(name, true, test)
+    override suspend fun given(name: String, test: suspend NyxSpecGivenContainerScope.() -> Unit) = addGiven(name, false, test)
+    override suspend fun xgiven(name: String, test: suspend NyxSpecGivenContainerScope.() -> Unit) = addGiven(name, true, test)
 
     private fun addFeature(name: String, xdisabled: Boolean, test: suspend NyxSpecFeatureContainerScope.() -> Unit) {
         addContainer(TestName("Feature: ", name, true), disabled = xdisabled, null) {
@@ -120,55 +135,51 @@ abstract class NyxSpec(body: NyxSpec.() -> Unit = {}) : DslDrivenSpec(), NyxSpec
     suspend fun ContainerScope.given(name: String, test: suspend NyxSpecGivenContainerScope.() -> Unit) {
         addGiven(name, test, xdisabled = false)
     }
-
-    suspend fun ContainerScope.upon(name: String, test: suspend NyxSpecUponContainerScope.() -> Unit) {
-        addUpon(name, test, xdisabled = false)
-    }
 }
 
 @KotestTestScope
-class NyxSpecFeatureContainerScope(testScope: TestScope) : AbstractContainerScope(testScope) {
+class NyxSpecFeatureContainerScope(testScope: TestScope) : AbstractContainerScope(testScope), NyxGivenScope, NyxUponScope {
     suspend fun scenario(name: String, test: suspend NyxSpecScenarioContainerScope.() -> Unit) = addScenario(name, test, xdisabled = false)
     suspend fun xscenario(name: String, test: suspend NyxSpecScenarioContainerScope.() -> Unit) = addScenario(name, test, xdisabled = true)
 
-    suspend fun given(name: String, test: suspend NyxSpecGivenContainerScope.() -> Unit) = addGiven(name, test, xdisabled = false)
-    suspend fun xgiven(name: String, test: suspend NyxSpecGivenContainerScope.() -> Unit) = addGiven(name, test, xdisabled = true)
+    override suspend fun given(name: String, test: suspend NyxSpecGivenContainerScope.() -> Unit) = addGiven(name, test, xdisabled = false)
+    override suspend fun xgiven(name: String, test: suspend NyxSpecGivenContainerScope.() -> Unit) = addGiven(name, test, xdisabled = true)
 
-    suspend fun upon(name: String, test: suspend NyxSpecUponContainerScope.() -> Unit) = addUpon(name, test, xdisabled = false)
-    suspend fun xupon(name: String, test: suspend NyxSpecUponContainerScope.() -> Unit) = addUpon(name, test, xdisabled = true)
+    override suspend fun upon(name: String, test: suspend NyxSpecUponContainerScope.() -> Unit) = addUpon(name, test, xdisabled = false)
+    override suspend fun xupon(name: String, test: suspend NyxSpecUponContainerScope.() -> Unit) = addUpon(name, test, xdisabled = true)
 }
 
 @KotestTestScope
-class NyxSpecScenarioContainerScope(testScope: TestScope) : AbstractContainerScope(testScope) {
-    suspend fun given(name: String, test: suspend NyxSpecGivenContainerScope.() -> Unit) = addGiven(name, test, xdisabled = false)
-    suspend fun xgiven(name: String, test: suspend NyxSpecGivenContainerScope.() -> Unit) = addGiven(name, test, xdisabled = true)
+class NyxSpecScenarioContainerScope(testScope: TestScope) : AbstractContainerScope(testScope), NyxGivenScope, NyxUponScope {
+    override suspend fun given(name: String, test: suspend NyxSpecGivenContainerScope.() -> Unit) = addGiven(name, test, xdisabled = false)
+    override suspend fun xgiven(name: String, test: suspend NyxSpecGivenContainerScope.() -> Unit) = addGiven(name, test, xdisabled = true)
 
-    suspend fun upon(name: String, test: suspend NyxSpecUponContainerScope.() -> Unit) = addUpon(name, test, xdisabled = false)
-    suspend fun xupon(name: String, test: suspend NyxSpecUponContainerScope.() -> Unit) = addUpon(name, test, xdisabled = true)
+    override suspend fun upon(name: String, test: suspend NyxSpecUponContainerScope.() -> Unit) = addUpon(name, test, xdisabled = false)
+    override suspend fun xupon(name: String, test: suspend NyxSpecUponContainerScope.() -> Unit) = addUpon(name, test, xdisabled = true)
 }
 
 @KotestTestScope
-class NyxSpecGivenContainerScope(testScope: TestScope) : AbstractContainerScope(testScope) {
+class NyxSpecGivenContainerScope(testScope: TestScope) : AbstractContainerScope(testScope), NyxUponScope, NyxShouldScope {
     suspend fun and(name: String, test: suspend NyxSpecGivenContainerScope.() -> Unit) = addAndGiven(name, test, xdisabled = false)
     suspend fun xand(name: String, test: suspend NyxSpecGivenContainerScope.() -> Unit) = addAndGiven(name, test, xdisabled = true)
 
-    suspend fun upon(name: String, test: suspend NyxSpecUponContainerScope.() -> Unit) = addUpon(name, test, xdisabled = false)
-    suspend fun xupon(name: String, test: suspend NyxSpecUponContainerScope.() -> Unit) = addUpon(name, test, xdisabled = true)
+    override suspend fun upon(name: String, test: suspend NyxSpecUponContainerScope.() -> Unit) = addUpon(name, test, xdisabled = false)
+    override suspend fun xupon(name: String, test: suspend NyxSpecUponContainerScope.() -> Unit) = addUpon(name, test, xdisabled = true)
 
-    suspend fun should(name: String, test: suspend TestScope.() -> Unit) = addShould(name, test, xdisabled = false)
-    suspend fun xshould(name: String, test: suspend TestScope.() -> Unit) = addShould(name, test, xdisabled = true)
+    override suspend fun should(name: String, test: suspend TestScope.() -> Unit) = addShould(name, test, xdisabled = false)
+    override suspend fun xshould(name: String, test: suspend TestScope.() -> Unit) = addShould(name, test, xdisabled = true)
 
     fun should(name: String) = shouldWithConfig(name, xdisabled = false)
     fun xshould(name: String) = shouldWithConfig(name, xdisabled = true)
 }
 
 @KotestTestScope
-class NyxSpecUponContainerScope(testScope: TestScope) : AbstractContainerScope(testScope) {
+class NyxSpecUponContainerScope(testScope: TestScope) : AbstractContainerScope(testScope), NyxShouldScope {
     suspend fun and(name: String, test: suspend NyxSpecUponContainerScope.() -> Unit) = addAndUpon(name, test, xdisabled = false)
     suspend fun xand(name: String, test: suspend NyxSpecUponContainerScope.() -> Unit) = addAndUpon(name, test, xdisabled = true)
 
-    suspend fun should(name: String, test: suspend TestScope.() -> Unit) = addShould(name, test, xdisabled = false)
-    suspend fun xshould(name: String, test: suspend TestScope.() -> Unit) = addShould(name, test, xdisabled = true)
+    override suspend fun should(name: String, test: suspend TestScope.() -> Unit) = addShould(name, test, xdisabled = false)
+    override suspend fun xshould(name: String, test: suspend TestScope.() -> Unit) = addShould(name, test, xdisabled = true)
 
     fun should(name: String) = shouldWithConfig(name, xdisabled = false)
     fun xshould(name: String) = shouldWithConfig(name, xdisabled = true)

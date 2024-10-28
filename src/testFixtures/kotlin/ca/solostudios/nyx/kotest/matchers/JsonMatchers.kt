@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file JsonMatchers.kt is part of nyx
- * Last modified on 25-10-2024 11:40 a.m.
+ * Last modified on 28-10-2024 01:58 a.m.
  *
  * MIT License
  *
@@ -43,19 +43,14 @@ import io.kotest.assertions.json.shouldNotBeJsonObject
 import io.kotest.assertions.json.shouldNotBeValidJson
 import io.kotest.assertions.json.shouldNotEqualJson
 import io.kotest.assertions.json.shouldNotEqualSpecifiedJson
-import org.intellij.lang.annotations.Language
 import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.readText
 
-@Language("JSON")
-@Target(AnnotationTarget.TYPE)
-annotation class Json
-
 // @formatter:off
 infix fun Path.shouldEqualJson(expected: String): Path = also { readText() shouldEqualJson expected }
 infix fun File.shouldEqualJson(expected: String): File = also { readText() shouldEqualJson expected }
-infix fun Path.shouldEqualJson(configureAndProvideExpected: CompareJsonOptions.() -> @Json String): Path = also { readText() shouldEqualJson configureAndProvideExpected }
+infix fun Path.shouldEqualJson(configureAndProvideExpected: CompareJsonOptions.() -> String): Path = also { readText() shouldEqualJson configureAndProvideExpected }
 infix fun File.shouldEqualJson(configureAndProvideExpected: CompareJsonOptions.() -> String): File = also { readText() shouldEqualJson configureAndProvideExpected }
 
 infix fun Path.shouldNotEqualJson(expected: String): Path = also { readText() shouldNotEqualJson expected }

@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file SerializationUtil.kt is part of nyx
- * Last modified on 15-09-2024 06:55 a.m.
+ * Last modified on 28-10-2024 01:58 a.m.
  *
  * MIT License
  *
@@ -66,8 +66,21 @@ internal fun Any?.toJsonElement(): JsonElement {
         this is Number -> JsonPrimitive(this)
         this is String -> JsonPrimitive(this)
         this is Enum<*> -> JsonPrimitive(this.name)
-        this is Pair<*, *> -> this.toList().toJsonElement()
-        this is Triple<*, *, *> -> this.toList().toJsonElement()
+        this is Pair<*, *>      -> JsonObject(
+            mapOf(
+                "first" to first.toJsonElement(),
+                "second" to second.toJsonElement(),
+            )
+        )
+
+        this is Triple<*, *, *> -> JsonObject(
+            mapOf(
+                "first" to first.toJsonElement(),
+                "second" to second.toJsonElement(),
+                "third" to third.toJsonElement(),
+            )
+        )
+
         else -> error("Can't serialize '$this' as it is of an unknown type")
     }
 }
@@ -97,14 +110,21 @@ internal fun Array<*>.toJsonElement(): JsonArray = buildJsonArray {
 
 internal fun BooleanArray.toJsonElement(): JsonArray = buildJsonArray { forEach { add(JsonPrimitive(it)) } }
 internal fun ByteArray.toJsonElement(): JsonArray = buildJsonArray { forEach { add(JsonPrimitive(it)) } }
-internal fun CharArray.toJsonElement(): JsonArray = buildJsonArray { forEach { add(JsonPrimitive(it.code)) } }
+internal fun CharArray.toJsonElement(): JsonArray = buildJsonArray { forEach { add(JsonPrimitive(it.toString())) } }
 internal fun ShortArray.toJsonElement(): JsonArray = buildJsonArray { forEach { add(JsonPrimitive(it)) } }
 internal fun IntArray.toJsonElement(): JsonArray = buildJsonArray { forEach { add(JsonPrimitive(it)) } }
 internal fun LongArray.toJsonElement(): JsonArray = buildJsonArray { forEach { add(JsonPrimitive(it)) } }
 internal fun FloatArray.toJsonElement(): JsonArray = buildJsonArray { forEach { add(JsonPrimitive(it)) } }
 internal fun DoubleArray.toJsonElement(): JsonArray = buildJsonArray { forEach { add(JsonPrimitive(it)) } }
 
+@ExperimentalUnsignedTypes
 internal fun UByteArray.toJsonElement(): JsonArray = buildJsonArray { forEach { add(JsonPrimitive(it)) } }
+
+@ExperimentalUnsignedTypes
 internal fun UShortArray.toJsonElement(): JsonArray = buildJsonArray { forEach { add(JsonPrimitive(it)) } }
+
+@ExperimentalUnsignedTypes
 internal fun UIntArray.toJsonElement(): JsonArray = buildJsonArray { forEach { add(JsonPrimitive(it)) } }
+
+@ExperimentalUnsignedTypes
 internal fun ULongArray.toJsonElement(): JsonArray = buildJsonArray { forEach { add(JsonPrimitive(it)) } }
