@@ -2,7 +2,7 @@
  * Copyright (c) 2023-2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxPlugin.kt is part of nyx
- * Last modified on 10-06-2024 03:41 p.m.
+ * Last modified on 21-10-2024 10:02 p.m.
  *
  * MIT License
  *
@@ -48,7 +48,7 @@ public class NyxPlugin : InternalNyxPlugin {
 
         try {
             project.plugins.withType<LoomGradlePluginBootstrap> {
-                project.plugins.apply(NyxMinecraftPlugin::class)
+                project.applyMinecraftPlugin()
             }
         } catch (_: NoClassDefFoundError) {
             // ignore
@@ -56,7 +56,7 @@ public class NyxPlugin : InternalNyxPlugin {
 
         try {
             project.plugins.withType<NeoGradleCommonProjectPlugin> {
-                project.plugins.apply(NyxMinecraftPlugin::class)
+                project.applyMinecraftPlugin()
             }
         } catch (_: NoClassDefFoundError) {
             // ignore
@@ -65,5 +65,9 @@ public class NyxPlugin : InternalNyxPlugin {
         project.afterEvaluate {
             nyx.configureProject()
         }
+    }
+
+    private fun Project.applyMinecraftPlugin() {
+        plugins.apply(NyxMinecraftPlugin::class)
     }
 }
