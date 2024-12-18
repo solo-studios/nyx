@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxNeoGradleExtension.kt is part of nyx
- * Last modified on 19-06-2024 04:47 p.m.
+ * Last modified on 18-12-2024 06:57 p.m.
  *
  * MIT License
  *
@@ -16,7 +16,7 @@
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
- * GRADLE-CONVENTIONS-PLUGIN IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * NYX IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -36,7 +36,6 @@ import net.neoforged.gradle.dsl.common.extensions.AccessTransformers
 import net.neoforged.gradle.dsl.common.extensions.Mappings
 import net.neoforged.gradle.dsl.common.extensions.Minecraft
 import net.neoforged.gradle.dsl.common.runtime.naming.NamingChannel
-import org.gradle.api.Action
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.api.plugins.ExtensionAware
@@ -93,15 +92,6 @@ public class NyxNeoGradleExtension(
      * @see Minecraft.namingChannel
      */
     public fun namingChannel(name: String, action: NamingChannel.() -> Unit) {
-        neoMinecraft.namingChannel(name, action)
-    }
-
-    /**
-     * Configures a specific naming channel.
-     *
-     * @see Minecraft.namingChannel
-     */
-    public fun namingChannel(name: String, action: Action<NamingChannel>) {
         neoMinecraft.namingChannel(name, action)
     }
 

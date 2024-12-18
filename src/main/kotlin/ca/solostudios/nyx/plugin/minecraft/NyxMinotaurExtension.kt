@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxMinotaurExtension.kt is part of nyx
- * Last modified on 19-06-2024 05:07 p.m.
+ * Last modified on 18-12-2024 06:57 p.m.
  *
  * MIT License
  *
@@ -16,7 +16,7 @@
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
- * GRADLE-CONVENTIONS-PLUGIN IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * NYX IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -39,7 +39,6 @@ import ca.solostudios.nyx.project.NyxProjectInfoExtension
 import com.modrinth.minotaur.TaskModrinthUpload
 import com.modrinth.minotaur.dependencies.container.NamedDependencyContainer
 import masecla.modrinth4j.model.version.ProjectVersion
-import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
@@ -121,15 +120,6 @@ public class NyxMinotaurExtension(
     }
 
     /**
-     * Configures any additional files.
-     *
-     * @see additionalFiles
-     */
-    public fun additionalFiles(action: Action<ConfigurableFileCollection>) {
-        action.execute(additionalFiles)
-    }
-
-    /**
      * Enables silent failures.
      *
      * @see failSilently
@@ -161,13 +151,6 @@ public class NyxMinotaurExtension(
      */
     public fun dependencies(dsl: DependenciesDsl.() -> Unit) {
         DependenciesDsl(project).apply(dsl)
-    }
-
-    /**
-     * Configures the dependencies for the modrinth release.
-     */
-    public fun dependencies(action: Action<DependenciesDsl>) {
-        dependencies { action.execute(this) }
     }
 
     override fun configureProject() {

@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file FabricModJson.kt is part of nyx
- * Last modified on 25-10-2024 06:52 p.m.
+ * Last modified on 18-12-2024 06:57 p.m.
  *
  * MIT License
  *
@@ -16,7 +16,7 @@
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
- * GRADLE-CONVENTIONS-PLUGIN IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * NYX IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -37,7 +37,6 @@ import ca.solostudios.nyx.internal.util.minecraft
 import ca.solostudios.nyx.internal.util.nyx
 import ca.solostudios.nyx.internal.util.property
 import ca.solostudios.nyx.internal.util.provider
-import org.gradle.api.Action
 import org.gradle.api.Named
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
@@ -246,10 +245,6 @@ public class FabricModJson(override val project: Project) : HasProject {
         entrypoints.action()
     }
 
-    public fun entrypoints(action: Action<NamedDomainObjectContainer<EntrypointContainer>>) {
-        action.execute(entrypoints)
-    }
-
     @JvmOverloads
     public fun NamedDomainObjectContainer<EntrypointContainer>.entry(name: String, entrypoint: String, adapter: String? = null) {
         maybeRegister(name) {
@@ -258,10 +253,6 @@ public class FabricModJson(override val project: Project) : HasProject {
     }
 
     public fun NamedDomainObjectContainer<EntrypointContainer>.entry(name: String, action: EntrypointContainer.() -> Unit) {
-        maybeRegister(name, action)
-    }
-
-    public fun NamedDomainObjectContainer<EntrypointContainer>.entry(name: String, action: Action<EntrypointContainer>) {
         maybeRegister(name, action)
     }
 
@@ -274,10 +265,6 @@ public class FabricModJson(override val project: Project) : HasProject {
     }
 
     public fun NamedDomainObjectContainer<EntrypointContainer>.main(action: EntrypointContainer.() -> Unit) {
-        entry("main", action)
-    }
-
-    public fun NamedDomainObjectContainer<EntrypointContainer>.main(action: Action<EntrypointContainer>) {
         entry("main", action)
     }
     // endregion
@@ -293,8 +280,6 @@ public class FabricModJson(override val project: Project) : HasProject {
     public fun NamedDomainObjectContainer<EntrypointContainer>.client(action: EntrypointContainer.() -> Unit) {
         entry("client", action)
     }
-
-    public fun NamedDomainObjectContainer<EntrypointContainer>.client(action: Action<EntrypointContainer>): Unit = entry("client", action)
     // endregion
 
     // region Server Entrypoints
@@ -308,19 +293,11 @@ public class FabricModJson(override val project: Project) : HasProject {
     public fun NamedDomainObjectContainer<EntrypointContainer>.server(action: EntrypointContainer.() -> Unit) {
         entry("server", action)
     }
-
-    public fun NamedDomainObjectContainer<EntrypointContainer>.server(action: Action<EntrypointContainer>) {
-        entry("server", action)
-    }
     // endregion
     // endregion
 
     public fun authors(action: NamedDomainObjectContainer<Person>.() -> Unit) {
         authors.action()
-    }
-
-    public fun authors(action: Action<NamedDomainObjectContainer<Person>>) {
-        action.execute(authors)
     }
 
     @JvmOverloads
@@ -335,10 +312,6 @@ public class FabricModJson(override val project: Project) : HasProject {
         contributors.action()
     }
 
-    public fun contributors(action: Action<NamedDomainObjectContainer<Person>>) {
-        action.execute(contributors)
-    }
-
     @JvmOverloads
     public fun contributor(name: String, contact: Map<String, String>? = null) {
         contributors.register(name) {
@@ -351,10 +324,6 @@ public class FabricModJson(override val project: Project) : HasProject {
         mixins.action()
     }
 
-    public fun mixins(action: Action<NamedDomainObjectContainer<MixinConfig>>) {
-        action.execute(mixins)
-    }
-
     @JvmOverloads
     public fun mixin(config: String, environment: Environment? = null) {
         mixins.register(config) {
@@ -365,10 +334,6 @@ public class FabricModJson(override val project: Project) : HasProject {
 
     public fun depends(action: NamedDomainObjectContainer<Dependency>.() -> Unit) {
         depends.action()
-    }
-
-    public fun depends(action: Action<NamedDomainObjectContainer<Dependency>>) {
-        action.execute(depends)
     }
 
     @JvmOverloads
@@ -389,10 +354,6 @@ public class FabricModJson(override val project: Project) : HasProject {
         recommends.action()
     }
 
-    public fun recommends(action: Action<NamedDomainObjectContainer<Dependency>>) {
-        action.execute(recommends)
-    }
-
     @JvmOverloads
     public fun recommends(mod: String, version: String? = null) {
         recommends.register(mod) {
@@ -409,10 +370,6 @@ public class FabricModJson(override val project: Project) : HasProject {
 
     public fun suggests(action: NamedDomainObjectContainer<Dependency>.() -> Unit) {
         suggests.action()
-    }
-
-    public fun suggests(action: Action<NamedDomainObjectContainer<Dependency>>) {
-        action.execute(suggests)
     }
 
     @JvmOverloads
@@ -433,10 +390,6 @@ public class FabricModJson(override val project: Project) : HasProject {
         conflicts.action()
     }
 
-    public fun conflicts(action: Action<NamedDomainObjectContainer<Dependency>>) {
-        action.execute(conflicts)
-    }
-
     @JvmOverloads
     public fun conflicts(mod: String, version: String? = null) {
         conflicts.register(mod) {
@@ -453,10 +406,6 @@ public class FabricModJson(override val project: Project) : HasProject {
 
     public fun breaks(action: NamedDomainObjectContainer<Dependency>.() -> Unit) {
         breaks.action()
-    }
-
-    public fun breaks(action: Action<NamedDomainObjectContainer<Dependency>>) {
-        action.execute(breaks)
     }
 
     @JvmOverloads
@@ -477,10 +426,6 @@ public class FabricModJson(override val project: Project) : HasProject {
         contact.action()
     }
 
-    public fun contact(action: Action<ModContact>) {
-        action.execute(contact)
-    }
-
     @JvmOverloads
     public fun icon(file: String, size: Int? = null) {
         icons.add(ModIcon(file, size))
@@ -492,10 +437,6 @@ public class FabricModJson(override val project: Project) : HasProject {
 
     public fun modmenu(action: ModMenu.() -> Unit) {
         modmenu.action()
-    }
-
-    public fun modmenu(action: Action<ModMenu>) {
-        action.execute(modmenu)
     }
 
     public fun custom(key: String, value: Any) {
@@ -685,16 +626,8 @@ public class FabricModJson(override val project: Project) : HasProject {
             links.action()
         }
 
-        public fun links(action: Action<ModMenuLinks>) {
-            action.execute(links)
-        }
-
         public fun parent(action: ModMenuParent.() -> Unit) {
             parent.action()
-        }
-
-        public fun parent(action: Action<ModMenuParent>) {
-            action.execute(parent)
         }
 
         public fun library(): Unit = badges.add("library")

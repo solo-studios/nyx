@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxGithubReleaseExtension.kt is part of nyx
- * Last modified on 19-06-2024 05:12 p.m.
+ * Last modified on 18-12-2024 06:57 p.m.
  *
  * MIT License
  *
@@ -16,7 +16,7 @@
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
- * GRADLE-CONVENTIONS-PLUGIN IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * NYX IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -32,7 +32,6 @@ import ca.solostudios.nyx.internal.util.fileCollection
 import ca.solostudios.nyx.internal.util.githubRelease
 import ca.solostudios.nyx.internal.util.property
 import ca.solostudios.nyx.project.NyxProjectInfoExtension
-import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.provider.Property
@@ -153,13 +152,6 @@ public class NyxGithubReleaseExtension(
      */
     public fun releaseAssets(action: (ConfigurableFileCollection).() -> Unit) {
         releaseAssets.apply(action)
-    }
-
-    /**
-     * Configures the release assets
-     */
-    public fun releaseAssets(action: Action<ConfigurableFileCollection>) {
-        action.execute(releaseAssets)
     }
 
     override fun configureProject() {

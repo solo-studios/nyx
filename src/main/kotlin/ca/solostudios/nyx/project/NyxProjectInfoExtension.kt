@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxProjectInfoExtension.kt is part of nyx
- * Last modified on 15-09-2024 07:06 p.m.
+ * Last modified on 18-12-2024 06:57 p.m.
  *
  * MIT License
  *
@@ -16,7 +16,7 @@
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
- * GRADLE-CONVENTIONS-PLUGIN IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * NYX IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -34,7 +34,6 @@ import ca.solostudios.nyx.internal.util.property
 import ca.solostudios.nyx.internal.util.provider
 import ca.solostudios.nyx.internal.util.tasks
 import ca.solostudios.nyx.internal.util.toStringOrEmpty
-import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
@@ -130,15 +129,6 @@ public class NyxProjectInfoExtension(override val project: Project) : InternalNy
      * Adds a developer to the publishing information
      *
      * @param developer Configuration for the developer that is added
-     */
-    public fun developer(developer: Action<MavenPomDeveloper>) {
-        this.developers.add { developer.execute(it) }
-    }
-
-    /**
-     * Adds a developer to the publishing information
-     *
-     * @param developer Configuration for the developer that is added
      * @receiver The developer to be added
      */
     public fun developer(developer: (MavenPomDeveloper).() -> Unit) {
@@ -148,22 +138,8 @@ public class NyxProjectInfoExtension(override val project: Project) : InternalNy
     /**
      * Configures the repository info.
      */
-    public fun repository(action: Action<NyxRepositoryInfo>) {
-        action.execute(repository)
-    }
-
-    /**
-     * Configures the repository info.
-     */
     public fun repository(action: (NyxRepositoryInfo).() -> Unit) {
         repository.apply(action)
-    }
-
-    /**
-     * Configures the license info.
-     */
-    public fun license(action: Action<NyxLicenseInfoExtension>) {
-        action.execute(license)
     }
 
     /**

@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxFabricLoomExtension.kt is part of nyx
- * Last modified on 15-10-2024 07:36 p.m.
+ * Last modified on 18-12-2024 06:57 p.m.
  *
  * MIT License
  *
@@ -16,7 +16,7 @@
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
- * GRADLE-CONVENTIONS-PLUGIN IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * NYX IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -48,7 +48,6 @@ import net.fabricmc.loom.configuration.FabricApiExtension
 import net.fabricmc.loom.configuration.ide.RunConfigSettings
 import net.fabricmc.loom.configuration.providers.minecraft.MinecraftJarConfiguration
 import net.fabricmc.loom.configuration.providers.minecraft.MinecraftSourceSets
-import org.gradle.api.Action
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.api.provider.Property
@@ -322,32 +321,12 @@ public class NyxFabricLoomExtension(
     }
 
     /**
-     * Configures data generation.
-     *
-     * @see FabricApiExtension.configureDataGeneration
-     */
-    public fun configureDataGeneration(action: Action<FabricApiExtension.DataGenerationSettings>) {
-        fabricApi {
-            configureDataGeneration(action)
-        }
-    }
-
-    /**
      * Configures the loom decompilers.
      *
      * @see LoomGradleExtensionAPI.decompilers
      */
     public fun decompilers(action: NamedDomainObjectContainer<DecompilerOptions>.() -> Unit) {
         decompilers.apply(action)
-    }
-
-    /**
-     * Configures the loom decompilers.
-     *
-     * @see LoomGradleExtensionAPI.decompilers
-     */
-    public fun decompilers(action: Action<NamedDomainObjectContainer<DecompilerOptions>>) {
-        action.execute(decompilers)
     }
 
     /**
@@ -360,15 +339,6 @@ public class NyxFabricLoomExtension(
     }
 
     /**
-     * Configures the loom runs
-     *
-     * @see LoomGradleExtensionAPI.runs
-     */
-    public fun runs(action: Action<NamedDomainObjectContainer<RunConfigSettings>>) {
-        action.execute(runs)
-    }
-
-    /**
      * Configures the mods.
      *
      * @see LoomGradleExtensionAPI.mods
@@ -377,23 +347,9 @@ public class NyxFabricLoomExtension(
         mods.apply(action)
     }
 
-    /**
-     * Configures the mods.
-     *
-     * @see LoomGradleExtensionAPI.mods
-     */
-    public fun mods(action: Action<NamedDomainObjectContainer<ModSettings>>) {
-        action.execute(mods)
-    }
-
     public fun fabricModJson(action: FabricModJson.() -> Unit) {
         generateFabricModJson = true
         fabricModJson.apply(action)
-    }
-
-    public fun fabricModJson(action: Action<FabricModJson>) {
-        generateFabricModJson = true
-        action.execute(fabricModJson)
     }
 
     /**

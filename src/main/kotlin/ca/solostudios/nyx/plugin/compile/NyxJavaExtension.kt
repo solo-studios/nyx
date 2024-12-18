@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxJavaExtension.kt is part of nyx
- * Last modified on 14-07-2024 08:25 p.m.
+ * Last modified on 18-12-2024 06:57 p.m.
  *
  * MIT License
  *
@@ -16,7 +16,7 @@
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
- * GRADLE-CONVENTIONS-PLUGIN IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * NYX IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -36,7 +36,6 @@ import ca.solostudios.nyx.internal.util.property
 import ca.solostudios.nyx.internal.util.tasks
 import ca.solostudios.nyx.plugin.minecraft.neoforge.NyxNeoGradleExtension
 import net.neoforged.gradle.neoform.runtime.tasks.RecompileSourceJar
-import org.gradle.api.Action
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.java.archives.Manifest
@@ -235,17 +234,6 @@ public class NyxJavaExtension(
      */
     public fun withJavadocJar() {
         javadocJar = true
-    }
-
-    /**
-     * Configures the manifest used in the resulting jar file(s)
-     *
-     * @param action Configuration for the manifest
-     */
-    public fun manifest(action: Action<Manifest>) {
-        java {
-            manifest(action)
-        }
     }
 
     /**
