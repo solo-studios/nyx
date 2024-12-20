@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file GenerateFabricModJson.kt is part of nyx
- * Last modified on 25-10-2024 06:45 p.m.
+ * Last modified on 19-12-2024 11:10 p.m.
  *
  * MIT License
  *
@@ -16,7 +16,7 @@
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
- * GRADLE-CONVENTIONS-PLUGIN IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * NYX IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -39,6 +39,7 @@ import ca.solostudios.nyx.plugin.minecraft.loom.FabricModJson
 import ca.solostudios.nyx.plugin.minecraft.loom.FabricModJson.Dependency
 import ca.solostudios.nyx.plugin.minecraft.loom.FabricModJson.Environment
 import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.encodeToStream
@@ -90,6 +91,8 @@ public class GenerateFabricModJson : DefaultTask() {
         val serialModJson = fabricModJson.get().toSerial()
 
         outputDirectory.file(outputFilename).asPath().outputStream().buffered().use { outputStream ->
+            val adapters = Json.encodeToString(serialModJson.languageAdapters)
+            println("serial language adapters: $adapters")
             json.encodeToStream(serialModJson, outputStream)
         }
     }
@@ -195,6 +198,10 @@ public class GenerateFabricModJson : DefaultTask() {
             }
         }.takeIf { it.isNotEmpty() }
 
+        val adapters = Json.encodeToString(languageAdapters.orNull?.takeIf { it.isNotEmpty() })
+        println("language adapters: $adapters")
+        //
+
         return SerialFabricModJson(
             id = this.id.get(),
             name = this.name.orNull,
@@ -236,7 +243,7 @@ public class GenerateFabricModJson : DefaultTask() {
 
     private fun NamedDomainObjectContainer<FabricModJson.Person>.toSerial(): List<SerialFabricModJson.Person>? {
         return takeIf { it.isNotEmpty() }?.map { person ->
-            if (person.contact.isPresent)
+            if (person.contact.isPresent && person.contact.get().isNotEmpty())
                 SerialContactablePerson(person.person, person.contact.get())
             else
                 SerialNamedPerson(person.person)

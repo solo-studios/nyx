@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxNeoGradleExtension.kt is part of nyx
- * Last modified on 18-12-2024 06:57 p.m.
+ * Last modified on 19-12-2024 11:10 p.m.
  *
  * MIT License
  *
@@ -110,7 +110,7 @@ public class NyxNeoGradleExtension(
      * @see Minecraft.accessTransformers
      */
     public fun accessTransformers(block: AccessTransformers.() -> Unit) {
-        neoMinecraft.accessTransformers(block)
+        neoMinecraft.accessTransformers.apply(block)
     }
 
     override fun setDefaultMixinRefmapName(defaultName: String) {
@@ -122,9 +122,6 @@ public class NyxNeoGradleExtension(
     }
 
     override fun configureProject() {
-        neoMinecraft {
-            this.accessTransformers
-        }
         neoRuns.configureEach {
             jvmArguments.add("-Xmx${allocatedMemory.get()}G")
             jvmArguments.addAll(additionalJvmArgs)

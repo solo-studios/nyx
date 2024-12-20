@@ -2,7 +2,7 @@
  * Copyright (c) 2023-2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file build.gradle.kts is part of nyx
- * Last modified on 25-10-2024 07:43 p.m.
+ * Last modified on 19-12-2024 11:10 p.m.
  *
  * MIT License
  *
@@ -16,7 +16,7 @@
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
- * GRADLE-CONVENTIONS-PLUGIN IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * NYX IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -27,13 +27,14 @@
 
 @file:Suppress("UnstableApiUsage")
 
+// import org.jetbrains.dokka.gradle.engine.plugins.DokkaPluginParametersBuilder
 import ca.solostudios.nyx.util.soloStudios
+import ca.solostudios.nyx.util.soloStudiosSnapshots
 import com.sass_lang.embedded_protocol.OutputStyle
 import groovy.text.SimpleTemplateEngine
 import io.freefair.gradle.plugins.sass.SassCompile
 import org.apache.tools.ant.filters.ReplaceTokens
 import org.jetbrains.dokka.gradle.engine.parameters.VisibilityModifier
-import org.jetbrains.dokka.gradle.engine.plugins.DokkaPluginParametersBuilder
 import org.jetbrains.dokka.gradle.tasks.DokkaGenerateTask
 import java.io.StringWriter
 import java.time.Year
@@ -53,6 +54,8 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 
     alias(libs.plugins.dokka)
+
+    alias(libs.plugins.ksp)
 
     alias(libs.plugins.axion.release)
 
@@ -151,6 +154,7 @@ nyx {
 
 repositories {
     soloStudios()
+    soloStudiosSnapshots()
     mavenCentral()
     gradlePluginPortal()
 }
@@ -161,6 +165,9 @@ dependencies {
     testFixturesApi(libs.bundles.kotlinx.serialization)
     testFixturesApi(libs.kotlinx.serialization.properties)
 
+    api(libs.ksp.service.annotation)
+    ksp(libs.ksp.service.annotation)
+
     compileOnly(gradleApi("8.6"))
 
     api(libs.apache.commons)
@@ -170,8 +177,6 @@ dependencies {
     implementation(libs.bundles.maven)
 
     implementation(libs.fuel)
-
-    implementation(libs.bundles.arrow)
 
     // Kotlin stuff
     compileOnly(libs.kotlin.plugin)
@@ -187,8 +192,7 @@ dependencies {
 
     testFixturesApi(libs.bundles.junit)
     testFixturesApi(libs.bundles.kotest)
-
-    api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
+    testFixturesApi(gradleKotlinDsl())
 
     testFixturesCompileOnly(gradleApi("8.6"))
     testFixturesCompileOnly(gradleTestKit("8.6"))
@@ -232,6 +236,9 @@ allure {
 functionalTest {
     // currently they all just execute using gradle 8.10
     // TODO fix this
+    testingStrategies = buildSet {
+        add(strategies.coverageForGradleVersion("8.6"))
+    }
     // testingStrategies = buildSet {
     //     add(strategies.coverageForGradleVersion("8.6"))
     //     add(strategies.coverageForGradleVersion("8.7"))
@@ -240,6 +247,7 @@ functionalTest {
     // }
     dependencies {
         implementation(testFixtures.modify(project))
+        implementation(gradleTestKit())
         pluginUnderTestMetadata(libs.fabric.loom)
     }
 }
@@ -253,7 +261,7 @@ sass {
 }
 
 val dokkaDir = project.layout.projectDirectory.dir("dokka")
-val dokkaBuildDir = dokka.dokkaPublicationDirectory
+val dokkaBuildDir = dokka.basePublicationsDirectory
 val dokkaTemplates = dokkaDir.dir("templates")
 
 val processDokkaIncludes by tasks.registering(ProcessResources::class) {
@@ -314,10 +322,6 @@ dokka {
     }
 
     pluginsConfiguration {
-        registerFactory(DokkaPluginParametersBuilder::class.java) { name ->
-            objects.newInstance<DokkaPluginParametersBuilder>(name, name)
-        }
-
         html {
             homepageLink = nyx.info.repository.projectUrl
             footerMessage = "© ${Year.now()} Copyright solo-studios"
@@ -328,23 +332,6 @@ dokka {
 
             customStyleSheets.from(fileTree(compileDokkaSass.flatMap { it.destinationDir }))
         }
-
-        // TODO: configuring custom plugins is currently broken
-        // register<DokkaScriptsPluginParameters>("scripts") {
-        //     scripts.from(fileTree(dokkaScripts))
-        // }
-        // register<DokkaStyleTweaksPluginParameters>("scripts") {
-        //     minimalScrollbar = true
-        //     darkPurpleHighlight = true
-        //     darkColorSchemeFix = true
-        //     improvedBlockquoteBorder = true
-        //     lighterBlockquoteText = true
-        //     improvedSectionTabBorder = true
-        //     sectionTabFontWeight = "500"
-        //     sectionTabTransition = true
-        //     disableCodeWrapping = true
-        //     sidebarWidth = "340px"
-        // }
     }
 }
 
@@ -353,15 +340,15 @@ testing.suites {
         useJUnitJupiter()
 
         dependencies {
-            implementation(gradleTestKit())
+            // implementation(gradleTestKit())
 
             implementation(testFixtures(project()))
 
             implementation(libs.kotlin.plugin)
             implementation(libs.dokka.plugin)
             implementation(libs.fabric.loom)
-            implementation(libs.quilt.loom)
-            implementation(libs.architectury.loom)
+            // implementation(libs.quilt.loom)
+            // implementation(libs.architectury.loom)
             implementation(libs.github.release)
             implementation(libs.modrinth.minotaur)
 
@@ -443,7 +430,7 @@ tasks {
     }
 
     check {
-        dependsOn(withType<Test>(), functionalTest)
+        dependsOn(withType<Test>(), functionalTest.testTasks.elements)
     }
 }
 

@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxCompilePlugin.kt is part of nyx
- * Last modified on 11-07-2024 08:32 p.m.
+ * Last modified on 19-12-2024 11:10 p.m.
  *
  * MIT License
  *
@@ -16,7 +16,7 @@
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
- * GRADLE-CONVENTIONS-PLUGIN IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * NYX IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -27,6 +27,7 @@
 
 package ca.solostudios.nyx.plugin.compile
 
+import ca.solostudios.kspservice.annotation.Service
 import ca.solostudios.nyx.NyxExtension
 import ca.solostudios.nyx.internal.InternalNyxPlugin
 import ca.solostudios.nyx.internal.util.create
@@ -35,6 +36,7 @@ import org.gradle.kotlin.dsl.the
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
 
+@Service(InternalNyxPlugin::class)
 internal class NyxCompilePlugin : InternalNyxPlugin {
     override fun apply(project: Project) {
         val nyxExtension = project.the<NyxExtension>()

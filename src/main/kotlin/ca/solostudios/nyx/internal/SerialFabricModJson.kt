@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file SerialFabricModJson.kt is part of nyx
- * Last modified on 14-09-2024 11:35 p.m.
+ * Last modified on 19-12-2024 11:10 p.m.
  *
  * MIT License
  *
@@ -16,7 +16,7 @@
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
- * GRADLE-CONVENTIONS-PLUGIN IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * NYX IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -79,7 +79,7 @@ internal data class SerialFabricModJson(
         SERVER
     }
 
-    @Serializable
+    @Serializable(with = EntrypointSerializer::class)
     sealed interface Entrypoint {
         @JvmInline
         @Serializable
@@ -94,7 +94,7 @@ internal data class SerialFabricModJson(
         ) : Entrypoint
     }
 
-    @Serializable
+    @Serializable(with = MixinConfigSerializer::class)
     sealed interface MixinConfig {
         @JvmInline
         @Serializable
@@ -109,7 +109,7 @@ internal data class SerialFabricModJson(
         ) : MixinConfig
     }
 
-    @Serializable
+    @Serializable(with = PersonSerializer::class)
     sealed interface Person {
         @JvmInline
         @Serializable
@@ -124,7 +124,7 @@ internal data class SerialFabricModJson(
         ) : Person
     }
 
-    @Serializable
+    @Serializable(with = ModIconSerializer::class)
     sealed interface ModIcon {
         @JvmInline
         @Serializable
@@ -139,11 +139,35 @@ internal data class SerialFabricModJson(
         ) : ModIcon
     }
 
+    internal object EntrypointSerializer : JsonContentPolymorphicSerializer<Entrypoint>(Entrypoint::class) {
+        override fun selectDeserializer(element: JsonElement): DeserializationStrategy<Entrypoint> = when (element) {
+            is JsonObject    -> Entrypoint.AdaptedEntrypoint.serializer()
+            is JsonPrimitive -> Entrypoint.StringEntrypoint.serializer()
+            else             -> error("Bad input for entrypoint")
+        }
+    }
+
+    internal object MixinConfigSerializer : JsonContentPolymorphicSerializer<MixinConfig>(MixinConfig::class) {
+        override fun selectDeserializer(element: JsonElement): DeserializationStrategy<MixinConfig> = when (element) {
+            is JsonObject    -> MixinConfig.EnvironmentMixinConfig.serializer()
+            is JsonPrimitive -> MixinConfig.StringMixinConfig.serializer()
+            else             -> error("Bad input for mixin config")
+        }
+    }
+
     internal object PersonSerializer : JsonContentPolymorphicSerializer<Person>(Person::class) {
         override fun selectDeserializer(element: JsonElement): DeserializationStrategy<Person> = when (element) {
             is JsonObject -> Person.ContactablePerson.serializer()
             is JsonPrimitive -> Person.NamedPerson.serializer()
             else -> error("Bad input for person")
+        }
+    }
+
+    internal object ModIconSerializer : JsonContentPolymorphicSerializer<ModIcon>(ModIcon::class) {
+        override fun selectDeserializer(element: JsonElement): DeserializationStrategy<ModIcon> = when (element) {
+            is JsonObject    -> ModIcon.ModIconMap.serializer()
+            is JsonPrimitive -> ModIcon.StringModIcon.serializer()
+            else             -> error("bad input for mod icon")
         }
     }
 

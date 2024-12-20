@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file GenerateFabricModJsonFunctionalTest.kt is part of nyx
- * Last modified on 25-10-2024 07:19 p.m.
+ * Last modified on 19-12-2024 11:11 p.m.
  *
  * MIT License
  *
@@ -16,7 +16,7 @@
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
- * GRADLE-CONVENTIONS-PLUGIN IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * NYX IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -295,7 +295,6 @@ class GenerateFabricModJsonFunctionalTest : NyxSpec({
                             |    "entrypoints":      {
                             |        "client":                   [
                             |            {
-                            |                "type":    "ca.solostudios.nyx.internal.SerialFabricModJson.Entrypoint.AdaptedEntrypoint",
                             |                "adapter": "some.adapter",
                             |                "value":   "my.group.MyClientClass"
                             |            },
@@ -303,7 +302,6 @@ class GenerateFabricModJsonFunctionalTest : NyxSpec({
                             |        ],
                             |        "custom_entrypoint":        [
                             |            {
-                            |                "type":    "ca.solostudios.nyx.internal.SerialFabricModJson.Entrypoint.AdaptedEntrypoint",
                             |                "adapter": "some.adapter",
                             |                "value":   "my.group.MyCustomEntrypointClass"
                             |            },
@@ -311,7 +309,6 @@ class GenerateFabricModJsonFunctionalTest : NyxSpec({
                             |        ],
                             |        "main":                     [
                             |            {
-                            |                "type":    "ca.solostudios.nyx.internal.SerialFabricModJson.Entrypoint.AdaptedEntrypoint",
                             |                "adapter": "some.adapter",
                             |                "value":   "my.group.MyMainClass"
                             |            },
@@ -323,7 +320,6 @@ class GenerateFabricModJsonFunctionalTest : NyxSpec({
                             |        "server":                   [
                             |            "my.group.MyOtherServerClass",
                             |            {
-                            |                "type":    "ca.solostudios.nyx.internal.SerialFabricModJson.Entrypoint.AdaptedEntrypoint",
                             |                "adapter": "some.adapter",
                             |                "value":   "my.group.MyServerClass"
                             |            }
@@ -331,7 +327,6 @@ class GenerateFabricModJsonFunctionalTest : NyxSpec({
                             |    },
                             |    "mixins":           [
                             |        {
-                            |            "type":        "ca.solostudios.nyx.internal.SerialFabricModJson.MixinConfig.EnvironmentMixinConfig",
                             |            "config":      "mymod.client.mixins.json",
                             |            "environment": "client"
                             |        },
@@ -381,31 +376,21 @@ class GenerateFabricModJsonFunctionalTest : NyxSpec({
                             |    "description":      "A multiline mod description\nsome other content",
                             |    "authors":          [
                             |        {
-                            |            "type":    "ca.solostudios.nyx.internal.SerialFabricModJson.Person.ContactablePerson",
                             |            "name":    "dummy_author_1",
                             |            "contact": {
                             |                "discord": "me"
                             |            }
                             |        },
-                            |        {
-                            |            "type":    "ca.solostudios.nyx.internal.SerialFabricModJson.Person.ContactablePerson",
-                            |            "name":    "dummy_author_2",
-                            |            "contact": { }
-                            |        }
+                            |        "dummy_author_2"
                             |    ],
                             |    "contributors":     [
                             |        {
-                            |            "type":    "ca.solostudios.nyx.internal.SerialFabricModJson.Person.ContactablePerson",
                             |            "name":    "dummy_contributor_1",
                             |            "contact": {
                             |                "discord": "me"
                             |            }
                             |        },
-                            |        {
-                            |            "type":    "ca.solostudios.nyx.internal.SerialFabricModJson.Person.ContactablePerson",
-                            |            "name":    "dummy_contributor_2",
-                            |            "contact": { }
-                            |        }
+                            |        "dummy_contributor_2"
                             |    ],
                             |    "contact":          {
                             |        "homepage":     "example.com",
@@ -419,7 +404,6 @@ class GenerateFabricModJsonFunctionalTest : NyxSpec({
                             |    "license":          "MIT",
                             |    "icon":             "my-icon.png",
                             |    "languageAdapters": {
-                            |        "type":        "kotlin.collections.LinkedHashMap",
                             |        "my-language": "my.group.MyLanguageAdapter"
                             |    },
                             |    "custom":           {

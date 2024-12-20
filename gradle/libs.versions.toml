@@ -1,9 +1,12 @@
 [versions]
-kotlin = "1.9.24"
-kotlin-plugin = "2.0.20"
-kotlinx-serialization = "1.6.3"
+kotlin = "2.0.20"
+kotlin-plugin = "2.1.0"
+kotlinx-serialization = "1.7.3"
 
-dokka = "2.0.0-Beta"
+dokka = "2.0.0"
+
+ksp = "2.0.20-1.0.25"
+ksp-service-annotation = "1.0.9-SNAPSHOT"
 
 axion-release = "1.18.8"
 
@@ -22,14 +25,14 @@ guava-kotlin = "0.1.0"
 
 slf4k = "0.5.3"
 
-quilt-loom = "1.7.3"
+quilt-loom = "1.8.5"
 
-fabric-loom = "1.8.10"
+fabric-loom = "1.9.2"
 
 architectury = "3.4.159"
 architectury-loom = "1.7.413"
 
-neogradle = "7.0.165"
+neogradle = "7.0.171"
 
 github-release = "2.5.2"
 
@@ -41,10 +44,10 @@ maven = "3.9.9"
 
 fuel = "2.3.1"
 
-arrow = "1.2.4"
+arrow = "2.0.0"
 
-junit-jupiter = "5.11.0"
-junit-launcher = "1.11.0"
+junit-jupiter = "5.11.4"
+junit-launcher = "1.11.4"
 
 kotest = "5.9.1"
 kotest-allure = "1.4.0"
@@ -58,6 +61,8 @@ kotlin-allopen = { id = "org.jetbrains.kotlin.plugin.allopen", version.ref = "ko
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ## Dokka
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
+
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 
 ## Axion release plugin
 ### Gradle release and version management plugin.
@@ -89,6 +94,8 @@ kotlin-plugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin",
 kotlinx-serialization-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-core", version.ref = "kotlinx-serialization" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 kotlinx-serialization-properties = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-properties", version.ref = "kotlinx-serialization" }
+
+ksp-service-annotation = { group = "ca.solo-studios", name = "ksp-service-annotation", version.ref = "ksp-service-annotation" }
 
 ## Apache Commons Text
 apache-commons = { group = "org.apache.commons", name = "commons-text", version.ref = "apache-commons-text" }
