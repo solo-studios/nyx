@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file ContentFilterableUtil.kt is part of nyx
- * Last modified on 21-12-2024 02:33 p.m.
+ * Last modified on 21-12-2024 03:10 p.m.
  *
  * MIT License
  *
@@ -27,7 +27,6 @@
 
 package ca.solostudios.nyx.util
 
-import ca.solostudios.nyx.internal.util.decodeFromReader
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.encodeToString
@@ -42,7 +41,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 @JvmOverloads
-public fun ContentFilterable.minifyJson(lenient: Boolean = true) {
+public fun ContentFilterable.minifyJson(lenient: Boolean = false) {
     filter<JsonMinifyFilterReader>(mapOf("lenient" to lenient))
 }
 
@@ -51,8 +50,8 @@ public fun ContentFilterable.minifyJson(properties: Map<String, Any?>) {
 }
 
 internal class JsonMinifyFilterReader(reader: Reader) : FilterReader(reader) {
-    var lenient = true
-    private val minifiedJson by lazy { minifyJson(reader) }
+    var lenient = false
+    private val minifiedJson by lazy { minifyJson(reader.buffered()) }
     private var position = 0
     private var mark = 0
     private var closed = false
@@ -61,14 +60,14 @@ internal class JsonMinifyFilterReader(reader: Reader) : FilterReader(reader) {
 
     @OptIn(ExperimentalSerializationApi::class)
     private fun minifyJson(reader: Reader): String {
+        val text = reader.readText()
         return try {
             when {
-                // lenient -> LENIENT_JSON.encodeToString(LENIENT_JSON.decodeFromReader(JsonElement.serializer(), reader))
-                lenient -> Json.encodeToString(Json.decodeFromReader(JsonElement.serializer(), reader))
-                else    -> Json.encodeToString(Json.decodeFromReader(JsonElement.serializer(), reader))
+                lenient -> STRICT_JSON.encodeToString(LENIENT_JSON.decodeFromString<JsonElement>(text))
+                else    -> STRICT_JSON.encodeToString(STRICT_JSON.decodeFromString<JsonElement>(text))
             }
         } catch (e: SerializationException) {
-            reader.apply { reset() }.readText()
+            text
         }
     }
 
@@ -153,17 +152,17 @@ internal class JsonMinifyFilterReader(reader: Reader) : FilterReader(reader) {
     companion object {
         const val EOF = -1
 
-        // @ExperimentalSerializationApi
-        // val LENIENT_JSON = Json {
-        //     allowComments = true
-        //     allowTrailingComma = true
-        //     isLenient = true
-        //     prettyPrint = false
-        // }
-        //
-        // @ExperimentalSerializationApi
-        // val STRICT_JSON = Json {
-        //     prettyPrint = false
-        // }
+        @ExperimentalSerializationApi
+        val LENIENT_JSON = Json {
+            allowComments = true
+            allowTrailingComma = true
+            isLenient = true
+            prettyPrint = false
+        }
+
+        @ExperimentalSerializationApi
+        val STRICT_JSON = Json {
+            prettyPrint = false
+        }
     }
 }

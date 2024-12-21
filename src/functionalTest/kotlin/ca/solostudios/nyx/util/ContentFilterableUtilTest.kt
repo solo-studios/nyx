@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file ContentFilterableUtilTest.kt is part of nyx
- * Last modified on 21-12-2024 02:33 p.m.
+ * Last modified on 21-12-2024 03:10 p.m.
  *
  * MIT License
  *
@@ -30,6 +30,7 @@ package ca.solostudios.nyx.util
 import ca.solostudios.nyx.kotest.matchers.shouldBeValidJson
 import ca.solostudios.nyx.kotest.matchers.shouldEqualJson
 import ca.solostudios.nyx.kotest.matchers.shouldHaveSucceeded
+import ca.solostudios.nyx.kotest.matchers.shouldNotBeValidJson
 import ca.solostudios.nyx.kotest.spec.NyxSpec
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.matchers.paths.shouldContainFile
@@ -49,7 +50,7 @@ class ContentFilterableUtilTest : NyxSpec({
             val json = """
                 {
                     "some simple json": true,
-                    "foo": [
+                    "foo":              [
                         "bar"
                     ]
                 }
@@ -100,6 +101,120 @@ class ContentFilterableUtilTest : NyxSpec({
                     jsonFile shouldEqualJson json
                     // language=JSON
                     jsonFile.readText() shouldBe """{"some simple json":true,"foo":["bar"]}"""
+                }
+            }
+        }
+
+        given("a broken json file") {
+            @Language("JSON")
+            val json = """
+                { "broken": "foo
+            """.trimIndent()
+            val project = gradleKtsProject(withPluginClasspath = true) {
+                writeBuildGradleKts(
+                    """
+                        |import ca.solostudios.nyx.util.minifyJson
+                        |
+                        |plugins {
+                        |    java
+                        |    id("ca.solo-studios.nyx")
+                        |}
+                        |
+                        |tasks {
+                        |    processResources {
+                        |        filesMatching("*.json") {
+                        |            minifyJson()
+                        |        }
+                        |    }
+                        |}
+                    """.trimMargin()
+                )
+
+                resolve("src/main/resources").createDirectories().resolve("test.json").createFile().writeText(json)
+            }
+            upon("executing the task") {
+                val runner = project.gradleRunner {
+                    addArguments("processResources")
+                }
+
+                should("not fail") {
+                    val build = shouldNotThrowAny {
+                        runner.build()
+                    }
+                    build.task(":processResources").shouldHaveSucceeded()
+                }
+
+                should("generate the expected output") {
+                    runner.build()
+
+                    val jsonFile = runner.buildDir.resolve("resources/main/test.json")
+                    jsonFile.parent.shouldExist()
+                    jsonFile.parent.shouldNotBeEmptyDirectory()
+                    jsonFile.parent shouldContainFile "test.json"
+
+                    jsonFile.shouldNotBeValidJson()
+                    // language=JSON
+                    jsonFile.readText() shouldBe """{ "broken": "foo"""
+                }
+            }
+        }
+
+        given("a lenient json file") {
+            @Language("JSON5")
+            val json = """
+                {
+                    "testing":        true,
+                    "trailing comma": [ "foo", "bar", ],
+                    // comment
+                    unquoted:         "value",
+                }
+            """.trimIndent()
+            val project = gradleKtsProject(withPluginClasspath = true) {
+                writeBuildGradleKts(
+                    """
+                        |import ca.solostudios.nyx.util.minifyJson
+                        |
+                        |plugins {
+                        |    java
+                        |    id("ca.solo-studios.nyx")
+                        |}
+                        |
+                        |tasks {
+                        |    processResources {
+                        |        filesMatching("*.json") {
+                        |            minifyJson(lenient = true)
+                        |        }
+                        |    }
+                        |}
+                    """.trimMargin()
+                )
+
+                resolve("src/main/resources").createDirectories().resolve("test.json").createFile().writeText(json)
+            }
+            upon("executing the task") {
+                val runner = project.gradleRunner {
+                    forwardOutput()
+                    addArguments("processResources")
+                }
+
+                should("not fail") {
+                    val build = shouldNotThrowAny {
+                        runner.build()
+                    }
+                    build.task(":processResources").shouldHaveSucceeded()
+                }
+
+                should("generate the expected output") {
+                    runner.build()
+
+                    val jsonFile = runner.buildDir.resolve("resources/main/test.json")
+                    jsonFile.parent.shouldExist()
+                    jsonFile.parent.shouldNotBeEmptyDirectory()
+                    jsonFile.parent shouldContainFile "test.json"
+
+                    jsonFile.shouldBeValidJson()
+                    // language=JSON
+                    jsonFile.readText() shouldBe """{"testing":true,"trailing comma":["foo","bar"],"unquoted":"value"}"""
                 }
             }
         }

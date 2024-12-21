@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file JsonMatchers.kt is part of nyx
- * Last modified on 28-10-2024 01:58 a.m.
+ * Last modified on 21-12-2024 03:00 p.m.
  *
  * MIT License
  *
@@ -16,7 +16,7 @@
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
- * GRADLE-CONVENTIONS-PLUGIN IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * NYX IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -43,11 +43,45 @@ import io.kotest.assertions.json.shouldNotBeJsonObject
 import io.kotest.assertions.json.shouldNotBeValidJson
 import io.kotest.assertions.json.shouldNotEqualJson
 import io.kotest.assertions.json.shouldNotEqualSpecifiedJson
+import io.kotest.matchers.Matcher
+import io.kotest.matchers.MatcherResult
+import io.kotest.matchers.should
+import io.kotest.matchers.shouldNot
+import kotlinx.serialization.json.Json
 import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.readText
 
 // @formatter:off
+fun beValidJson(parser: Json) = object : Matcher<String?> {
+   override fun test(value: String?): MatcherResult {
+      return try {
+         value?.let(parser::parseToJsonElement)
+         MatcherResult(
+            true,
+            { "expected: actual json to be valid json: $value" },
+            { "expected: actual json to be invalid json: $value" }
+         )
+      } catch (ex: Exception) {
+         MatcherResult(
+            false,
+            { "expected: actual json to be valid json: $value" },
+            { "expected: actual json to be invalid json: $value" }
+         )
+      }
+   }
+}
+
+fun String.shouldBeValidJson(parser: Json): String {
+   this should beValidJson(parser)
+   return this
+}
+
+fun String.shouldNotBeValidJson(parser: Json): String {
+   this shouldNot beValidJson(parser)
+   return this
+}
+
 infix fun Path.shouldEqualJson(expected: String): Path = also { readText() shouldEqualJson expected }
 infix fun File.shouldEqualJson(expected: String): File = also { readText() shouldEqualJson expected }
 infix fun Path.shouldEqualJson(configureAndProvideExpected: CompareJsonOptions.() -> String): Path = also { readText() shouldEqualJson configureAndProvideExpected }
@@ -90,3 +124,9 @@ fun File.shouldBeValidJson(): File = also { readText().shouldBeValidJson() }
 
 fun Path.shouldNotBeValidJson(): Path = also { readText().shouldNotBeValidJson() }
 fun File.shouldNotBeValidJson(): File = also { readText().shouldNotBeValidJson() }
+
+fun Path.shouldBeValidJson(parser: Json): Path = also { readText().shouldBeValidJson(parser) }
+fun File.shouldBeValidJson(parser: Json): File = also { readText().shouldBeValidJson(parser) }
+
+fun Path.shouldNotBeValidJson(parser: Json): Path = also { readText().shouldNotBeValidJson(parser) }
+fun File.shouldNotBeValidJson(parser: Json): File = also { readText().shouldNotBeValidJson(parser) }
