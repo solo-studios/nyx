@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file SerializationUtil.kt is part of nyx
- * Last modified on 28-10-2024 01:58 a.m.
+ * Last modified on 21-12-2024 02:34 p.m.
  *
  * MIT License
  *
@@ -16,7 +16,7 @@
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
- * GRADLE-CONVENTIONS-PLUGIN IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * NYX IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -29,6 +29,7 @@
 
 package ca.solostudios.nyx.internal.util
 
+import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
@@ -38,34 +39,52 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.decodeFromStream
+import kotlinx.serialization.serializer
 import kotlinx.serialization.serializerOrNull
+import org.apache.commons.io.input.ReaderInputStream
+import java.io.Reader
+import java.nio.charset.Charset
 
+@ExperimentalSerializationApi
+internal inline fun <reified T> Json.decodeFromReader(reader: Reader, charset: Charset = Charsets.UTF_8): T {
+    return decodeFromReader(serializersModule.serializer(), reader, charset)
+}
+
+@ExperimentalSerializationApi
+internal fun <T> Json.decodeFromReader(
+    deserializer: DeserializationStrategy<T>,
+    reader: Reader,
+    charset: Charset = Charsets.UTF_8,
+): T {
+    return decodeFromStream(deserializer, ReaderInputStream(reader, charset))
+}
 
 internal fun Any?.toJsonElement(): JsonElement {
     val serializer = this?.let { Json.serializersModule.serializerOrNull(this::class.java) }
 
     return when {
-        this == null -> JsonNull
-        serializer != null -> Json.encodeToJsonElement(serializer, this)
-        this is Map<*, *> -> toJsonElement()
-        this is Array<*> -> toJsonElement()
+        this == null         -> JsonNull
+        serializer != null   -> Json.encodeToJsonElement(serializer, this)
+        this is Map<*, *>    -> toJsonElement()
+        this is Array<*>     -> toJsonElement()
         this is BooleanArray -> toJsonElement()
-        this is ByteArray -> toJsonElement()
-        this is CharArray -> toJsonElement()
-        this is ShortArray -> toJsonElement()
-        this is IntArray -> toJsonElement()
-        this is LongArray -> toJsonElement()
-        this is FloatArray -> toJsonElement()
-        this is DoubleArray -> toJsonElement()
-        this is UByteArray -> toJsonElement()
-        this is UShortArray -> toJsonElement()
-        this is UIntArray -> toJsonElement()
-        this is ULongArray -> toJsonElement()
+        this is ByteArray    -> toJsonElement()
+        this is CharArray    -> toJsonElement()
+        this is ShortArray   -> toJsonElement()
+        this is IntArray     -> toJsonElement()
+        this is LongArray    -> toJsonElement()
+        this is FloatArray   -> toJsonElement()
+        this is DoubleArray  -> toJsonElement()
+        this is UByteArray   -> toJsonElement()
+        this is UShortArray  -> toJsonElement()
+        this is UIntArray    -> toJsonElement()
+        this is ULongArray   -> toJsonElement()
         this is Collection<*> -> toJsonElement()
-        this is Boolean -> JsonPrimitive(this)
-        this is Number -> JsonPrimitive(this)
-        this is String -> JsonPrimitive(this)
-        this is Enum<*> -> JsonPrimitive(this.name)
+        this is Boolean      -> JsonPrimitive(this)
+        this is Number       -> JsonPrimitive(this)
+        this is String       -> JsonPrimitive(this)
+        this is Enum<*>      -> JsonPrimitive(this.name)
         this is Pair<*, *>      -> JsonObject(
             mapOf(
                 "first" to first.toJsonElement(),
@@ -81,7 +100,7 @@ internal fun Any?.toJsonElement(): JsonElement {
             )
         )
 
-        else -> error("Can't serialize '$this' as it is of an unknown type")
+        else                 -> error("Can't serialize '$this' as it is of an unknown type")
     }
 }
 

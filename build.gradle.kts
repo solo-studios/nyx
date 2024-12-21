@@ -108,6 +108,9 @@ nyx {
         jvmTarget = 17
 
         kotlin {
+            apiVersion = "1.8"
+            languageVersion = "1.8"
+
             withExplicitApi()
             allOpen.annotations("ca.solostudios.nyx.internal.AllOpen")
         }

@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxPluginFunctionalTest.kt is part of nyx
- * Last modified on 17-09-2024 12:45 a.m.
+ * Last modified on 21-12-2024 02:33 p.m.
  *
  * MIT License
  *
@@ -16,7 +16,7 @@
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
- * GRADLE-CONVENTIONS-PLUGIN IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * NYX IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -34,7 +34,7 @@ import ca.solostudios.nyx.util.gradleKtsProject
 class NyxPluginFunctionalTest : NyxSpec({
     feature("the nyx plugin") {
         given("it is loaded") {
-            val project = gradleKtsProject {
+            val project = gradleKtsProject(withPluginClasspath = true) {
                 writeBuildGradleKts(
                     """
                         |plugins {
@@ -47,7 +47,6 @@ class NyxPluginFunctionalTest : NyxSpec({
 
             upon("loading the project") {
                 project.gradleRunner {
-                    withPluginClasspath()
                     addArguments("build")
 
                     should("not fail") {
