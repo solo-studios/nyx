@@ -1,11 +1,11 @@
 [versions]
-kotlin = "2.0.20"
+kotlin = "2.0.21"
 kotlin-plugin = "2.1.0"
 kotlinx-serialization = "1.7.3"
 
 dokka = "2.0.0"
 
-ksp = "2.0.20-1.0.25"
+ksp = "2.0.21-1.0.25"
 ksp-service-annotation = "1.0.8"
 
 axion-release = "1.18.8"

@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file GenerateFabricModJson.kt is part of nyx
- * Last modified on 19-12-2024 11:10 p.m.
+ * Last modified on 21-12-2024 10:23 p.m.
  *
  * MIT License
  *
@@ -87,7 +87,7 @@ public class GenerateFabricModJson : DefaultTask() {
 
     @TaskAction
     @OptIn(ExperimentalSerializationApi::class)
-    private fun generateJson() {
+    internal fun generateJson() {
         val serialModJson = fabricModJson.get().toSerial()
 
         outputDirectory.file(outputFilename).asPath().outputStream().buffered().use { outputStream ->
