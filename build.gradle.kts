@@ -2,7 +2,7 @@
  * Copyright (c) 2023-2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file build.gradle.kts is part of nyx
- * Last modified on 19-12-2024 11:10 p.m.
+ * Last modified on 21-12-2024 02:33 p.m.
  *
  * MIT License
  *
@@ -27,7 +27,6 @@
 
 @file:Suppress("UnstableApiUsage")
 
-// import org.jetbrains.dokka.gradle.engine.plugins.DokkaPluginParametersBuilder
 import ca.solostudios.nyx.util.soloStudios
 import ca.solostudios.nyx.util.soloStudiosSnapshots
 import com.sass_lang.embedded_protocol.OutputStyle
@@ -171,7 +170,7 @@ dependencies {
     api(libs.ksp.service.annotation)
     ksp(libs.ksp.service.annotation)
 
-    compileOnly(gradleApi("8.6"))
+    compileOnly(gradleApi("8.8"))
 
     api(libs.apache.commons)
 
@@ -197,8 +196,8 @@ dependencies {
     testFixturesApi(libs.bundles.kotest)
     testFixturesApi(gradleKotlinDsl())
 
-    testFixturesCompileOnly(gradleApi("8.6"))
-    testFixturesCompileOnly(gradleTestKit("8.6"))
+    testFixturesCompileOnly(gradleApi("8.8"))
+    testFixturesCompileOnly(gradleTestKit("8.8"))
 }
 
 gradlePlugin {
@@ -240,7 +239,7 @@ functionalTest {
     // currently they all just execute using gradle 8.10
     // TODO fix this
     testingStrategies = buildSet {
-        add(strategies.coverageForGradleVersion("8.6"))
+        add(strategies.coverageForGradleVersion("8.8"))
     }
     // testingStrategies = buildSet {
     //     add(strategies.coverageForGradleVersion("8.6"))

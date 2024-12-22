@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file ContentFilterableUtilTest.kt is part of nyx
- * Last modified on 21-12-2024 03:10 p.m.
+ * Last modified on 21-12-2024 03:45 p.m.
  *
  * MIT License
  *
@@ -193,7 +193,6 @@ class ContentFilterableUtilTest : NyxSpec({
             }
             upon("executing the task") {
                 val runner = project.gradleRunner {
-                    forwardOutput()
                     addArguments("processResources")
                 }
 

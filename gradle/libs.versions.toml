@@ -23,7 +23,7 @@ apache-commons-text = "1.12.0"
 guava = "32.1.3-jre"
 guava-kotlin = "0.1.0"
 
-slf4k = "0.5.3"
+slf4k = "0.5.4"
 
 quilt-loom = "1.8.5"
 

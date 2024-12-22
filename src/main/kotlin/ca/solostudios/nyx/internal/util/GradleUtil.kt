@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file GradleUtil.kt is part of nyx
- * Last modified on 18-12-2024 06:57 p.m.
+ * Last modified on 21-12-2024 09:22 p.m.
  *
  * MIT License
  *
@@ -53,6 +53,8 @@ import org.gradle.api.file.ProjectLayout
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.plugins.PluginContainer
+import org.gradle.api.problems.ProblemReporter
+import org.gradle.api.problems.Problems
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.api.tasks.TaskContainer
@@ -62,6 +64,7 @@ import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.newInstance
 import org.gradle.kotlin.dsl.register
+import org.gradle.kotlin.dsl.support.serviceOf
 import org.gradle.kotlin.dsl.the
 import org.gradle.kotlin.dsl.withType
 import org.gradle.plugins.signing.SigningExtension
@@ -176,6 +179,10 @@ internal val NyxExtension.publishing: NyxPublishingExtension
 internal fun NyxPublishingExtension.githubRelease(block: NyxGithubReleaseExtension.() -> Unit) = project.configure<NyxGithubReleaseExtension>(block)
 internal val NyxPublishingExtension.githubRelease: NyxGithubReleaseExtension
     get() = (this as ExtensionAware).the<NyxGithubReleaseExtension>()
+
+internal fun HasProject.problemReporter(block: ProblemReporter.() -> Unit) = project.serviceOf<Problems>().reporter.apply(block)
+internal val HasProject.problemReporter: ProblemReporter
+    get() = project.serviceOf<Problems>().reporter
 
 internal fun <T : Any> NamedDomainObjectContainer<T>.maybeRegister(name: String, action: T.() -> Unit = {}) = when {
     findByName(name) != null -> named(name, action)

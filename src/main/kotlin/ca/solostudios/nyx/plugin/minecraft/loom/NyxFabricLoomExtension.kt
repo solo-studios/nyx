@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxFabricLoomExtension.kt is part of nyx
- * Last modified on 18-12-2024 06:57 p.m.
+ * Last modified on 21-12-2024 09:22 p.m.
  *
  * MIT License
  *
@@ -34,6 +34,7 @@ import ca.solostudios.nyx.internal.util.layout
 import ca.solostudios.nyx.internal.util.loom
 import ca.solostudios.nyx.internal.util.lowerCamelCaseName
 import ca.solostudios.nyx.internal.util.nyx
+import ca.solostudios.nyx.internal.util.problemReporter
 import ca.solostudios.nyx.internal.util.property
 import ca.solostudios.nyx.internal.util.publishing
 import ca.solostudios.nyx.internal.util.sourceSets
@@ -50,6 +51,7 @@ import net.fabricmc.loom.configuration.providers.minecraft.MinecraftJarConfigura
 import net.fabricmc.loom.configuration.providers.minecraft.MinecraftSourceSets
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
+import org.gradle.api.problems.Severity
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.SourceSet
@@ -61,8 +63,8 @@ import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
+import org.gradle.util.GradleVersion
 import org.slf4j.kotlin.getLogger
-import org.slf4j.kotlin.warn
 import kotlin.io.path.createDirectories
 import kotlin.io.path.createFile
 import kotlin.io.path.exists
@@ -355,9 +357,11 @@ public class NyxFabricLoomExtension(
     /**
      * Adds an access widener at `src/main/resources/`[name]`.accesswidener`.
      *
-     * The file will be created if it does not exist (this is to avoid an error with fabric loom)
+     * The file will be created if it does not exist (this is to avoid an error
+     * with fabric loom)
      *
-     * @param name The name of the access widener, defaulting to `project.name`.
+     * @param name The name of the access widener, defaulting to
+     *         `project.name`.
      */
     public fun accessWidener(name: String = project.name) {
         loom {
@@ -369,13 +373,33 @@ public class NyxFabricLoomExtension(
                 // try creating access widener file
                 val firstAccessWidener = accessWidenerPaths.first()
 
-                logger.warn {
-                    """
-                        Can't find an access widener in any resource directory named '$name.accesswidener'.
-                        Created one at $firstAccessWidener for you.
+                val warningMessage = """
+                    Can't find an access widener in any resource directory named '$name.accesswidener'.
+                    Loom will report an error if it cannot find the access widener, so one has been
+                    created for you at $firstAccessWidener.
 
-                        If this is not desired, please either remove the file and create it in another resource directory, or remove loom.accessWidener() from your buildscript.
-                    """.trimIndent()
+                    If this is not desired, please either remove the file and create it in another
+                    resource directory for your main source set, or remove loom.accessWidener()
+                    from your buildscript.
+                """.trimIndent()
+
+                if (GradleVersion.current() >= GradleVersion.version("8.8")) {
+                    @Suppress("UnstableApiUsage")
+                    problemReporter.reporting {
+                        id("missing-access-widener", "Missing Access Widener")
+                        severity(Severity.WARNING)
+                        details(warningMessage)
+                        solution(
+                            """
+                                change loom.accessWidener() to use the name of an access widener that is in the
+                                src/main/resources/ directory (or the resources directory for your main source set),
+                                or use the newly created access widener at $firstAccessWidener.
+                            """.trimIndent()
+                        )
+                        stackLocation()
+                    }
+                } else {
+                    logger.warn(warningMessage)
                 }
 
                 firstAccessWidener.parent.createDirectories()
