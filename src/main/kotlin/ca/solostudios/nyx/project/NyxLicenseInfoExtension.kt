@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxLicenseInfoExtension.kt is part of nyx
- * Last modified on 19-06-2024 05:11 p.m.
+ * Last modified on 21-12-2024 09:31 p.m.
  *
  * MIT License
  *
@@ -16,7 +16,7 @@
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
- * GRADLE-CONVENTIONS-PLUGIN IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * NYX IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -34,7 +34,8 @@ import org.gradle.api.provider.Property
 
 public class NyxLicenseInfoExtension(override val project: Project) : InternalNyxExtension {
     /**
-     * The name for the selected license. Recommended to be the SPDX identifier.
+     * The name for the selected license. Recommended to be the SPDX
+     * identifier.
      */
     public val name: Property<String> = property()
 
