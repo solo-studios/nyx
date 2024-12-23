@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxKotlinExtension.kt is part of nyx
- * Last modified on 25-09-2024 06:17 p.m.
+ * Last modified on 23-12-2024 01:46 p.m.
  *
  * MIT License
  *
@@ -16,7 +16,7 @@
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
- * GRADLE-CONVENTIONS-PLUGIN IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * NYX IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -36,13 +36,16 @@ import ca.solostudios.nyx.internal.util.java
 import ca.solostudios.nyx.internal.util.kotlin
 import ca.solostudios.nyx.internal.util.listProperty
 import ca.solostudios.nyx.internal.util.property
+import ca.solostudios.nyx.internal.util.tasks
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
+import org.gradle.jvm.tasks.Jar
 import org.gradle.jvm.toolchain.JavaToolchainSpec
 import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.provideDelegate
+import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode
 import org.jetbrains.kotlin.gradle.dsl.KotlinCommonCompilerOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinCommonCompilerToolOptions
@@ -233,8 +236,10 @@ public class NyxKotlinExtension(
             when (this) {
                 is KotlinJvmProjectExtension -> {
                     configureCommonCompilations(target)
-                    if (sourcesJar.isTrue)
+                    if (sourcesJar.isTrue) {
                         java.withSourcesJar()
+                        tasks.withType<Jar>().named { it == "kotlinSourcesJar" }.configureEach { enabled = false }
+                    }
 
                     target.compilations.configureEach {
                         configureJvmCompilation(this)
@@ -256,7 +261,7 @@ public class NyxKotlinExtension(
                     }
                 }
 
-                else -> {
+                else                         -> {
                     // Throw error for other platforms
                     logger.error(NotImplementedError("Unsupported kotlin platform.")) {
                         """

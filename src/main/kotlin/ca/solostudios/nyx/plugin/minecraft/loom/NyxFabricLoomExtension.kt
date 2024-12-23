@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxFabricLoomExtension.kt is part of nyx
- * Last modified on 21-12-2024 09:22 p.m.
+ * Last modified on 22-12-2024 11:04 p.m.
  *
  * MIT License
  *
@@ -432,9 +432,6 @@ public class NyxFabricLoomExtension(
     }
 
     override fun configureProject() {
-        if (project.plugins.hasPlugin("org.jetbrains.kotlin.jvm")) // kotlin sources jar task breaks the normal sources jar
-            tasks.withType<Jar>().named { it == "kotlinSourcesJar" }.configureEach { enabled = false }
-
         loom {
             runs.configureEach {
                 vmArg("-Xmx${allocatedMemory.get()}G")
