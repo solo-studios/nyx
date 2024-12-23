@@ -2,7 +2,7 @@
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file ContentFilterableUtilTest.kt is part of nyx
- * Last modified on 22-12-2024 11:01 p.m.
+ * Last modified on 22-12-2024 11:06 p.m.
  *
  * MIT License
  *
@@ -100,6 +100,7 @@ class ContentFilterableUtilTest : NyxSpec({
                 }
             """.trimIndent()
             val reader = JsonMinifyFilterReader(StringReader(json))
+            reader.lenient = true
             upon("executing the task") {
                 should("not fail") {
                     shouldNotThrowAny {
