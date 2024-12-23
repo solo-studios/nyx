@@ -1,8 +1,8 @@
 /*
  * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
  *
- * The file ContentFilterableUtilTest.kt is part of nyx
- * Last modified on 21-12-2024 03:45 p.m.
+ * The file ContentFilterableUtilFunctionalTest.kt is part of nyx
+ * Last modified on 22-12-2024 10:49 p.m.
  *
  * MIT License
  *
@@ -43,7 +43,7 @@ import kotlin.io.path.createFile
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
 
-class ContentFilterableUtilTest : NyxSpec({
+class ContentFilterableUtilFunctionalTest : NyxSpec({
     feature("minify json") {
         given("a simple json file") {
             @Language("JSON")
