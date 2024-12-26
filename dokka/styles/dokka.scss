@@ -2,7 +2,7 @@
  * Copyright (c) 2023-2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file dokka.scss is part of nyx
- * Last modified on 18-10-2024 01:48 a.m.
+ * Last modified on 25-12-2024 06:16 p.m.
  *
  * MIT License
  *
@@ -16,7 +16,7 @@
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
- * GRADLE-CONVENTIONS-PLUGIN IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * NYX IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -26,6 +26,14 @@
  */
 
 @import 'mixins';
+
+.theme-dark {
+    --active-tab-border-color: rgba(127, 82, 255, 1);
+    --inactive-tab-border-color: rgba(164, 164, 170, 0.7);
+    --active-section-color: rgba(129, 84, 255, 1);
+    --inactive-section-color: rgba(25, 25, 28, .7);
+    --navigation-highlight-color: rgba(127, 82, 255, .2);
+}
 
 /* Checklists/checkboxes */
 

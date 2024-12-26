@@ -2,7 +2,7 @@
  * Copyright (c) 2023-2024 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file build.gradle.kts is part of nyx
- * Last modified on 21-12-2024 02:33 p.m.
+ * Last modified on 25-12-2024 07:04 p.m.
  *
  * MIT License
  *
@@ -104,7 +104,7 @@ nyx {
         distributeLicense = true
         buildDependsOnJar = true
         reproducibleBuilds = true
-        jvmTarget = 17
+        jvmToolchain = 17
 
         kotlin {
             apiVersion = "1.8"
@@ -282,9 +282,7 @@ val processDokkaIncludes by tasks.registering(ProcessResources::class) {
 
     from(includes) {
         exclude { it.name.startsWith("_") }
-    }
 
-    doFirst {
         val dependencyInformation = processTemplate(includes.file("_dependency.md").asFile, mapOf("project" to projectInfo))
         filter<ReplaceTokens>(
             "tokens" to mapOf("dependencies" to dependencyInformation),
