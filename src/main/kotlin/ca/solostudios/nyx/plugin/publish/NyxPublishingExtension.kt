@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
+ * Copyright (c) 2024-2025 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxPublishingExtension.kt is part of nyx
- * Last modified on 25-12-2024 05:33 p.m.
+ * Last modified on 05-01-2025 12:09 a.m.
  *
  * MIT License
  *
@@ -68,20 +68,24 @@ public class NyxPublishingExtension(
     /**
      * If in-memory pgp keys should be enabled.
      *
-     * When in-memory pgp keys are used, you can set the following project properties:
+     * When in-memory pgp keys are used, you can set the following project
+     * properties:
      * - `signingKey`
      * - `signingKeyId`
      * - `signingPassword`
      *
      * You can set these globally by adding
+     *
      * ```properties
      * signingKey=[key]
      * signingKeyId=[id]
      * signingPassword=[key password]
      * ```
-     * in [the `gradle.properties` located in your `$GRADLE_USER_HOME`](https://docs.gradle.org/current/userguide/build_environment.html#sec:gradle_environment_variables).
-     * By default, this is located at `~/.gradle/gradle.properties` on Linux/MacOS,
-     * and `%USERPROFILE%\.gradle\gradle.properties` on Windows.
+     *
+     * in
+     * [the `gradle.properties` located in your `$GRADLE_USER_HOME`](https://docs.gradle.org/current/userguide/build_environment.html#sec:gradle_environment_variables).
+     * By default, this is located at `~/.gradle/gradle.properties` on
+     * Linux/MacOS, and `%USERPROFILE%\.gradle\gradle.properties` on Windows.
      */
     public val inMemoryPgpKeys: Property<Boolean> = property<Boolean>().convention(true)
 
@@ -124,7 +128,7 @@ public class NyxPublishingExtension(
     }
 
     /**
-     * Configures the repositories used for publishing
+     * Configures the repositories used for publishing.
      */
     public fun repositories(action: RepositoryHandler.() -> Unit) {
         publish = true
@@ -158,7 +162,7 @@ public class NyxPublishingExtension(
                         useInMemoryPgpKeys(signingKey, signingPassword)
                     }
 
-                    else -> useGpgCmd()
+                    else                                          -> useGpgCmd()
                 }
                 sign(publishing.publications)
             }
@@ -187,7 +191,7 @@ public class NyxPublishingExtension(
                         }
                     }
 
-                    else -> {
+                    else                                                       -> {
                         if (withType<MavenPublication>().isEmpty()) {
                             create<MavenPublication>(info.module.get()) {
                                 from(project.components["java"])
@@ -266,6 +270,9 @@ public class NyxPublishingExtension(
     }
 
     public companion object {
+        /**
+         * The name this extension is added with.
+         */
         public const val NAME: String = "publishing"
     }
 }

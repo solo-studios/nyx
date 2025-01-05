@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2023-2024 solonovamax <solonovamax@12oclockpoint.com>
+ * Copyright (c) 2023-2025 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxExtension.kt is part of nyx
- * Last modified on 18-12-2024 06:57 p.m.
+ * Last modified on 05-01-2025 12:06 a.m.
  *
  * MIT License
  *
@@ -28,10 +28,21 @@
 package ca.solostudios.nyx
 
 import ca.solostudios.nyx.internal.InternalNyxExtension
+import ca.solostudios.nyx.plugin.compile.NyxCompileExtension
+import ca.solostudios.nyx.plugin.publish.NyxPublishingExtension
 import ca.solostudios.nyx.project.NyxProjectInfoExtension
 import org.gradle.api.Project
 import org.gradle.api.tasks.Nested
 
+/**
+ * Base extension for Nyx.
+ *
+ * The available sub-extensions depend on which plugins are loaded.
+ *
+ * @see NyxProjectInfoExtension
+ * @see NyxCompileExtension
+ * @see NyxPublishingExtension
+ */
 public class NyxExtension(override val project: Project) : InternalNyxExtension {
     /**
      * The project's metadata.
@@ -53,6 +64,9 @@ public class NyxExtension(override val project: Project) : InternalNyxExtension 
     }
 
     public companion object {
+        /**
+         * The name this extension is added with.
+         */
         public const val NAME: String = "nyx"
     }
 }

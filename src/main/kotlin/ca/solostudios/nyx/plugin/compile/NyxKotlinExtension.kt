@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
+ * Copyright (c) 2024-2025 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxKotlinExtension.kt is part of nyx
- * Last modified on 23-12-2024 01:46 p.m.
+ * Last modified on 05-01-2025 12:09 a.m.
  *
  * MIT License
  *
@@ -60,6 +60,9 @@ import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 import org.slf4j.kotlin.error
 import org.slf4j.kotlin.getLogger
 
+/**
+ * An extension to configure the kotlin plugin.
+ */
 public class NyxKotlinExtension(
     override val project: Project,
     compile: NyxCompileExtension,
@@ -304,6 +307,9 @@ public class NyxKotlinExtension(
     }
 
     public companion object {
+        /**
+         * The name this extension is added with.
+         */
         public const val NAME: String = "kotlin"
     }
 }

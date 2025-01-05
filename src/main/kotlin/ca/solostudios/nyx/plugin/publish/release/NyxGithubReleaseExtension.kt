@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
+ * Copyright (c) 2024-2025 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxGithubReleaseExtension.kt is part of nyx
- * Last modified on 18-12-2024 06:57 p.m.
+ * Last modified on 05-01-2025 12:06 a.m.
  *
  * MIT License
  *
@@ -37,42 +37,52 @@ import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.provider.Property
 import org.gradle.kotlin.dsl.assign
 
+/**
+ * An extension to configure the GitHub release plugin.
+ */
 public class NyxGithubReleaseExtension(
     override val project: Project,
     private val info: NyxProjectInfoExtension,
 ) : InternalNyxExtension {
     /**
-     * Whether to automatically generate the body for this release.
-     * If `body` is specified, the body will be pre-pended to the automatically generated notes.
+     * Whether to automatically generate the body for this release. If `body`
+     * is specified, the body will be pre-pended to the automatically generated
+     * notes.
      *
-     * See: https://docs.github.com/en/rest/releases/releases?apiVersion=2022-11-28#create-a-release
+     * See:
+     * https://docs.github.com/en/rest/releases/releases?apiVersion=2022-11-28#create-a-release.
      */
     public val generateReleaseNotes: Property<Boolean> = property()
 
     /**
      * Text describing the contents of the tag.
      *
-     * See: https://docs.github.com/en/rest/releases/releases?apiVersion=2022-11-28#create-a-release
+     * See:
+     * https://docs.github.com/en/rest/releases/releases?apiVersion=2022-11-28#create-a-release.
      */
     public val body: Property<String> = property()
 
     /**
-     * `true` to create a draft (unpublished) release, `false` to create a published one.
+     * `true` to create a draft (unpublished) release, `false` to create a
+     * published one.
      *
-     * See: https://docs.github.com/en/rest/releases/releases?apiVersion=2022-11-28#create-a-release
+     * See:
+     * https://docs.github.com/en/rest/releases/releases?apiVersion=2022-11-28#create-a-release.
      */
     public val draft: Property<Boolean> = property()
 
     /**
-     * `true` to identify the release as a prerelease.
-     * `false` to identify the release as a full release.
+     * `true` to identify the release as a prerelease. `false` to identify the
+     * release as a full release.
      *
-     * See: https://docs.github.com/en/rest/releases/releases?apiVersion=2022-11-28#create-a-release
+     * See:
+     * https://docs.github.com/en/rest/releases/releases?apiVersion=2022-11-28#create-a-release.
      */
     public val prerelease: Property<Boolean> = property()
 
     /**
-     * If these artifacts can be used to overwrite an existing release (delete, then re-create).
+     * If these artifacts can be used to overwrite an existing release (delete,
+     * then re-create).
      */
     public val overwrite: Property<Boolean> = property()
 
@@ -148,7 +158,7 @@ public class NyxGithubReleaseExtension(
     }
 
     /**
-     * Configures the release assets
+     * Configures the release assets.
      */
     public fun releaseAssets(action: (ConfigurableFileCollection).() -> Unit) {
         releaseAssets.apply(action)
@@ -197,7 +207,19 @@ public class NyxGithubReleaseExtension(
     }
 
     public companion object {
+        /**
+         * The gradle property used to retrieve the modrinth token.
+         *
+         * Please specify this property in
+         * [the `gradle.properties` located in your `$GRADLE_USER_HOME`](https://docs.gradle.org/current/userguide/build_environment.html#sec:gradle_environment_variables).
+         * By default, this is located at `~/.gradle/gradle.properties` on
+         * Linux/MacOS, and `%USERPROFILE%\.gradle\gradle.properties` on Windows.
+         */
         public const val GITHUB_TOKEN_GRADLE_PROPERTY: String = "github.token"
+
+        /**
+         * The name this extension is added with.
+         */
         public const val NAME: String = "github"
     }
 }

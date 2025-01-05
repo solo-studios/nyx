@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
+ * Copyright (c) 2024-2025 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxNeoGradleExtension.kt is part of nyx
- * Last modified on 19-12-2024 11:10 p.m.
+ * Last modified on 05-01-2025 12:06 a.m.
  *
  * MIT License
  *
@@ -41,7 +41,9 @@ import org.gradle.api.Project
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.Property
 
-
+/**
+ * An extension to configure the neogradle environment.
+ */
 public class NyxNeoGradleExtension(
     override val project: Project,
 ) : AbstractMinecraftExtension(project) {

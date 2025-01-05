@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
+ * Copyright (c) 2024-2025 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file SonatypePublishExtension.kt is part of nyx
- * Last modified on 18-09-2024 12:22 a.m.
+ * Last modified on 05-01-2025 12:06 a.m.
  *
  * MIT License
  *
@@ -16,7 +16,7 @@
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
- * GRADLE-CONVENTIONS-PLUGIN IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * NYX IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -36,24 +36,29 @@ public class SonatypePublishExtension(override val project: Project) : InternalN
     /**
      * The publishing type to use when uploading the artifact.
      *
-     * By default, this is set to `USER_MANAGED`.
-     * This means that you are required to manually log in to Sonatype Central to approve all publications.
+     * By default, this is set to `USER_MANAGED`. This means that you are
+     * required to manually log in to Sonatype Central to approve all
+     * publications.
      */
     public val publishingType: Property<PublishingType> = property<PublishingType>().convention(PublishingType.USER_MANAGED)
 
     /**
      * The username used to authenticate to sonatype.
      *
-     * If unset, it will default to the username provided via the `PasswordCredentials` for the `SonatypeCentral` repository.
+     * If unset, it will default to the username provided via the
+     * `PasswordCredentials` for the `SonatypeCentral` repository.
      *
      * You can set the password globally by adding
+     *
      * ```properties
      * SonatypeCentralUsername=[username]
      * SonatypeCentralPassword=[password]
      * ```
-     * in [the `gradle.properties` located in your `$GRADLE_USER_HOME`](https://docs.gradle.org/current/userguide/build_environment.html#sec:gradle_environment_variables).
-     * By default, this is located at `~/.gradle/gradle.properties` on Linux/MacOS,
-     * and `%USERPROFILE%\.gradle\gradle.properties` on Windows.
+     *
+     * in
+     * [the `gradle.properties` located in your `$GRADLE_USER_HOME`](https://docs.gradle.org/current/userguide/build_environment.html#sec:gradle_environment_variables).
+     * By default, this is located at `~/.gradle/gradle.properties` on
+     * Linux/MacOS, and `%USERPROFILE%\.gradle\gradle.properties` on Windows.
      *
      * It is preferred to use that method over setting this property.
      */
@@ -62,22 +67,29 @@ public class SonatypePublishExtension(override val project: Project) : InternalN
     /**
      * The password used to authenticate to sonatype.
      *
-     * If unset, it will default to the password provided via the `PasswordCredentials` for the `SonatypeCentral` repository.
+     * If unset, it will default to the password provided via the
+     * `PasswordCredentials` for the `SonatypeCentral` repository.
      *
      * You can set the password globally by adding
+     *
      * ```properties
      * SonatypeCentralUsername=[username]
      * SonatypeCentralPassword=[password]
      * ```
-     * in [the `gradle.properties` located in your `$GRADLE_USER_HOME`](https://docs.gradle.org/current/userguide/build_environment.html#sec:gradle_environment_variables).
-     * By default, this is located at `~/.gradle/gradle.properties` on Linux/MacOS,
-     * and `%USERPROFILE%\.gradle\gradle.properties` on Windows.
+     *
+     * in
+     * [the `gradle.properties` located in your `$GRADLE_USER_HOME`](https://docs.gradle.org/current/userguide/build_environment.html#sec:gradle_environment_variables).
+     * By default, this is located at `~/.gradle/gradle.properties` on
+     * Linux/MacOS, and `%USERPROFILE%\.gradle\gradle.properties` on Windows.
      *
      * It is preferred to use that method over setting this property.
      */
     public val password: Property<String> = property()
 
     public companion object {
+        /**
+         * The name this extension is added with.
+         */
         public const val NAME: String = "sonatype"
     }
 
@@ -85,11 +97,12 @@ public class SonatypePublishExtension(override val project: Project) : InternalN
 }
 
 /**
- * Whether to have the deployment stop in the `VALIDATED` state
- * and require a user to log in and manually approve its progression,
- * or to automatically go directly to `PUBLISHING` when validation has passed.
+ * Whether to have the deployment stop in the `VALIDATED` state and
+ * require a user to log in and manually approve its progression, or to
+ * automatically go directly to `PUBLISHING` when validation has passed.
  *
- * See: [https://central.sonatype.com/api-doc](https://central.sonatype.com/api-doc)
+ * See:
+ * [https://central.sonatype.com/api-doc](https://central.sonatype.com/api-doc)
  */
 public enum class PublishingType {
     /**

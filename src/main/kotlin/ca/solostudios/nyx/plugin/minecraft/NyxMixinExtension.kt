@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
+ * Copyright (c) 2024-2025 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxMixinExtension.kt is part of nyx
- * Last modified on 19-06-2024 04:58 p.m.
+ * Last modified on 05-01-2025 12:06 a.m.
  *
  * MIT License
  *
@@ -16,7 +16,7 @@
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
- * GRADLE-CONVENTIONS-PLUGIN IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * NYX IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -36,6 +36,9 @@ import org.gradle.api.provider.Property
 import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.getValue
 
+/**
+ * An extension used to configure the mixin environment.
+ */
 public class NyxMixinExtension(
     override val project: Project,
     private val minecraftExtension: AbstractMinecraftExtension,
@@ -43,17 +46,19 @@ public class NyxMixinExtension(
     /**
      * If hotswapping mixins should be enabled.
      *
-     * Note: this will also find the first net.fabricmc:sponge-mixin artifact on the runtime classpath and add it as a java agent
+     * Note: this will also find the first net.fabricmc:sponge-mixin artifact
+     * on the runtime classpath and add it as a java agent
      *
-     * If you have just added this plugin and had previously generated run configurations, delete them so they can be re-created.
+     * If you have just added this plugin and had previously generated run
+     * configurations, delete them so they can be re-created.
      *
      * This sets the `mixin.hotSwap` jvm property.
      */
     public val hotswap: Property<Boolean> = property<Boolean>().convention(true)
 
     /**
-     * If *ALL* mixin debug features should be enabled.
-     * This includes `mixin.debug.verify`.
+     * If *ALL* mixin debug features should be enabled. This includes
+     * `mixin.debug.verify`.
      *
      * Note: enabling this can sometimes cause issues with other mods' mixins.
      *
@@ -71,7 +76,7 @@ public class NyxMixinExtension(
     /**
      * If dumping the target class on failures should be enabled.
      *
-     * This sets the `mixin.dumpTargetOnFailure` jvm property
+     * This sets the `mixin.dumpTargetOnFailure` jvm property.
      */
     public val dumpTargetOnFailure: Property<Boolean> = property<Boolean>().convention(true)
 
@@ -89,14 +94,15 @@ public class NyxMixinExtension(
      *
      * Note: enabling this can sometimes cause issues with other mods' mixins.
      *
-     * This sets the `mixin.debug.verify` jvm property
+     * This sets the `mixin.debug.verify` jvm property.
      */
     public val verify: Property<Boolean> = property<Boolean>().convention(false)
 
     /**
      * If exporting the mixins after they have been applied should be enabled.
      *
-     * This will export the classes in the `.mixin.out` dir under the run directory
+     * This will export the classes in the `.mixin.out` dir under the run
+     * directory
      *
      * This sets the `mixin.debug.export` jvm property.
      */
@@ -170,7 +176,7 @@ public class NyxMixinExtension(
      *
      * This file is relative to `src/main/resources/`.
      *
-     * This ONLY applies to forge.
+     * This **only** applies to forge.
      */
     public fun mixinConfig(name: String) {
         minecraftExtension.addMixinConfig(name)
@@ -181,7 +187,8 @@ public class NyxMixinExtension(
      *
      * This ONLY applies to fabric.
      *
-     * @param name The directory used for the refmap, defaults to `project.name`.
+     * @param name The directory used for the refmap, defaults to
+     *         `project.name`.
      */
     public fun mixinRefmapName(name: String = project.name) {
         minecraftExtension.setDefaultMixinRefmapName("mixins/$name/refmap.json")
@@ -216,6 +223,9 @@ public class NyxMixinExtension(
     }
 
     public companion object {
+        /**
+         * The name this extension is added with.
+         */
         public const val NAME: String = "mixin"
     }
 }

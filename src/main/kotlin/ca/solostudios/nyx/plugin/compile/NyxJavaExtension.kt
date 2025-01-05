@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
+ * Copyright (c) 2024-2025 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxJavaExtension.kt is part of nyx
- * Last modified on 18-12-2024 06:57 p.m.
+ * Last modified on 05-01-2025 12:09 a.m.
  *
  * MIT License
  *
@@ -54,6 +54,9 @@ import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.properties
 import org.gradle.kotlin.dsl.withType
 
+/**
+ * An extension to configure the java plugin.
+ */
 public class NyxJavaExtension(
     override val project: Project,
     compile: NyxCompileExtension,
@@ -332,15 +335,22 @@ public class NyxJavaExtension(
         return when {
             NyxNeoGradleExtension.isNotLoaded(project) -> false
             this is RecompileSourceJar -> true
-            else -> false
+            else                       -> false
         }
     }
 
     public companion object {
+        /**
+         * The name this extension is added with.
+         */
         public const val NAME: String = "java"
     }
 
-    public class DoclintJavadocFileOption(value: List<String>) : AbstractListJavadocOptionFileOption<List<String>>("Xdoclint", value, ",") {
+    internal class DoclintJavadocFileOption(value: List<String>) : AbstractListJavadocOptionFileOption<List<String>>(
+        "Xdoclint",
+        value,
+        ","
+    ) {
         override fun duplicate(): DoclintJavadocFileOption = DoclintJavadocFileOption(value.toMutableList())
         override fun writeCollectionValue(writerContext: JavadocOptionFileWriterContext) {
             writerContext.apply {

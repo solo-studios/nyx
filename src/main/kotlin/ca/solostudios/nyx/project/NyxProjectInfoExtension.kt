@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
+ * Copyright (c) 2024-2025 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxProjectInfoExtension.kt is part of nyx
- * Last modified on 18-12-2024 06:57 p.m.
+ * Last modified on 25-12-2024 07:35 p.m.
  *
  * MIT License
  *
@@ -137,6 +137,27 @@ public class NyxProjectInfoExtension(override val project: Project) : InternalNy
 
     /**
      * Configures the repository info.
+     *
+     * For example,
+     * ```kotlin
+     * repository {
+     *     // Set a repository from a git host that has a /issues page
+     *     // This sets the url to https://forgejo.solo-studios.ca/solo-studios/my-project
+     *
+     *     // Set a repository from a git host that does *not* have a /issues page
+     *     // It is recommended to also set the issue management system and the issues url if you use this
+     *     // This sets the url to https://git.solo-studios.ca/solo-studios/my-project
+     *     fromGitHost(owner = "solo-studios", repo = "my-project", host = "https://git.solo-studios.ca")
+     *
+     *     // Set issue management system name
+     *     issueManagement = "Jira"
+     *
+     *     // Set issues url
+     *     projectIssues = "https://jira.solo-studios.ca"
+     * }
+     * ```
+     *
+     * @see NyxRepositoryInfo
      */
     public fun repository(action: (NyxRepositoryInfo).() -> Unit) {
         repository.apply(action)

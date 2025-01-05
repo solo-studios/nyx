@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
+ * Copyright (c) 2024-2025 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxMinotaurExtension.kt is part of nyx
- * Last modified on 18-12-2024 06:57 p.m.
+ * Last modified on 05-01-2025 12:09 a.m.
  *
  * MIT License
  *
@@ -51,6 +51,9 @@ import org.gradle.kotlin.dsl.getValue
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.withType
 
+/**
+ * An extension to configure publishing using Minotaur.
+ */
 public class NyxMinotaurExtension(
     override val project: Project,
     private val info: NyxProjectInfoExtension,
@@ -106,7 +109,8 @@ public class NyxMinotaurExtension(
     public val detectLoaders: Property<Boolean> = property()
 
     /**
-     * If minotaur should automatically adding the `dependsOn` information for upload files.
+     * If minotaur should automatically adding the `dependsOn` information for
+     * upload files.
      */
     public val autoAddDependsOn: Property<Boolean> = property()
 
@@ -138,7 +142,8 @@ public class NyxMinotaurExtension(
     }
 
     /**
-     * Enables automatically adding the `dependsOn` information for upload files.
+     * Enables automatically adding the `dependsOn` information for upload
+     * files.
      *
      * @see autoAddDependsOn
      */
@@ -192,7 +197,7 @@ public class NyxMinotaurExtension(
         // currently only support loom
         // TODO: support neoforge
         when {
-            file.isPresent -> {
+            file.isPresent                  -> {
                 modrinth.file = file
             }
 
@@ -227,19 +232,38 @@ public class NyxMinotaurExtension(
         }
     }
 
+    /**
+     * DSL for declaring modrinth dependencies.
+     */
     public class DependenciesDsl(override val project: Project) : HasProject {
+        /**
+         * Marks a mod with the specified [projectId] and optional [versionId] as
+         * incompatible.
+         */
         public fun incompatible(projectId: String, versionId: String? = null) {
             dependency(modrinth.incompatible, projectId, versionId)
         }
 
+        /**
+         * Marks a mod with the specified [projectId] and optional [versionId] as
+         * optional.
+         */
         public fun optional(projectId: String, versionId: String? = null) {
             dependency(modrinth.optional, projectId, versionId)
         }
 
+        /**
+         * Marks a mod with the specified [projectId] and optional [versionId] as
+         * required.
+         */
         public fun required(projectId: String, versionId: String? = null) {
             dependency(modrinth.required, projectId, versionId)
         }
 
+        /**
+         * Marks a mod with the specified [projectId] and optional [versionId] as
+         * embedded.
+         */
         public fun embedded(projectId: String, versionId: String? = null) {
             dependency(modrinth.embedded, projectId, versionId)
         }
@@ -253,7 +277,19 @@ public class NyxMinotaurExtension(
     }
 
     public companion object {
+        /**
+         * The gradle property used to retrieve the modrinth token.
+         *
+         * Please specify this property in
+         * [the `gradle.properties` located in your `$GRADLE_USER_HOME`](https://docs.gradle.org/current/userguide/build_environment.html#sec:gradle_environment_variables).
+         * By default, this is located at `~/.gradle/gradle.properties` on
+         * Linux/MacOS, and `%USERPROFILE%\.gradle\gradle.properties` on Windows.
+         */
         public const val MODRINTH_TOKEN_GRADLE_PROPERTY: String = "modrinth.token"
+
+        /**
+         * The name this extension is added with.
+         */
         public const val NAME: String = "minotaur"
     }
 
@@ -263,20 +299,23 @@ public class NyxMinotaurExtension(
      * @see ProjectVersion.VersionType
      */
     public enum class VersionType(
+        /**
+         * The name of this channel.
+         */
         public val channelName: String,
     ) {
         /**
-         * If this version was released on the "release" channel
+         * If this version was released on the "release" channel.
          */
         RELEASE("release"),
 
         /**
-         *  If this version was released on the "beta" channel
+         * If this version was released on the "beta" channel.
          */
         BETA("beta"),
 
         /**
-         * If this version was released on the "alpha" channel
+         * If this version was released on the "alpha" channel.
          */
         ALPHA("alpha")
     }

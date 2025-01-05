@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
+ * Copyright (c) 2024-2025 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxFabricLoomExtension.kt is part of nyx
- * Last modified on 22-12-2024 11:04 p.m.
+ * Last modified on 05-01-2025 12:06 a.m.
  *
  * MIT License
  *
@@ -72,6 +72,10 @@ import kotlin.io.path.writeText
 import net.fabricmc.loom.configuration.providers.minecraft.MinecraftSourceSets.Split as SplitMinecraftSourceSet
 import net.fabricmc.loom.util.Constants as LoomConstants
 
+/**
+ * An extension to configure the fabric-loom plugin and all derivative
+ * plugins.
+ */
 public class NyxFabricLoomExtension(
     override val project: Project,
 ) : AbstractMinecraftExtension(project) {
@@ -349,6 +353,9 @@ public class NyxFabricLoomExtension(
         mods.apply(action)
     }
 
+    /**
+     * Configures the generation of the `fabric.mod.json` file.
+     */
     public fun fabricModJson(action: FabricModJson.() -> Unit) {
         generateFabricModJson = true
         fabricModJson.apply(action)

@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
+ * Copyright (c) 2024-2025 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file ContentFilterableUtil.kt is part of nyx
- * Last modified on 21-12-2024 03:10 p.m.
+ * Last modified on 04-01-2025 11:18 p.m.
  *
  * MIT License
  *
@@ -40,11 +40,41 @@ import java.io.Reader
 import kotlin.math.max
 import kotlin.math.min
 
+/**
+ * Minifies json in each file as it is copied.
+ *
+ * Should only be used inside of a `filesMatching` block, otherwise it will
+ * attempt to minify even non-json files.
+ *
+ * For example (remove the spaces in the patterns):
+ * ```kotlin
+ * processResources {
+ *     filesMatching(listOf("** / *.json", "** / *.mcmeta")) {
+ *         minifyJson(lenient = true)
+ *     }
+ * }
+ * ```
+ */
 @JvmOverloads
 public fun ContentFilterable.minifyJson(lenient: Boolean = false) {
     filter<JsonMinifyFilterReader>(mapOf("lenient" to lenient))
 }
 
+/**
+ * Minifies json in each file as it is copied.
+ *
+ * Should only be used inside of a `filesMatching` block, otherwise it will
+ * attempt to minify even non-json files.
+ *
+ * For example (remove the spaces in the patterns):
+ * ```kotlin
+ * processResources {
+ *     filesMatching(listOf("** / *.json", "** / *.mcmeta")) {
+ *         minifyJson(lenient = true)
+ *     }
+ * }
+ * ```
+ */
 public fun ContentFilterable.minifyJson(properties: Map<String, Any?>) {
     filter<JsonMinifyFilterReader>(properties)
 }
