@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
+ * Copyright (c) 2024-2025 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file SerialFabricModJson.kt is part of nyx
- * Last modified on 19-12-2024 11:10 p.m.
+ * Last modified on 21-01-2025 03:33 p.m.
  *
  * MIT License
  *
@@ -28,6 +28,8 @@
 package ca.solostudios.nyx.internal
 
 import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.EncodeDefault
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
@@ -41,6 +43,7 @@ import kotlinx.serialization.json.JsonTransformingSerializer
 
 
 @Serializable
+@OptIn(ExperimentalSerializationApi::class)
 internal data class SerialFabricModJson(
     val id: String,
     val name: String? = null,
@@ -65,6 +68,7 @@ internal data class SerialFabricModJson(
     val languageAdapters: Map<String, String>? = null,
     val custom: JsonObject? = null,
 ) {
+    @EncodeDefault
     val schemaVersion: Int = 1
 
     @Serializable

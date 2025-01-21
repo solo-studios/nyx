@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
+ * Copyright (c) 2024-2025 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file GenerateFabricModJsonFunctionalTest.kt is part of nyx
- * Last modified on 19-12-2024 11:11 p.m.
+ * Last modified on 21-01-2025 03:35 p.m.
  *
  * MIT License
  *
@@ -99,6 +99,7 @@ class GenerateFabricModJsonFunctionalTest : NyxSpec({
                         // language=JSON
                         """
                             |{
+                            |    "schemaVersion": 1,
                             |    "id": "simple-fmj",
                             |    "name": "Simple Fmj",
                             |    "version": "1.2.3",
@@ -285,6 +286,7 @@ class GenerateFabricModJsonFunctionalTest : NyxSpec({
                         // language=JSON
                         """
                             |{
+                            |    "schemaVersion":    1,
                             |    "id":               "complex-fmj",
                             |    "name":             "Complex fabric.mod.json Example",
                             |    "version":          "1.2.3",
