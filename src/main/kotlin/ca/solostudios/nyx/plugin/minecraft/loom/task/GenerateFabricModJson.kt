@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
+ * Copyright (c) 2024-2025 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file GenerateFabricModJson.kt is part of nyx
- * Last modified on 21-12-2024 10:23 p.m.
+ * Last modified on 22-01-2025 11:17 a.m.
  *
  * MIT License
  *
@@ -39,7 +39,6 @@ import ca.solostudios.nyx.plugin.minecraft.loom.FabricModJson
 import ca.solostudios.nyx.plugin.minecraft.loom.FabricModJson.Dependency
 import ca.solostudios.nyx.plugin.minecraft.loom.FabricModJson.Environment
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.encodeToStream
@@ -91,8 +90,6 @@ public class GenerateFabricModJson : DefaultTask() {
         val serialModJson = fabricModJson.get().toSerial()
 
         outputDirectory.file(outputFilename).asPath().outputStream().buffered().use { outputStream ->
-            val adapters = Json.encodeToString(serialModJson.languageAdapters)
-            println("serial language adapters: $adapters")
             json.encodeToStream(serialModJson, outputStream)
         }
     }
@@ -197,10 +194,6 @@ public class GenerateFabricModJson : DefaultTask() {
                 put(key, value.toJsonElement())
             }
         }.takeIf { it.isNotEmpty() }
-
-        val adapters = Json.encodeToString(languageAdapters.orNull?.takeIf { it.isNotEmpty() })
-        println("language adapters: $adapters")
-        //
 
         return SerialFabricModJson(
             id = this.id.get(),
