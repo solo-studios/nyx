@@ -2,7 +2,7 @@
  * Copyright (c) 2024-2025 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file GenerateFabricModJson.kt is part of nyx
- * Last modified on 22-01-2025 11:17 a.m.
+ * Last modified on 23-01-2025 09:36 p.m.
  *
  * MIT License
  *
@@ -59,6 +59,7 @@ import ca.solostudios.nyx.internal.SerialFabricModJson.MixinConfig.StringMixinCo
 import ca.solostudios.nyx.internal.SerialFabricModJson.ModIcon.ModIconMap as SerialModIconMap
 import ca.solostudios.nyx.internal.SerialFabricModJson.Person.ContactablePerson as SerialContactablePerson
 import ca.solostudios.nyx.internal.SerialFabricModJson.Person.NamedPerson as SerialNamedPerson
+import net.fabricmc.loom.util.Constants as LoomConstants
 
 /**
  * Serializes a [FabricModJson] to a file.
@@ -83,6 +84,11 @@ public class GenerateFabricModJson : DefaultTask() {
      */
     @Input
     public val outputFilename: Property<String> = property<String>().convention("fabric.mod.json")
+
+    init {
+        group = LoomConstants.TaskGroup.FABRIC
+        description = "Generate the fabric.mod.json file"
+    }
 
     @TaskAction
     @OptIn(ExperimentalSerializationApi::class)

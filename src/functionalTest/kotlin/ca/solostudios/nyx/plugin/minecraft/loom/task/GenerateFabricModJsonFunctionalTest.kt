@@ -2,7 +2,7 @@
  * Copyright (c) 2024-2025 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file GenerateFabricModJsonFunctionalTest.kt is part of nyx
- * Last modified on 21-01-2025 03:35 p.m.
+ * Last modified on 23-01-2025 09:37 p.m.
  *
  * MIT License
  *
@@ -29,7 +29,7 @@ package ca.solostudios.nyx.plugin.minecraft.loom.task
 
 import ca.solostudios.nyx.kotest.matchers.shouldBeValidJson
 import ca.solostudios.nyx.kotest.matchers.shouldEqualJson
-import ca.solostudios.nyx.kotest.matchers.shouldHaveSucceeded
+import ca.solostudios.nyx.kotest.matchers.shouldNotHaveFailed
 import ca.solostudios.nyx.kotest.spec.NyxSpec
 import ca.solostudios.nyx.util.addArguments
 import ca.solostudios.nyx.util.buildDir
@@ -39,8 +39,8 @@ import io.kotest.matchers.paths.shouldContainFile
 import io.kotest.matchers.paths.shouldExist
 import io.kotest.matchers.paths.shouldNotBeEmptyDirectory
 
-class GenerateFabricModJsonFunctionalTest : NyxSpec({
-    feature("the GenerateFabricModJson task") {
+class GenerateMainFabricModJsonFunctionalTest : NyxSpec({
+    feature("the generateMainFabricModJson task") {
         // this test fails because fuck you gradle
         // givenFabricLoomVersionShouldNotFailGenerateFMJ("1.7.1")
         given("a project with a simple FabricModJson") {
@@ -76,21 +76,21 @@ class GenerateFabricModJsonFunctionalTest : NyxSpec({
                 )
             }
 
-            upon("executing the GenerateFabricModJson task") {
+            upon("executing the generateMainFabricModJson task") {
                 val runner = project.gradleRunner {
-                    addArguments("generateFabricModJson")
+                    addArguments("generateMainFabricModJson")
                 }
 
                 should("not fail") {
                     val build = shouldNotThrowAny {
                         runner.build()
                     }
-                    build.task(":generateMainFabricModJson").shouldHaveSucceeded()
+                    build.task(":generateMainFabricModJson").shouldNotHaveFailed()
                 }
                 should("generate the expected fabric.mod.json") {
                     runner.build()
 
-                    val fabricModJson = runner.buildDir.resolve("fabricModJson").resolve("fabric.mod.json")
+                    val fabricModJson = runner.buildDir.resolve("fabricModJson").resolve("main").resolve("fabric.mod.json")
                     fabricModJson.parent.shouldNotBeEmptyDirectory()
                     fabricModJson.parent shouldContainFile "fabric.mod.json"
 
@@ -122,7 +122,7 @@ class GenerateFabricModJsonFunctionalTest : NyxSpec({
                 }
 
                 should("execute generateMainFabricModJson") {
-                    runner.build().task(":generateMainFabricModJson").shouldHaveSucceeded()
+                    runner.build().task(":generateMainFabricModJson").shouldNotHaveFailed()
                 }
             }
         }
@@ -262,7 +262,7 @@ class GenerateFabricModJsonFunctionalTest : NyxSpec({
                 )
             }
 
-            upon("executing the GenerateFabricModJson task") {
+            upon("executing the generateMainFabricModJson task") {
                 val runner = project.gradleRunner {
                     addArguments("generateMainFabricModJson")
                 }
@@ -271,12 +271,12 @@ class GenerateFabricModJsonFunctionalTest : NyxSpec({
                     val build = shouldNotThrowAny {
                         runner.build()
                     }
-                    build.task(":generateMainFabricModJson").shouldHaveSucceeded()
+                    build.task(":generateMainFabricModJson").shouldNotHaveFailed()
                 }
                 should("generate the expected fabric.mod.json") {
                     runner.build()
 
-                    val fabricModJson = runner.buildDir.resolve("fabricModJson").resolve("fabric.mod.json")
+                    val fabricModJson = runner.buildDir.resolve("fabricModJson").resolve("main").resolve("fabric.mod.json")
                     fabricModJson.parent.shouldExist()
                     fabricModJson.parent.shouldNotBeEmptyDirectory()
                     fabricModJson.parent shouldContainFile "fabric.mod.json"
@@ -464,11 +464,149 @@ class GenerateFabricModJsonFunctionalTest : NyxSpec({
                     }
                 }
                 should("execute generateMainFabricModJson") {
-                    runner.build().task(":generateMainFabricModJson").shouldHaveSucceeded()
+                    runner.build().task(":generateMainFabricModJson").shouldNotHaveFailed()
                 }
             }
         }
 
+        given("a project with a datagen source set") {
+            val project = gradleKtsProject(withPluginClasspath = true) {
+                writeSettingsGradleKts(
+                    """
+                        |rootProject.name = "datagen-fmj"
+                    """.trimMargin()
+                )
+
+                writeBuildGradleKts(
+                    """
+                        |plugins {
+                        |    java
+                        |    id("fabric-loom")
+                        |    id("ca.solo-studios.nyx")
+                        |}
+                        |
+                        |version = "1.2.3"
+                        |group = "my.group"
+                        |
+                        |nyx {
+                        |    minecraft {
+                        |        generateFabricModJson = true
+                        |        configureDataGeneration {
+                        |            createSourceSet = true
+                        |            modId = nyx.info.name
+                        |        }
+                        |    }
+                        |}
+                        |
+                        |dependencies {
+                        |    minecraft("com.mojang:minecraft:1.20.1")
+                        |    mappings("net.fabricmc:yarn:1.20.1+build.3:v2")
+                        |}
+                    """.trimMargin()
+                )
+            }
+
+            upon("executing the generateMainFabricModJson task") {
+                val runner = project.gradleRunner {
+                    addArguments("generateMainFabricModJson")
+                }
+
+                should("not fail") {
+                    val build = shouldNotThrowAny {
+                        runner.build()
+                    }
+                    build.task(":generateMainFabricModJson").shouldNotHaveFailed()
+                }
+                should("generate the expected fabric.mod.json") {
+                    runner.build()
+
+                    val fabricModJson = runner.buildDir.resolve("fabricModJson").resolve("main").resolve("fabric.mod.json")
+                    fabricModJson.parent.shouldNotBeEmptyDirectory()
+                    fabricModJson.parent shouldContainFile "fabric.mod.json"
+
+                    fabricModJson.shouldBeValidJson()
+                    fabricModJson.shouldEqualJson {
+                        // language=JSON
+                        """
+                            |{
+                            |    "schemaVersion": 1,
+                            |    "id": "datagen-fmj",
+                            |    "name": "Datagen Fmj",
+                            |    "version": "1.2.3",
+                            |    "environment": "*"
+                            |}
+                        """.trimMargin()
+                    }
+                }
+            }
+
+            upon("executing the generateDatagenFabricModJson task") {
+                val runner = project.gradleRunner {
+                    addArguments("generateDatagenFabricModJson")
+                }
+
+                should("not fail") {
+                    val build = shouldNotThrowAny {
+                        runner.build()
+                    }
+                    build.task(":generateDatagenFabricModJson").shouldNotHaveFailed()
+                }
+                should("generate the expected fabric.mod.json") {
+                    runner.build()
+
+                    val fabricModJson = runner.buildDir.resolve("fabricModJson").resolve("datagen").resolve("fabric.mod.json")
+                    fabricModJson.parent.shouldNotBeEmptyDirectory()
+                    fabricModJson.parent shouldContainFile "fabric.mod.json"
+
+                    fabricModJson.shouldBeValidJson()
+                    fabricModJson.shouldEqualJson {
+                        // language=JSON
+                        """
+                            |{
+                            |    "schemaVersion": 1,
+                            |    "id": "datagen-fmj",
+                            |    "name": "Datagen Fmj",
+                            |    "version": "1.2.3",
+                            |    "environment": "*"
+                            |}
+                        """.trimMargin()
+                    }
+                }
+            }
+
+            upon("executing the build task") {
+                val runner = project.gradleRunner {
+                    addArguments("build")
+                }
+
+                should("not fail") {
+                    shouldNotThrowAny {
+                        runner.build()
+                    }
+                }
+
+                should("execute generateMainFabricModJson") {
+                    runner.build().task(":generateMainFabricModJson").shouldNotHaveFailed()
+                }
+            }
+
+            upon("executing the datagenClasses task") {
+                val runner = project.gradleRunner {
+                    addArguments("datagenClasses")
+                }
+
+                should("not fail") {
+                    shouldNotThrowAny {
+                        runner.build()
+                    }
+                }
+
+                should("execute generateMainFabricModJson and generateDatagenFabricModJson") {
+                    runner.build().task(":generateMainFabricModJson").shouldNotHaveFailed()
+                    runner.build().task(":generateDatagenFabricModJson").shouldNotHaveFailed()
+                }
+            }
+        }
     }
 })
 

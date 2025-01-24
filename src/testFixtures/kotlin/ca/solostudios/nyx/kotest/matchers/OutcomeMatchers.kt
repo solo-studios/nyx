@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
+ * Copyright (c) 2024-2025 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file OutcomeMatchers.kt is part of nyx
- * Last modified on 25-10-2024 07:36 p.m.
+ * Last modified on 23-01-2025 09:36 p.m.
  *
  * MIT License
  *
@@ -16,7 +16,7 @@
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
- * GRADLE-CONVENTIONS-PLUGIN IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * NYX IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -32,17 +32,25 @@ package ca.solostudios.nyx.kotest.matchers
 import io.kotest.matchers.MatcherResult
 import io.kotest.matchers.neverNullMatcher
 import io.kotest.matchers.should
+import io.kotest.matchers.shouldNot
 import org.gradle.testkit.runner.BuildTask
 import org.gradle.testkit.runner.TaskOutcome
 
-infix fun BuildTask?.shouldBe(outcome: TaskOutcome) = this should beOutcome(outcome)
+fun BuildTask?.shouldHaveSucceeded() = this shouldBe TaskOutcome.SUCCESS
+fun BuildTask?.shouldNotHaveSucceeded() = this shouldNotBe TaskOutcome.SUCCESS
+fun BuildTask?.shouldHaveFailed() = this shouldBe TaskOutcome.FAILED
+fun BuildTask?.shouldNotHaveFailed() = this shouldNotBe TaskOutcome.FAILED
+fun BuildTask?.shouldBeUpToDate() = this shouldBe TaskOutcome.UP_TO_DATE
+fun BuildTask?.shouldNotBeUpToDate() = this shouldNotBe TaskOutcome.UP_TO_DATE
+fun BuildTask?.shouldBeSkipped() = this shouldBe TaskOutcome.SKIPPED
+fun BuildTask?.shouldNotBeSkipped() = this shouldNotBe TaskOutcome.SKIPPED
+fun BuildTask?.shouldBeFromCache() = this shouldBe TaskOutcome.FROM_CACHE
+fun BuildTask?.shouldNotBeFromCache() = this shouldNotBe TaskOutcome.FROM_CACHE
+fun BuildTask?.shouldHaveNoSource() = this shouldBe TaskOutcome.NO_SOURCE
+fun BuildTask?.shouldNotHaveNoSource() = this shouldNotBe TaskOutcome.NO_SOURCE
 
-fun BuildTask?.shouldHaveSucceeded() = this should beOutcome(TaskOutcome.SUCCESS)
-fun BuildTask?.shouldHaveFailed() = this should beOutcome(TaskOutcome.FAILED)
-fun BuildTask?.shouldBeUpToDate() = this should beOutcome(TaskOutcome.UP_TO_DATE)
-fun BuildTask?.shouldBeSkipped() = this should beOutcome(TaskOutcome.SKIPPED)
-fun BuildTask?.shouldBeFromCache() = this should beOutcome(TaskOutcome.FROM_CACHE)
-fun BuildTask?.shouldHaveNoSource() = this should beOutcome(TaskOutcome.NO_SOURCE)
+infix fun BuildTask?.shouldBe(outcome: TaskOutcome) = this should beOutcome(outcome)
+infix fun BuildTask?.shouldNotBe(outcome: TaskOutcome) = this shouldNot beOutcome(outcome)
 
 fun beOutcome(outcome: TaskOutcome) = neverNullMatcher<BuildTask> { task ->
     MatcherResult(

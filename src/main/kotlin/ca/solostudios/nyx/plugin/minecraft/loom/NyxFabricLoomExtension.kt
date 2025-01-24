@@ -2,7 +2,7 @@
  * Copyright (c) 2024-2025 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxFabricLoomExtension.kt is part of nyx
- * Last modified on 05-01-2025 12:06 a.m.
+ * Last modified on 23-01-2025 09:36 p.m.
  *
  * MIT License
  *
@@ -70,7 +70,6 @@ import kotlin.io.path.createFile
 import kotlin.io.path.exists
 import kotlin.io.path.writeText
 import net.fabricmc.loom.configuration.providers.minecraft.MinecraftSourceSets.Split as SplitMinecraftSourceSet
-import net.fabricmc.loom.util.Constants as LoomConstants
 
 /**
  * An extension to configure the fabric-loom plugin and all derivative
@@ -214,6 +213,8 @@ public class NyxFabricLoomExtension(
      */
     public val generateFabricModJson: Property<Boolean> = property()
 
+    private val usesDatagenSourceSet: Property<Boolean> = property()
+
     /**
      * Enables interface injection.
      *
@@ -310,8 +311,7 @@ public class NyxFabricLoomExtension(
      * @see FabricApiExtension.configureDataGeneration
      */
     public fun withDataGeneration() {
-        fabricApi {
-            configureDataGeneration()
+        configureDataGeneration {
         }
     }
 
@@ -322,7 +322,10 @@ public class NyxFabricLoomExtension(
      */
     public fun configureDataGeneration(action: FabricApiExtension.DataGenerationSettings.() -> Unit) {
         fabricApi {
-            configureDataGeneration(action)
+            configureDataGeneration {
+                action()
+                usesDatagenSourceSet = createSourceSet
+            }
         }
     }
 
@@ -452,6 +455,12 @@ public class NyxFabricLoomExtension(
                 configureSourceSet(this)
             }
 
+            if (usesDatagenSourceSet.isTrue) {
+                sourceSets.named("datagen") {
+                    configureSourceSet(this)
+                }
+            }
+
             if (loom.areEnvironmentSourceSetsSplit()) {
                 val minecraftSourceSets = MinecraftSourceSets.get(project)
                 val clientSourceSetName = minecraftSourceSets.getSourceSetForEnv(SplitMinecraftSourceSet.CLIENT_ONLY_SOURCE_SET_NAME)
@@ -472,13 +481,13 @@ public class NyxFabricLoomExtension(
         val sourceSetName = sourceSet.name
 
         val generateFabricModJson by tasks.register<GenerateFabricModJson>(lowerCamelCaseName("generate", sourceSetName, "FabricModJson")) {
-            group = LoomConstants.TaskGroup.FABRIC
-            description = "Generate the fabric.mod.json file"
-
             fabricModJson = this@NyxFabricLoomExtension.fabricModJson
-            outputDirectory = layout.buildDirectory.dir("fabricModJson")
+            outputDirectory = layout.buildDirectory.dir("fabricModJson/$sourceSetName")
         }
         sourceSet.compiledBy(generateFabricModJson)
+        sourceSet.resources {
+            srcDirs(generateFabricModJson.outputDirectory)
+        }
 
         tasks.withType<Jar>().named { it == sourceSet.sourcesJarTaskName }.configureEach {
             from(generateFabricModJson)
