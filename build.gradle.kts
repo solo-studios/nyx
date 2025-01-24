@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2023-2024 solonovamax <solonovamax@12oclockpoint.com>
+ * Copyright (c) 2023-2025 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file build.gradle.kts is part of nyx
- * Last modified on 25-12-2024 07:04 p.m.
+ * Last modified on 23-01-2025 09:48 p.m.
  *
  * MIT License
  *
@@ -33,6 +33,8 @@ import com.sass_lang.embedded_protocol.OutputStyle
 import groovy.text.SimpleTemplateEngine
 import io.freefair.gradle.plugins.sass.SassCompile
 import org.apache.tools.ant.filters.ReplaceTokens
+import org.gradle.internal.component.external.model.TestFixturesSupport
+import org.gradle.jvm.component.internal.DefaultJvmSoftwareComponent
 import org.jetbrains.dokka.gradle.engine.parameters.VisibilityModifier
 import org.jetbrains.dokka.gradle.tasks.DokkaGenerateTask
 import java.io.StringWriter
@@ -447,3 +449,14 @@ fun processTemplate(templateFile: File, templateProperties: Map<String, Any?>): 
 
 val Project.isSnapshot: Boolean
     get() = version.toString().endsWith("-SNAPSHOT")
+
+
+project.components.withType<DefaultJvmSoftwareComponent> {
+    val testFixturesFeature by features.named(TestFixturesSupport.TEST_FIXTURES_FEATURE_NAME)
+    withVariantsFromConfiguration(testFixturesFeature.apiElementsConfiguration) {
+        skip()
+    }
+    withVariantsFromConfiguration(testFixturesFeature.runtimeElementsConfiguration) {
+        skip()
+    }
+}
