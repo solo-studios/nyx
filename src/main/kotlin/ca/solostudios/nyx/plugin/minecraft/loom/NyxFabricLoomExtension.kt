@@ -2,7 +2,7 @@
  * Copyright (c) 2024-2025 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxFabricLoomExtension.kt is part of nyx
- * Last modified on 23-01-2025 09:36 p.m.
+ * Last modified on 26-01-2025 08:37 p.m.
  *
  * MIT License
  *
@@ -49,6 +49,7 @@ import net.fabricmc.loom.configuration.FabricApiExtension
 import net.fabricmc.loom.configuration.ide.RunConfigSettings
 import net.fabricmc.loom.configuration.providers.minecraft.MinecraftJarConfiguration
 import net.fabricmc.loom.configuration.providers.minecraft.MinecraftSourceSets
+import net.fabricmc.loom.task.RunGameTask
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.api.problems.Severity
@@ -213,6 +214,11 @@ public class NyxFabricLoomExtension(
      */
     public val generateFabricModJson: Property<Boolean> = property()
 
+    /**
+     * If all the [Jar] tasks should depend on the datagen task.
+     */
+    public val jarDependsOnDatagen: Property<Boolean> = property()
+
     private val usesDatagenSourceSet: Property<Boolean> = property()
 
     /**
@@ -302,6 +308,15 @@ public class NyxFabricLoomExtension(
      */
     public fun withGenerateFabricModJson() {
         generateFabricModJson = true
+    }
+
+    /**
+     * Makes all [Jar] tasks depend on the datagen task.
+     *
+     * @see jarDependsOnDatagen
+     */
+    public fun withJarDependsOnDatagen() {
+        jarDependsOnDatagen = true
     }
 
     /**
@@ -467,6 +482,24 @@ public class NyxFabricLoomExtension(
 
                 sourceSets.named { it == clientSourceSetName }.configureEach {
                     configureSourceSet(this)
+                }
+            }
+        }
+
+        if (jarDependsOnDatagen.isTrue) {
+            tasks {
+                require(findByName("runDatagen") != null) {
+                    "The runDatagen task must be present, because jarDependsOnDatagen is set to true"
+                }
+
+                val runDatagen by named<RunGameTask>("runDatagen")
+
+                withType<RunGameTask>().matching { it != runDatagen }.configureEach {
+                    dependsOn(runDatagen)
+                }
+
+                withType<Jar>().configureEach {
+                    dependsOn(runDatagen)
                 }
             }
         }
