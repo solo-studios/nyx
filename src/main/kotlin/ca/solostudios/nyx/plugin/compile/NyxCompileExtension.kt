@@ -41,7 +41,6 @@ import org.gradle.jvm.tasks.Jar
 import org.gradle.jvm.toolchain.JavaToolchainSpec
 import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.named
-import org.gradle.kotlin.dsl.support.listFilesOrdered
 import org.gradle.kotlin.dsl.withType
 import java.io.File
 
@@ -269,13 +268,21 @@ public class NyxCompileExtension(override val project: Project) : InternalNyxExt
     private fun Project.firstFileMatchingInParents(filter: (File) -> Boolean): File? {
         val projectIterable = Iterable {
             object : Iterator<Project> {
-                val project = this@firstFileMatchingInParents.project
-                override fun hasNext(): Boolean = project.parent != null
-                override fun next(): Project = project.parent!!
+                var currentProject: Project? = this@firstFileMatchingInParents.project
+
+                override fun hasNext(): Boolean = currentProject != null
+                override fun next(): Project {
+                    val project = currentProject
+                    if (project == null)
+                        throw NoSuchElementException("No further elements")
+
+                    currentProject = project.parent
+                    return project
+                }
             }
         }
-        return projectIterable.firstNotNullOfOrNull {
-            project.projectDir.listFilesOrdered { it.isFile }.firstOrNull(filter)
+        return projectIterable.firstNotNullOfOrNull { project ->
+            project.projectDir.listFiles().asSequence().sorted().firstOrNull(filter)
         }
     }
 
