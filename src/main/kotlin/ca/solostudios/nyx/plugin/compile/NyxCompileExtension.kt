@@ -114,7 +114,7 @@ public class NyxCompileExtension(override val project: Project) : InternalNyxExt
      * @see NyxJavaExtension.jvmTarget
      * @see NyxKotlinExtension.jvmTarget
      */
-    public val jvmTarget: Property<Int> = property()
+    public val jvmTarget: Property<Int> = property<Int>().convention(jvmToolchain)
 
     /**
      * If the sources jar is enabled.
