@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
+ * Copyright (c) 2024-2025 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxCompileExtension.kt is part of nyx
- * Last modified on 28-09-2024 12:20 a.m.
+ * Last modified on 26-01-2025 09:48 p.m.
  *
  * MIT License
  *
@@ -16,7 +16,7 @@
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
- * GRADLE-CONVENTIONS-PLUGIN IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * NYX IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -44,6 +44,9 @@ import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.withType
 import java.io.File
 
+/**
+ * An extension to configure all compilation plugins. (java, kotlin, etc.)
+ */
 public class NyxCompileExtension(override val project: Project) : InternalNyxExtension {
     /**
      * If all warnings are enabled.
@@ -71,7 +74,8 @@ public class NyxCompileExtension(override val project: Project) : InternalNyxExt
     /**
      * If the `LICENSE` file should be distributed in the jar.
      *
-     * The license is resolved from nearest project that contains a `LICENSE` file (ignoring any file extensions).
+     * The license is resolved from nearest project that contains a `LICENSE`
+     * file (ignoring any file extensions).
      */
     public val distributeLicense: Property<Boolean> = property<Boolean>().convention(true)
 
@@ -133,7 +137,8 @@ public class NyxCompileExtension(override val project: Project) : InternalNyxExt
     /**
      * Enables reproducible builds.
      *
-     * See: [Gradle Reproducible Builds](https://docs.gradle.org/current/userguide/working_with_files.html#sec:reproducible_archives)
+     * See:
+     * [Gradle Reproducible Builds](https://docs.gradle.org/current/userguide/working_with_files.html#sec:reproducible_archives)
      */
     public val reproducibleBuilds: Property<Boolean> = property<Boolean>().convention(true)
 
@@ -287,6 +292,9 @@ public class NyxCompileExtension(override val project: Project) : InternalNyxExt
     }
 
     public companion object {
+        /**
+         * The name this extension is added with.
+         */
         public const val NAME: String = "compile"
     }
 }
