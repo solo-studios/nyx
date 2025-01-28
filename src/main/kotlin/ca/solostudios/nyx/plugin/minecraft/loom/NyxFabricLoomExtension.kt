@@ -2,7 +2,7 @@
  * Copyright (c) 2024-2025 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxFabricLoomExtension.kt is part of nyx
- * Last modified on 26-01-2025 08:37 p.m.
+ * Last modified on 27-01-2025 09:51 p.m.
  *
  * MIT License
  *
@@ -520,10 +520,6 @@ public class NyxFabricLoomExtension(
         sourceSet.compiledBy(generateFabricModJson)
         sourceSet.resources {
             srcDirs(generateFabricModJson.outputDirectory)
-        }
-
-        tasks.withType<Jar>().named { it == sourceSet.sourcesJarTaskName }.configureEach {
-            from(generateFabricModJson)
         }
     }
 }
