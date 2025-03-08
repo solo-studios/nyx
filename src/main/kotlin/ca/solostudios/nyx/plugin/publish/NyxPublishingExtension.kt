@@ -2,7 +2,7 @@
  * Copyright (c) 2024-2025 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxPublishingExtension.kt is part of nyx
- * Last modified on 05-01-2025 12:09 a.m.
+ * Last modified on 06-03-2025 08:42 p.m.
  *
  * MIT License
  *
@@ -263,8 +263,8 @@ public class NyxPublishingExtension(
                     connection = info.repository.projectCloneScmUri
                 if (info.repository.projectCloneDeveloperUri.isPresent)
                     developerConnection = info.repository.projectCloneDeveloperUri
-                if (info.repository.projectUrl.isPresent)
-                    url = info.repository.projectUrl
+                if (info.repository.projectRepoUrl.isPresent)
+                    url = info.repository.projectRepoUrl
             }
         }
     }

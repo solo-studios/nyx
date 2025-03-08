@@ -2,7 +2,7 @@
  * Copyright (c) 2024-2025 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxRepositoryInfo.kt is part of nyx
- * Last modified on 25-12-2024 07:39 p.m.
+ * Last modified on 06-03-2025 08:48 p.m.
  *
  * MIT License
  *
@@ -124,6 +124,26 @@ public class NyxRepositoryInfo(override val project: Project) : InternalNyxExten
         .convention(projectHost.flatMap { host -> projectPath.map { path -> "$host/$path" } })
 
     /**
+     * The url for the git repository of the project. Used to set information
+     * for maven publishing.
+     *
+     * By default, this is `https://$baseUri`.
+     *
+     * This is similar to [projectUrl], however if the project has a homepage
+     * then the [projectUrl] may be different.
+     *
+     * Prefer using the `from*` methods over this.
+     *
+     * @see projectUrl
+     * @see fromGithub
+     * @see fromGitlab
+     * @see fromCodeberg
+     * @see fromGitHostWithIssues
+     * @see fromGitHost
+     */
+    public val projectRepoUrl: Property<String> = property<String>().convention(projectBaseUri.map { "https://$it" })
+
+    /**
      * The base uri for cloning. Used to set information for maven publishing.
      *
      * By default, this is `$baseUri.git`.
@@ -186,8 +206,10 @@ public class NyxRepositoryInfo(override val project: Project) : InternalNyxExten
      *
      * By default, this is `https://$baseUri`.
      *
-     * Prefer using the `from*` methods over this.
+     * Similar to [projectRepoUrl], however if the project has a homepage, then
+     * [projectRepoUrl] will still be the url for the repository.
      *
+     * @see projectRepoUrl
      * @see fromGithub
      * @see fromGitlab
      * @see fromCodeberg
@@ -362,6 +384,22 @@ public class NyxRepositoryInfo(override val project: Project) : InternalNyxExten
         projectPath = "$owner/$repo"
         projectOwner = owner
         projectRepo = repo
+    }
+
+    /**
+     * Sets the project homepage url. Should be used in conjunction with a
+     * `from*` function.
+     *
+     * For example,
+     * ```kotlin
+     * repository {
+     *     fromGithub("solo-studios", "my-project")
+     *     withHomepage("https://my-project.solo-studios.ca")
+     * }
+     * ```
+     */
+    public fun withHomepage(homepage: String) {
+        projectUrl = homepage
     }
 
     override fun configureProject() {}

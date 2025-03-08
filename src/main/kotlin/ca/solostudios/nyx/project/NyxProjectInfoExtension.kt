@@ -2,7 +2,7 @@
  * Copyright (c) 2024-2025 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxProjectInfoExtension.kt is part of nyx
- * Last modified on 25-12-2024 07:35 p.m.
+ * Last modified on 06-03-2025 08:45 p.m.
  *
  * MIT License
  *
@@ -143,6 +143,7 @@ public class NyxProjectInfoExtension(override val project: Project) : InternalNy
      * repository {
      *     // Set a repository from a git host that has a /issues page
      *     // This sets the url to https://forgejo.solo-studios.ca/solo-studios/my-project
+     *     fromGitHostWithIssues(owner = "solo-studios", repo = "my-project", host = "https://forgejo.solo-studios.ca")
      *
      *     // Set a repository from a git host that does *not* have a /issues page
      *     // It is recommended to also set the issue management system and the issues url if you use this
