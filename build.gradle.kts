@@ -2,7 +2,7 @@
  * Copyright (c) 2023-2025 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file build.gradle.kts is part of nyx
- * Last modified on 08-03-2025 04:02 p.m.
+ * Last modified on 08-03-2025 06:31 p.m.
  *
  * MIT License
  *
@@ -252,6 +252,8 @@ functionalTest {
     dependencies {
         implementation(testFixtures.modify(project))
         implementation(gradleTestKit())
+
+        pluginUnderTestMetadata(libs.kotlin.plugin)
         pluginUnderTestMetadata(libs.fabric.loom)
     }
 }
