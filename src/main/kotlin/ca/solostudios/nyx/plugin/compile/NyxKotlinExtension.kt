@@ -2,7 +2,7 @@
  * Copyright (c) 2024-2025 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxKotlinExtension.kt is part of nyx
- * Last modified on 08-03-2025 03:54 p.m.
+ * Last modified on 08-03-2025 05:52 p.m.
  *
  * MIT License
  *
@@ -46,7 +46,6 @@ import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode
-import org.jetbrains.kotlin.gradle.dsl.HasConfigurableKotlinCompilerOptions
 import org.jetbrains.kotlin.gradle.dsl.JsModuleKind
 import org.jetbrains.kotlin.gradle.dsl.JsSourceMapEmbedMode
 import org.jetbrains.kotlin.gradle.dsl.JsSourceMapNamesPolicy
@@ -397,12 +396,10 @@ public class NyxKotlinExtension(
             if (jvmToolchain.isPresent)
                 jvmToolchain(jvmToolchain.get())
 
-            if (this is HasConfigurableKotlinCompilerOptions<*>)
-                configureCommonCompilerOptions()
-
             when (this) {
                 is KotlinJvmProjectExtension    -> {
-                    configureJvmCompilerOptions()
+                    compilerOptions.configureJvmCompilerOptions()
+                    compilerOptions.configureCommonCompilerOptions()
 
                     if (sourcesJar.isTrue) {
                         java.withSourcesJar()
@@ -412,15 +409,17 @@ public class NyxKotlinExtension(
                 }
 
                 is KotlinMultiplatformExtension -> {
+                    compilerOptions.configureCommonCompilerOptions()
+
                     if (sourcesJar.isTrue)
                         withSourcesJar(publish = true)
 
                     targets.withType<KotlinJvmTarget>().configureEach {
-                        configureJvmCompilerOptions()
+                        compilerOptions.configureJvmCompilerOptions()
                     }
 
                     targets.withType<KotlinJsIrTarget>().configureEach {
-                        configureJsCompilerOptions()
+                        compilerOptions.configureJsCompilerOptions()
                     }
                 }
 
@@ -438,70 +437,66 @@ public class NyxKotlinExtension(
         }
     }
 
-    private fun HasConfigurableKotlinCompilerOptions<KotlinJvmCompilerOptions>.configureJvmCompilerOptions() {
+    private fun KotlinJvmCompilerOptions.configureJvmCompilerOptions() {
         val nyx = this@NyxKotlinExtension
-        compilerOptions {
-            if (nyx.jvmTarget.isPresent)
-                jvmTarget = JvmTarget.fromTarget(nyx.jvmTarget.get().let { target -> if (target == 8) "1.8" else target.toString() })
+        if (nyx.jvmTarget.isPresent)
+            jvmTarget = JvmTarget.fromTarget(nyx.jvmTarget.get().let { target -> if (target == 8) "1.8" else target.toString() })
 
-            if (nyx.javaParameters.isPresent)
-                javaParameters = nyx.javaParameters
-        }
+        if (nyx.javaParameters.isPresent)
+            javaParameters = nyx.javaParameters
     }
 
-    private fun HasConfigurableKotlinCompilerOptions<KotlinJsCompilerOptions>.configureJsCompilerOptions() {
+    private fun KotlinJsCompilerOptions.configureJsCompilerOptions() {
         val nyx = this@NyxKotlinExtension
-        compilerOptions {
-            if (nyx.jsModuleKind.isPresent)
-                moduleKind = nyx.jsModuleKind
+        // compilerOptions {
+        if (nyx.jsModuleKind.isPresent)
+            moduleKind = nyx.jsModuleKind
 
-            if (nyx.jsSourceMap.isPresent)
-                sourceMap = nyx.jsSourceMap
+        if (nyx.jsSourceMap.isPresent)
+            sourceMap = nyx.jsSourceMap
 
-            if (nyx.jsSourceMapEmbedSources.isPresent)
-                sourceMapEmbedSources = nyx.jsSourceMapEmbedSources
+        if (nyx.jsSourceMapEmbedSources.isPresent)
+            sourceMapEmbedSources = nyx.jsSourceMapEmbedSources
 
-            if (nyx.jsSourceMapNamesPolicy.isPresent)
-                sourceMapNamesPolicy = nyx.jsSourceMapNamesPolicy
+        if (nyx.jsSourceMapNamesPolicy.isPresent)
+            sourceMapNamesPolicy = nyx.jsSourceMapNamesPolicy
 
-            if (nyx.jsTarget.isPresent)
-                target = nyx.jsTarget
+        if (nyx.jsTarget.isPresent)
+            target = nyx.jsTarget
 
-            if (nyx.jsUseEsClasses.isPresent)
-                useEsClasses = nyx.jsUseEsClasses
-        }
+        if (nyx.jsUseEsClasses.isPresent)
+            useEsClasses = nyx.jsUseEsClasses
+        // }
     }
 
-    private fun HasConfigurableKotlinCompilerOptions<*>.configureCommonCompilerOptions() {
+    private fun KotlinCommonCompilerOptions.configureCommonCompilerOptions() {
         val nyx = this@NyxKotlinExtension
-        compilerOptions {
-            if (nyx.apiVersion.isPresent)
-                apiVersion = nyx.apiVersion.map { KotlinVersion.fromVersion(it) }.get()
+        if (nyx.apiVersion.isPresent)
+            apiVersion = nyx.apiVersion.map { KotlinVersion.fromVersion(it) }.get()
 
-            if (nyx.languageVersion.isPresent)
-                languageVersion = nyx.languageVersion.map { KotlinVersion.fromVersion(it) }.get()
+        if (nyx.languageVersion.isPresent)
+            languageVersion = nyx.languageVersion.map { KotlinVersion.fromVersion(it) }.get()
 
-            if (nyx.warningsAsErrors.isPresent)
-                allWarningsAsErrors = nyx.warningsAsErrors.get()
+        if (nyx.warningsAsErrors.isPresent)
+            allWarningsAsErrors = nyx.warningsAsErrors.get()
 
-            if (nyx.progressiveMode.isPresent)
-                progressiveMode = nyx.progressiveMode
+        if (nyx.progressiveMode.isPresent)
+            progressiveMode = nyx.progressiveMode
 
-            if (nyx.extraWarnings.isPresent)
-                extraWarnings = nyx.extraWarnings
+        if (nyx.extraWarnings.isPresent)
+            extraWarnings = nyx.extraWarnings
 
-            if (nyx.optIn.isPresent)
-                optIn = nyx.optIn
+        if (nyx.optIn.isPresent)
+            optIn = nyx.optIn
 
-            if (nyx.suppressWarnings.isPresent)
-                suppressWarnings = nyx.suppressWarnings.get()
+        if (nyx.suppressWarnings.isPresent)
+            suppressWarnings = nyx.suppressWarnings.get()
 
-            if (nyx.compilerArgs.isPresent)
-                freeCompilerArgs.addAll(nyx.compilerArgs)
+        if (nyx.compilerArgs.isPresent)
+            freeCompilerArgs.addAll(nyx.compilerArgs)
 
-            if (nyx.suppressedWarnings.isPresent)
-                freeCompilerArgs.addAll(nyx.suppressedWarnings.get().map { "-Xsuppress-warning=$it" })
-        }
+        if (nyx.suppressedWarnings.isPresent)
+            freeCompilerArgs.addAll(nyx.suppressedWarnings.get().map { "-Xsuppress-warning=$it" })
     }
 
     public companion object {
