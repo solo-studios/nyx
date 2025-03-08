@@ -2,7 +2,7 @@
  * Copyright (c) 2024-2025 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxKotlinExtension.kt is part of nyx
- * Last modified on 08-03-2025 03:54 p.m.
+ * Last modified on 08-03-2025 04:59 p.m.
  *
  * MIT License
  *
@@ -397,9 +397,6 @@ public class NyxKotlinExtension(
             if (jvmToolchain.isPresent)
                 jvmToolchain(jvmToolchain.get())
 
-            if (this is HasConfigurableKotlinCompilerOptions<*>)
-                configureCommonCompilerOptions()
-
             when (this) {
                 is KotlinJvmProjectExtension    -> {
                     configureJvmCompilerOptions()
@@ -412,6 +409,8 @@ public class NyxKotlinExtension(
                 }
 
                 is KotlinMultiplatformExtension -> {
+                    configureCommonCompilerOptions()
+
                     if (sourcesJar.isTrue)
                         withSourcesJar(publish = true)
 
