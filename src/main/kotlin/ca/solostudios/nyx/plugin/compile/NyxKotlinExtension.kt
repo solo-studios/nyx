@@ -2,7 +2,7 @@
  * Copyright (c) 2024-2025 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxKotlinExtension.kt is part of nyx
- * Last modified on 05-01-2025 12:09 a.m.
+ * Last modified on 08-03-2025 03:54 p.m.
  *
  * MIT License
  *
@@ -42,20 +42,23 @@ import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.jvm.tasks.Jar
-import org.gradle.jvm.toolchain.JavaToolchainSpec
 import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode
+import org.jetbrains.kotlin.gradle.dsl.HasConfigurableKotlinCompilerOptions
+import org.jetbrains.kotlin.gradle.dsl.JsModuleKind
+import org.jetbrains.kotlin.gradle.dsl.JsSourceMapEmbedMode
+import org.jetbrains.kotlin.gradle.dsl.JsSourceMapNamesPolicy
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinCommonCompilerOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinCommonCompilerToolOptions
-import org.jetbrains.kotlin.gradle.dsl.KotlinCommonOptions
-import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
+import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompilerOptions
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
-import org.jetbrains.kotlin.gradle.dsl.KotlinTopLevelExtension
-import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
-import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
+import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
 import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 import org.slf4j.kotlin.error
 import org.slf4j.kotlin.getLogger
@@ -70,51 +73,77 @@ public class NyxKotlinExtension(
     private val logger by getLogger()
 
     /**
-     * Sets the kotlin api version used
+     * Sets the kotlin api version used.
      *
-     * @see KotlinCommonOptions.apiVersion
+     * @see KotlinCommonCompilerOptions.apiVersion
      */
     public val apiVersion: Property<String> = property()
 
     /**
-     * Sets the kotlin language version used
+     * Sets the kotlin language version used.
      *
-     * @see KotlinCommonOptions.languageVersion
+     * @see KotlinCommonCompilerOptions.languageVersion
      */
     public val languageVersion: Property<String> = property()
 
     /**
-     * Enables the following opt-in annotations
+     * Enables the following opt-in annotations.
      *
      * @see KotlinCommonCompilerOptions.optIn
      */
     public val optIn: ListProperty<String> = listProperty()
 
     /**
-     * The explicit api mode
+     * The explicit api mode.
      *
-     * @see KotlinTopLevelExtension.explicitApi
+     * @see
+     *         org.jetbrains.kotlin.gradle.dsl.KotlinTopLevelExtensionConfig.explicitApi
      */
     public val explicitApi: Property<ExplicitApiMode> = property()
 
     /**
+     * If the
+     * [progressive compiler mode](https://kotlinlang.org/docs/whatsnew13.html#progressive-mode)
+     * is enabled.
+     *
+     * @see KotlinCommonCompilerOptions.progressiveMode
+     */
+    public val progressiveMode: Property<Boolean> = property()
+
+    /**
      * If compilers outputting warnings as errors is enabled.
      *
+     * @see KotlinCommonCompilerToolOptions.allWarningsAsErrors
      * @see NyxCompileExtension.warningsAsErrors
      */
     public val warningsAsErrors: Property<Boolean> = property<Boolean>().convention(compile.warningsAsErrors)
 
     /**
+     * If
+     * [additional compiler warnings](https://kotlinlang.org/docs/whatsnew21.html#extra-compiler-checks)
+     * are enabled.
+     *
+     * @see KotlinCommonCompilerToolOptions.extraWarnings
+     */
+    public val extraWarnings: Property<Boolean> = property()
+
+    /**
      * If all warnings should be suppressed.
      *
+     * @see KotlinCommonCompilerToolOptions.suppressWarnings
      * @see NyxCompileExtension.suppressWarnings
      */
     public val suppressWarnings: Property<Boolean> = property<Boolean>().convention(compile.suppressWarnings)
 
     /**
+     * List of specific warnings to be suppressed.
+     */
+    public val suppressedWarnings: ListProperty<String> = listProperty()
+
+    /**
      * The jvm toolchain release to use.
      *
-     * @see JavaToolchainSpec.getLanguageVersion
+     * @see JavaPluginExtension.toolchain
      * @see NyxCompileExtension.jvmToolchain
      */
     public val jvmToolchain: Property<Int> = property<Int>().convention(compile.jvmToolchain)
@@ -122,10 +151,76 @@ public class NyxKotlinExtension(
     /**
      * The jvm target to use.
      *
+     * @see KotlinJvmCompilerOptions.jvmTarget
      * @see JavaPluginExtension.setTargetCompatibility
      * @see NyxCompileExtension.jvmTarget
      */
     public val jvmTarget: Property<Int> = property<Int>().convention(compile.jvmTarget)
+
+    /**
+     * If the compiler should generate metadata for Java 1.8 reflection on
+     * method parameters.
+     *
+     * @see KotlinJvmCompilerOptions.javaParameters
+     */
+    public val javaParameters: Property<Boolean> = property()
+
+    /**
+     * The kind of JS module generated by the compiler. ES modules are enabled
+     * by default in case of ES2015 target usage.
+     *
+     * This only applies to Kotlin/JS targets.
+     *
+     * @see KotlinJsCompilerOptions.moduleKind
+     */
+    public val jsModuleKind: Property<JsModuleKind> = property()
+
+    /**
+     * If source maps are enabled.
+     *
+     * This only applies to Kotlin/JS targets.
+     *
+     * @see KotlinJsCompilerOptions.sourceMap
+     */
+    public val jsSourceMap: Property<Boolean> = property()
+
+    /**
+     * If source files should be embedded in the source maps.
+     *
+     * This only applies to Kotlin/JS targets.
+     *
+     * @see KotlinJsCompilerOptions.sourceMapEmbedSources
+     */
+    public val jsSourceMapEmbedSources: Property<JsSourceMapEmbedMode> = property()
+
+    /**
+     * Mode for mapping generated names to original names.
+     *
+     * This only applies to Kotlin/JS targets.
+     *
+     * @see KotlinJsCompilerOptions.sourceMapNamesPolicy
+     */
+    public val jsSourceMapNamesPolicy: Property<JsSourceMapNamesPolicy> = property()
+
+    /**
+     * The ECMA version to target for generated JavaScript files. Should be one
+     * of: `es5`, `es2015`.
+     *
+     * This only applies to Kotlin/JS targets.
+     *
+     * @see KotlinJsCompilerOptions.target
+     */
+    public val jsTarget: Property<String> = property()
+
+    /**
+     * If ES2015 classes should be generated by the compiler. Enabled by
+     * default if the [target][jsTarget] is set to `es2015`.
+     *
+     * This only applies to Kotlin/JS targets.
+     *
+     * @see KotlinJsCompilerOptions.useEsClasses
+     */
+    public val jsUseEsClasses: Property<Boolean> = property()
 
     /**
      * If the sources jar is enabled.
@@ -155,7 +250,8 @@ public class NyxKotlinExtension(
     /**
      * Enables the strict explicit api mode.
      *
-     * @see KotlinTopLevelExtension.explicitApi
+     * @see
+     *         org.jetbrains.kotlin.gradle.dsl.KotlinTopLevelExtensionConfig.explicitApi
      */
     public fun withExplicitApi() {
         explicitApi = ExplicitApiMode.Strict
@@ -164,10 +260,21 @@ public class NyxKotlinExtension(
     /**
      * Enables the warning explicit api mode.
      *
-     * @see KotlinTopLevelExtension.explicitApiWarning
+     * @see
+     *         org.jetbrains.kotlin.gradle.dsl.KotlinTopLevelExtensionConfig.explicitApiWarning
      */
     public fun withExplicitApiWarning() {
         explicitApi = ExplicitApiMode.Warning
+    }
+
+    /**
+     * Enables the
+     * [progressive compiler mode](https://kotlinlang.org/docs/whatsnew13.html#progressive-mode).
+     *
+     * @see progressiveMode
+     */
+    public fun withProgressiveMode() {
+        progressiveMode = true
     }
 
     /**
@@ -180,12 +287,66 @@ public class NyxKotlinExtension(
     }
 
     /**
+     * Enables
+     * [additional compiler warnings](https://kotlinlang.org/docs/whatsnew21.html#extra-compiler-checks).
+     *
+     * @see extraWarnings
+     */
+    public fun withExtraWarnings() {
+        extraWarnings = true
+    }
+
+    /**
      * Enables suppressing warnings.
      *
      * @see suppressWarnings
      */
     public fun withSuppressWarnings() {
         suppressWarnings = true
+    }
+
+    /**
+     * Enables generation of metadata for Java 1.8 reflection on method
+     * parameters.
+     *
+     * @see javaParameters
+     */
+    public fun withJavaParameters() {
+        javaParameters = true
+    }
+
+    /**
+     * Enables js source maps.
+     *
+     * @see jsSourceMap
+     */
+    public fun withJsSourceMap() {
+        jsSourceMap = true
+    }
+
+    /**
+     * Targets ECMA ES2015.
+     *
+     * @see jsTarget
+     */
+    public fun withJsEs2015Target() {
+        jsTarget = "es2015"
+    }
+
+    /**
+     * Targets ECMA ES5.
+     *
+     * @see jsTarget
+     */
+    public fun withJsEs5Target() {
+        jsTarget = "es5"
+    }
+
+    /**
+     * Generates ES2015 classes.
+     */
+    public fun withJsEsClasses() {
+        jsUseEsClasses = true
     }
 
     /**
@@ -236,16 +397,17 @@ public class NyxKotlinExtension(
             if (jvmToolchain.isPresent)
                 jvmToolchain(jvmToolchain.get())
 
+            if (this is HasConfigurableKotlinCompilerOptions<*>)
+                configureCommonCompilerOptions()
+
             when (this) {
-                is KotlinJvmProjectExtension -> {
-                    configureCommonCompilations(target)
+                is KotlinJvmProjectExtension    -> {
+                    configureJvmCompilerOptions()
+
                     if (sourcesJar.isTrue) {
                         java.withSourcesJar()
-                        tasks.withType<Jar>().named { it == "kotlinSourcesJar" }.configureEach { enabled = false }
-                    }
-
-                    target.compilations.configureEach {
-                        configureJvmCompilation(this)
+                        // ensure kotlin's sources jar is disabled, because it breaks things
+                        tasks.withType<Jar>().named("kotlinSourcesJar").configure { enabled = false }
                     }
                 }
 
@@ -253,18 +415,16 @@ public class NyxKotlinExtension(
                     if (sourcesJar.isTrue)
                         withSourcesJar(publish = true)
 
-                    targets.configureEach {
-                        configureCommonCompilations(this)
+                    targets.withType<KotlinJvmTarget>().configureEach {
+                        configureJvmCompilerOptions()
+                    }
 
-                        if (this is KotlinJvmTarget) {
-                            compilations.configureEach {
-                                configureJvmCompilation(this)
-                            }
-                        }
+                    targets.withType<KotlinJsIrTarget>().configureEach {
+                        configureJsCompilerOptions()
                     }
                 }
 
-                else                         -> {
+                else                            -> {
                     // Throw error for other platforms
                     logger.error(NotImplementedError("Unsupported kotlin platform.")) {
                         """
@@ -278,31 +438,69 @@ public class NyxKotlinExtension(
         }
     }
 
-    private fun configureJvmCompilation(compilation: KotlinCompilation<KotlinJvmOptions>) {
-        if (jvmTarget.isPresent)
-            compilation.kotlinOptions.jvmTarget = /* evil */ if (jvmTarget.get() == 8) "1.8" else jvmTarget.get().toString()
+    private fun HasConfigurableKotlinCompilerOptions<KotlinJvmCompilerOptions>.configureJvmCompilerOptions() {
+        val nyx = this@NyxKotlinExtension
+        compilerOptions {
+            if (nyx.jvmTarget.isPresent)
+                jvmTarget = JvmTarget.fromTarget(nyx.jvmTarget.get().let { target -> if (target == 8) "1.8" else target.toString() })
+
+            if (nyx.javaParameters.isPresent)
+                javaParameters = nyx.javaParameters
+        }
     }
 
-    @Suppress("DEPRECATION")
-    private fun configureCommonCompilations(target: KotlinTarget) {
-        target.compilations.configureEach {
-            if (apiVersion.isPresent)
-                kotlinOptions.apiVersion = apiVersion.get()
+    private fun HasConfigurableKotlinCompilerOptions<KotlinJsCompilerOptions>.configureJsCompilerOptions() {
+        val nyx = this@NyxKotlinExtension
+        compilerOptions {
+            if (nyx.jsModuleKind.isPresent)
+                moduleKind = nyx.jsModuleKind
 
-            if (languageVersion.isPresent)
-                kotlinOptions.languageVersion = languageVersion.get()
+            if (nyx.jsSourceMap.isPresent)
+                sourceMap = nyx.jsSourceMap
 
-            if (warningsAsErrors.isPresent)
-                kotlinOptions.allWarningsAsErrors = warningsAsErrors.get()
+            if (nyx.jsSourceMapEmbedSources.isPresent)
+                sourceMapEmbedSources = nyx.jsSourceMapEmbedSources
 
-            if (optIn.isPresent)
-                kotlinOptions.options.optIn = optIn
+            if (nyx.jsSourceMapNamesPolicy.isPresent)
+                sourceMapNamesPolicy = nyx.jsSourceMapNamesPolicy
 
-            if (suppressWarnings.isPresent)
-                kotlinOptions.suppressWarnings = suppressWarnings.get()
+            if (nyx.jsTarget.isPresent)
+                target = nyx.jsTarget
 
-            if (compilerArgs.isPresent)
-                kotlinOptions.options.freeCompilerArgs.addAll(compilerArgs)
+            if (nyx.jsUseEsClasses.isPresent)
+                useEsClasses = nyx.jsUseEsClasses
+        }
+    }
+
+    private fun HasConfigurableKotlinCompilerOptions<*>.configureCommonCompilerOptions() {
+        val nyx = this@NyxKotlinExtension
+        compilerOptions {
+            if (nyx.apiVersion.isPresent)
+                apiVersion = nyx.apiVersion.map { KotlinVersion.fromVersion(it) }.get()
+
+            if (nyx.languageVersion.isPresent)
+                languageVersion = nyx.languageVersion.map { KotlinVersion.fromVersion(it) }.get()
+
+            if (nyx.warningsAsErrors.isPresent)
+                allWarningsAsErrors = nyx.warningsAsErrors.get()
+
+            if (nyx.progressiveMode.isPresent)
+                progressiveMode = nyx.progressiveMode
+
+            if (nyx.extraWarnings.isPresent)
+                extraWarnings = nyx.extraWarnings
+
+            if (nyx.optIn.isPresent)
+                optIn = nyx.optIn
+
+            if (nyx.suppressWarnings.isPresent)
+                suppressWarnings = nyx.suppressWarnings.get()
+
+            if (nyx.compilerArgs.isPresent)
+                freeCompilerArgs.addAll(nyx.compilerArgs)
+
+            if (nyx.suppressedWarnings.isPresent)
+                freeCompilerArgs.addAll(nyx.suppressedWarnings.get().map { "-Xsuppress-warning=$it" })
         }
     }
 

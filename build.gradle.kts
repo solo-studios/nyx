@@ -2,7 +2,7 @@
  * Copyright (c) 2023-2025 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file build.gradle.kts is part of nyx
- * Last modified on 23-01-2025 09:48 p.m.
+ * Last modified on 08-03-2025 04:02 p.m.
  *
  * MIT License
  *
@@ -308,11 +308,15 @@ dokka {
         reportUndocumented = true
         documentedVisibilities = setOf(VisibilityModifier.Public, VisibilityModifier.Protected)
 
+        @Suppress("unused")
         externalDocumentationLinks {
             val gradle by registering {
-                // https://docs.gradle.org/current/kotlin-dsl/index.html
                 url("https://docs.gradle.org/${gradle.gradleVersion}/kotlin-dsl/")
                 packageListUrl("https://docs.gradle.org/${gradle.gradleVersion}/kotlin-dsl/gradle/package-list")
+            }
+            val kotlinPlugin by registering {
+                url("https://kotlinlang.org/api/kotlin-gradle-plugin/")
+                packageListUrl("https://kotlinlang.org/api/kotlin-gradle-plugin/package-list")
             }
         }
 
