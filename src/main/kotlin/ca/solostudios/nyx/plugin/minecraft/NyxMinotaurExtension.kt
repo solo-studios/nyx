@@ -2,7 +2,7 @@
  * Copyright (c) 2024-2025 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxMinotaurExtension.kt is part of nyx
- * Last modified on 05-01-2025 12:09 a.m.
+ * Last modified on 13-03-2025 04:19 p.m.
  *
  * MIT License
  *
@@ -44,12 +44,10 @@ import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
-import org.gradle.api.publish.plugins.PublishingPlugin
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.getValue
 import org.gradle.kotlin.dsl.named
-import org.gradle.kotlin.dsl.withType
 
 /**
  * An extension to configure publishing using Minotaur.
@@ -224,7 +222,7 @@ public class NyxMinotaurExtension(
             modrinth.additionalFiles.addAll(additionalFiles.asFileTree.files)
         }
 
-        project.plugins.withType<PublishingPlugin> {
+        project.pluginManager.withPlugin("publishing") {
             val modrinth by tasks.named("modrinth")
             val publish by tasks.named("publish")
 

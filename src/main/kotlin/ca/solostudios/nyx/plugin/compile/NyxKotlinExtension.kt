@@ -2,7 +2,7 @@
  * Copyright (c) 2024-2025 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxKotlinExtension.kt is part of nyx
- * Last modified on 13-03-2025 02:14 a.m.
+ * Last modified on 13-03-2025 04:19 p.m.
  *
  * MIT License
  *
@@ -368,7 +368,7 @@ public class NyxKotlinExtension(
 
     override fun configureProject() {
         if (javadocJar.isTrue) {
-            if (!project.plugins.hasPlugin("org.jetbrains.dokka")) {
+            if (!project.pluginManager.hasPlugin(DOKKA_PLUGIN_ID)) {
                 // Project does not have dokka plugin. do not attempt to configure it.
                 logger.error(IllegalStateException()) {
                     """
@@ -502,5 +502,7 @@ public class NyxKotlinExtension(
          * The name this extension is added with.
          */
         public const val NAME: String = "kotlin"
+
+        private const val DOKKA_PLUGIN_ID = "org.jetbrains.dokka"
     }
 }

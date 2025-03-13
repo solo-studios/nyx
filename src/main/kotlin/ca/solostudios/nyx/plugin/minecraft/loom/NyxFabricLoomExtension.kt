@@ -2,7 +2,7 @@
  * Copyright (c) 2024-2025 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxFabricLoomExtension.kt is part of nyx
- * Last modified on 27-01-2025 09:51 p.m.
+ * Last modified on 13-03-2025 04:19 p.m.
  *
  * MIT License
  *
@@ -354,7 +354,7 @@ public class NyxFabricLoomExtension(
     }
 
     /**
-     * Configures the loom runs
+     * Configures the loom runs.
      *
      * @see LoomGradleExtensionAPI.runs
      */
@@ -504,7 +504,7 @@ public class NyxFabricLoomExtension(
             }
         }
 
-        project.plugins.withId("com.github.breadmoirai.github-release") {
+        project.pluginManager.withPlugin(GITHUB_RELEASE_PLUGIN_ID) {
             val remapJar by tasks.named<Jar>("remapJar")
             nyx.publishing.githubRelease.releaseAssets.from(remapJar)
         }
@@ -521,5 +521,9 @@ public class NyxFabricLoomExtension(
         sourceSet.resources {
             srcDirs(generateFabricModJson.outputDirectory)
         }
+    }
+
+    public companion object {
+        private const val GITHUB_RELEASE_PLUGIN_ID = "com.github.breadmoirai.github-release"
     }
 }

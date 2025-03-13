@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
+ * Copyright (c) 2024-2025 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxCompilePlugin.kt is part of nyx
- * Last modified on 19-12-2024 11:10 p.m.
+ * Last modified on 13-03-2025 04:19 p.m.
  *
  * MIT License
  *
@@ -33,8 +33,7 @@ import ca.solostudios.nyx.internal.InternalNyxPlugin
 import ca.solostudios.nyx.internal.util.create
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.the
-import org.gradle.kotlin.dsl.withType
-import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
+import java.util.concurrent.atomic.AtomicBoolean
 
 @Service(InternalNyxPlugin::class)
 internal class NyxCompilePlugin : InternalNyxPlugin {
@@ -46,7 +45,7 @@ internal class NyxCompilePlugin : InternalNyxPlugin {
             compileExtension.configureProject()
         }
 
-        project.plugins.withId("java") {
+        project.pluginManager.withPlugin("java") {
             val javaExtension = compileExtension.create<NyxJavaExtension>(NyxJavaExtension.NAME, project, compileExtension)
 
             project.afterEvaluate {
@@ -54,16 +53,33 @@ internal class NyxCompilePlugin : InternalNyxPlugin {
             }
         }
 
-        try {
-            project.plugins.withType<KotlinBasePlugin> {
-                val kotlinExtension = compileExtension.create<NyxKotlinExtension>(NyxKotlinExtension.NAME, project, compileExtension)
-
-                project.afterEvaluate {
-                    kotlinExtension.configureProject()
+        val appliedKotlinPlugin = AtomicBoolean(false)
+        for (agpPluginId in KOTLIN_PLUGIN_IDS) {
+            project.pluginManager.withPlugin(agpPluginId) {
+                if (!appliedKotlinPlugin.getAndSet(true)) {
+                    applyKotlinExtension(project, compileExtension)
                 }
             }
-        } catch (_: NoClassDefFoundError) {
-            // ignore
         }
+    }
+
+    fun applyKotlinExtension(project: Project, compileExtension: NyxCompileExtension) {
+        val kotlinExtension = compileExtension.create<NyxKotlinExtension>(NyxKotlinExtension.NAME, project, compileExtension)
+
+        project.afterEvaluate {
+            kotlinExtension.configureProject()
+        }
+    }
+
+    companion object {
+        internal val KOTLIN_PLUGIN_IDS = listOf(
+            "kotlin",
+            "kotlin-android",
+            "kotlin-multiplatform",
+            "org.jetbrains.kotlin.android",
+            "org.jetbrains.kotlin.js",
+            "org.jetbrains.kotlin.jvm",
+            "org.jetbrains.kotlin.multiplatform",
+        )
     }
 }

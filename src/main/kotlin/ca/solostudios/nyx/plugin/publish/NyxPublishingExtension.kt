@@ -2,7 +2,7 @@
  * Copyright (c) 2024-2025 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxPublishingExtension.kt is part of nyx
- * Last modified on 06-03-2025 08:42 p.m.
+ * Last modified on 13-03-2025 04:19 p.m.
  *
  * MIT License
  *
@@ -74,7 +74,7 @@ public class NyxPublishingExtension(
      * - `signingKeyId`
      * - `signingPassword`
      *
-     * You can set these globally by adding
+     * You can set these globally by adding.
      *
      * ```properties
      * signingKey=[key]
@@ -178,20 +178,20 @@ public class NyxPublishingExtension(
             publications {
 
                 when {
-                    project.plugins.hasPlugin("org.jetbrains.kotlin.multiplatform") -> {
+                    project.pluginManager.hasPlugin(KOTLIN_MULTIPLATFORM_PLUGIN_ID) -> {
                         // when using kotlin multiplatform, publications will be created for you
                         withType<MavenPublication>().configureEach {
                             configurePublication(applyArtifactId = false)
                         }
                     }
 
-                    project.plugins.hasPlugin("org.gradle.java-gradle-plugin") -> {
+                    project.pluginManager.hasPlugin(JAVA_GRADLE_PLUGIN_PLUGIN_ID)   -> {
                         withType<MavenPublication>().configureEach {
                             configurePublication(applyArtifactId = false, applyGroupId = false)
                         }
                     }
 
-                    else                                                       -> {
+                    else                                                            -> {
                         if (withType<MavenPublication>().isEmpty()) {
                             create<MavenPublication>(info.module.get()) {
                                 from(project.components["java"])
@@ -274,5 +274,9 @@ public class NyxPublishingExtension(
          * The name this extension is added with.
          */
         public const val NAME: String = "publishing"
+
+        private const val KOTLIN_MULTIPLATFORM_PLUGIN_ID = "org.jetbrains.kotlin.multiplatform"
+
+        private const val JAVA_GRADLE_PLUGIN_PLUGIN_ID = "org.gradle.java-gradle-plugin"
     }
 }

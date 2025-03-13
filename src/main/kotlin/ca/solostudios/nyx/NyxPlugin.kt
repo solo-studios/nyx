@@ -2,7 +2,7 @@
  * Copyright (c) 2023-2025 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxPlugin.kt is part of nyx
- * Last modified on 25-12-2024 06:22 p.m.
+ * Last modified on 13-03-2025 04:19 p.m.
  *
  * MIT License
  *
@@ -42,9 +42,9 @@ internal class NyxPlugin : InternalNyxPlugin {
     override fun apply(project: Project) {
         val nyx = project.create<NyxExtension>(NyxExtension.NAME, project)
 
-        project.plugins.apply(NyxPublishingPlugin::class)
+        project.pluginManager.apply(NyxPublishingPlugin::class)
 
-        project.plugins.apply(NyxCompilePlugin::class)
+        project.pluginManager.apply(NyxCompilePlugin::class)
 
         try {
             project.plugins.withType<LoomGradlePluginBootstrap> {
@@ -68,6 +68,6 @@ internal class NyxPlugin : InternalNyxPlugin {
     }
 
     private fun Project.applyMinecraftPlugin() {
-        plugins.apply(NyxMinecraftPlugin::class)
+        pluginManager.apply(NyxMinecraftPlugin::class)
     }
 }

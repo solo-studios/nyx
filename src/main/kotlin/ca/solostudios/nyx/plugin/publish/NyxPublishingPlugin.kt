@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
+ * Copyright (c) 2024-2025 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxPublishingPlugin.kt is part of nyx
- * Last modified on 19-12-2024 11:10 p.m.
+ * Last modified on 13-03-2025 04:19 p.m.
  *
  * MIT License
  *
@@ -41,7 +41,7 @@ internal class NyxPublishingPlugin : InternalNyxPlugin {
         val nyxExtension = project.the<NyxExtension>()
         val publishingExtension = nyxExtension.create<NyxPublishingExtension>(NyxPublishingExtension.NAME, project, nyxExtension.info)
 
-        project.plugins.withId("com.github.breadmoirai.github-release") {
+        project.pluginManager.withPlugin("com.github.breadmoirai.github-release") {
             publishingExtension.create<NyxGithubReleaseExtension>(NyxGithubReleaseExtension.NAME, project, nyxExtension.info)
         }
 

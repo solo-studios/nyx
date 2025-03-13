@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
+ * Copyright (c) 2024-2025 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxMinecraftPlugin.kt is part of nyx
- * Last modified on 21-12-2024 09:30 p.m.
+ * Last modified on 13-03-2025 04:23 p.m.
  *
  * MIT License
  *
@@ -48,7 +48,7 @@ internal class NyxMinecraftPlugin : InternalNyxPlugin {
         val nyxExtension = project.the<NyxExtension>()
         val minecraftExtension = project.createMinecraftExtension()
 
-        project.plugins.withId("com.modrinth.minotaur") {
+        project.pluginManager.withPlugin("com.modrinth.minotaur") {
             val minotaurExtension = minecraftExtension.create<NyxMinotaurExtension>(NyxMinotaurExtension.NAME, project, nyxExtension.info)
 
             project.afterEvaluate {
@@ -75,7 +75,7 @@ internal class NyxMinecraftPlugin : InternalNyxPlugin {
         val minecraftExtension = nyxExtension.create(AbstractMinecraftExtension.NAME, extensionClass, project)
 
         // Only add mixin extension if it's applicable (loom or neogradle mixin)
-        if (isLoom || plugins.hasPlugin("net.neoforged.gradle.mixin")) {
+        if (isLoom || pluginManager.hasPlugin("net.neoforged.gradle.mixin")) {
             val mixinExtension = minecraftExtension.create<NyxMixinExtension>(NyxMixinExtension.NAME, project, minecraftExtension)
 
             afterEvaluate {
@@ -116,7 +116,7 @@ internal class NyxMinecraftPlugin : InternalNyxPlugin {
 
             val baseConfiguration = this
             val shadowConfigurationName = lowerCamelCaseName(name, nameAddition)
-            val shadowConfiguration by register(shadowConfigurationName) {
+            register(shadowConfigurationName) {
                 inclusionConfiguration.extendsFrom(this)
                 baseConfiguration.extendsFrom(this)
             }
