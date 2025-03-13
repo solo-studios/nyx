@@ -2,7 +2,7 @@
  * Copyright (c) 2024-2025 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxKotlinExtension.kt is part of nyx
- * Last modified on 08-03-2025 05:52 p.m.
+ * Last modified on 13-03-2025 02:14 a.m.
  *
  * MIT License
  *
@@ -448,7 +448,6 @@ public class NyxKotlinExtension(
 
     private fun KotlinJsCompilerOptions.configureJsCompilerOptions() {
         val nyx = this@NyxKotlinExtension
-        // compilerOptions {
         if (nyx.jsModuleKind.isPresent)
             moduleKind = nyx.jsModuleKind
 
@@ -466,7 +465,6 @@ public class NyxKotlinExtension(
 
         if (nyx.jsUseEsClasses.isPresent)
             useEsClasses = nyx.jsUseEsClasses
-        // }
     }
 
     private fun KotlinCommonCompilerOptions.configureCommonCompilerOptions() {
