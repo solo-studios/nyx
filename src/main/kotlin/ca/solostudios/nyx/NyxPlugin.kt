@@ -2,7 +2,7 @@
  * Copyright (c) 2023-2025 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxPlugin.kt is part of nyx
- * Last modified on 13-03-2025 04:19 p.m.
+ * Last modified on 13-03-2025 06:57 p.m.
  *
  * MIT License
  *
@@ -32,6 +32,7 @@ import ca.solostudios.nyx.internal.util.create
 import ca.solostudios.nyx.plugin.compile.NyxCompilePlugin
 import ca.solostudios.nyx.plugin.minecraft.NyxMinecraftPlugin
 import ca.solostudios.nyx.plugin.publish.NyxPublishingPlugin
+import net.fabricmc.loom.LoomGradlePlugin
 import net.fabricmc.loom.bootstrap.LoomGradlePluginBootstrap
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
@@ -48,6 +49,14 @@ internal class NyxPlugin : InternalNyxPlugin {
 
         try {
             project.plugins.withType<LoomGradlePluginBootstrap> {
+                project.applyMinecraftPlugin()
+            }
+        } catch (_: NoClassDefFoundError) {
+            // ignore
+        }
+
+        try {
+            project.plugins.withType<LoomGradlePlugin> {
                 project.applyMinecraftPlugin()
             }
         } catch (_: NoClassDefFoundError) {

@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
+ * Copyright (c) 2024-2025 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file GradleUtil.kt is part of nyx
- * Last modified on 21-12-2024 09:22 p.m.
+ * Last modified on 13-03-2025 07:06 p.m.
  *
  * MIT License
  *
@@ -35,7 +35,7 @@ import ca.solostudios.nyx.plugin.publish.release.NyxGithubReleaseExtension
 import com.github.breadmoirai.githubreleaseplugin.GithubReleaseExtension
 import com.modrinth.minotaur.ModrinthExtension
 import net.fabricmc.loom.api.LoomGradleExtensionAPI
-import net.fabricmc.loom.configuration.FabricApiExtension
+import net.fabricmc.loom.api.fabricapi.FabricApiExtension
 import net.neoforged.gradle.dsl.common.extensions.Minecraft
 import net.neoforged.gradle.dsl.common.runs.run.RunManager
 import net.neoforged.gradle.dsl.mixin.extension.Mixin

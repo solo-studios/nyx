@@ -2,7 +2,7 @@
  * Copyright (c) 2024-2025 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxFabricLoomExtension.kt is part of nyx
- * Last modified on 13-03-2025 04:19 p.m.
+ * Last modified on 13-03-2025 07:07 p.m.
  *
  * MIT License
  *
@@ -45,6 +45,7 @@ import net.fabricmc.loom.api.InterfaceInjectionExtensionAPI
 import net.fabricmc.loom.api.LoomGradleExtensionAPI
 import net.fabricmc.loom.api.ModSettings
 import net.fabricmc.loom.api.decompilers.DecompilerOptions
+import net.fabricmc.loom.api.fabricapi.DataGenerationSettings
 import net.fabricmc.loom.configuration.FabricApiExtension
 import net.fabricmc.loom.configuration.ide.RunConfigSettings
 import net.fabricmc.loom.configuration.providers.minecraft.MinecraftJarConfiguration
@@ -335,7 +336,7 @@ public class NyxFabricLoomExtension(
      *
      * @see FabricApiExtension.configureDataGeneration
      */
-    public fun configureDataGeneration(action: FabricApiExtension.DataGenerationSettings.() -> Unit) {
+    public fun configureDataGeneration(action: DataGenerationSettings.() -> Unit) {
         fabricApi {
             configureDataGeneration {
                 action()

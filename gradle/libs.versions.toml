@@ -25,12 +25,10 @@ guava-kotlin = "0.1.0"
 
 slf4k = "0.5.4"
 
-quilt-loom = "1.8.5"
+fabric-loom = "1.10.4"
 
-fabric-loom = "1.9.2"
-
-architectury = "3.4.159"
-architectury-loom = "1.7.413"
+architectury = "3.4.161"
+architectury-loom = "1.9.428"
 
 neogradle = "7.0.171"
 
@@ -110,7 +108,6 @@ slf4k = { group = "ca.solo-studios", name = "slf4k", version.ref = "slf4k" }
 
 ## fabric-loom & derivatives plugins
 fabric-loom = { group = "fabric-loom", name = "fabric-loom.gradle.plugin", version.ref = "fabric-loom" }
-quilt-loom = { group = "org.quiltmc.loom", name = "org.quiltmc.loom.gradle.plugin", version.ref = "quilt-loom" }
 architectury = { group = "architectury-plugin", name = "architectury-plugin.gradle.plugin", version.ref = "architectury" }
 architectury-loom = { group = "dev.architectury.loom", name = "dev.architectury.loom.gradle.plugin", version.ref = "architectury-loom" }
 
@@ -160,7 +157,6 @@ kotlinx-serialization = [
 
 loom = [
     "fabric-loom",
-    "quilt-loom",
     "architectury",
     "architectury-loom",
 ]
