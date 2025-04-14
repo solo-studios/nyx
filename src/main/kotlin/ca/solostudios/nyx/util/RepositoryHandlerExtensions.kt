@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
+ * Copyright (c) 2024-2025 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file RepositoryHandlerExtensions.kt is part of nyx
- * Last modified on 19-06-2024 05:27 p.m.
+ * Last modified on 14-04-2025 06:05 p.m.
  *
  * MIT License
  *
@@ -16,7 +16,7 @@
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
- * GRADLE-CONVENTIONS-PLUGIN IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * NYX IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -264,6 +264,13 @@ public fun RepositoryHandler.modMaven(action: MavenArtifactRepository.() -> Unit
 public fun RepositoryHandler.tterrag(action: MavenArtifactRepository.() -> Unit = {}): MavenArtifactRepository {
     return maven("https://maven.tterrag.com/") {
         name = "tterrag"
+        action()
+    }
+}
+
+public fun RepositoryHandler.paperMc(action: MavenArtifactRepository.() -> Unit = {}): MavenArtifactRepository {
+    return maven("https://repo.papermc.io/repository/maven-public/") {
+        name = "Paper MC"
         action()
     }
 }
