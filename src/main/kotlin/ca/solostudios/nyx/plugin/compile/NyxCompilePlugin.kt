@@ -2,7 +2,7 @@
  * Copyright (c) 2024-2025 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxCompilePlugin.kt is part of nyx
- * Last modified on 13-03-2025 04:19 p.m.
+ * Last modified on 22-09-2025 02:36 a.m.
  *
  * MIT License
  *
@@ -56,7 +56,7 @@ internal class NyxCompilePlugin : InternalNyxPlugin {
         val appliedKotlinPlugin = AtomicBoolean(false)
         for (agpPluginId in KOTLIN_PLUGIN_IDS) {
             project.pluginManager.withPlugin(agpPluginId) {
-                if (!appliedKotlinPlugin.getAndSet(true)) {
+                if (appliedKotlinPlugin.compareAndSet(false, true)) {
                     applyKotlinExtension(project, compileExtension)
                 }
             }

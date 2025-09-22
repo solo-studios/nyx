@@ -2,7 +2,7 @@
  * Copyright (c) 2024-2025 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file NyxProjectInfoExtension.kt is part of nyx
- * Last modified on 06-03-2025 08:45 p.m.
+ * Last modified on 22-09-2025 02:40 a.m.
  *
  * MIT License
  *
@@ -32,16 +32,12 @@ import ca.solostudios.nyx.internal.util.formatAsName
 import ca.solostudios.nyx.internal.util.listProperty
 import ca.solostudios.nyx.internal.util.property
 import ca.solostudios.nyx.internal.util.provider
-import ca.solostudios.nyx.internal.util.tasks
 import ca.solostudios.nyx.internal.util.toStringOrEmpty
 import org.gradle.api.Project
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.publish.maven.MavenPomDeveloper
 import org.gradle.api.tasks.Nested
-import org.gradle.api.tasks.bundling.AbstractArchiveTask
-import org.gradle.kotlin.dsl.assign
-import org.gradle.kotlin.dsl.withType
 
 public class NyxProjectInfoExtension(override val project: Project) : InternalNyxExtension {
     /**
@@ -171,11 +167,5 @@ public class NyxProjectInfoExtension(override val project: Project) : InternalNy
         license.apply(action)
     }
 
-    override fun configureProject() {
-        tasks {
-            withType<AbstractArchiveTask>().configureEach {
-                archiveBaseName = project.name
-            }
-        }
-    }
+    override fun configureProject() {}
 }
