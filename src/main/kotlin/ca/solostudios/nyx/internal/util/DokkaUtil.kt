@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
+ * Copyright (c) 2024-2025 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file DokkaUtil.kt is part of nyx
- * Last modified on 17-10-2024 11:00 p.m.
+ * Last modified on 03-10-2025 02:46 a.m.
  *
  * MIT License
  *
@@ -16,7 +16,7 @@
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
- * GRADLE-CONVENTIONS-PLUGIN IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * NYX IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -37,6 +37,7 @@ import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.DocsType
 import org.gradle.api.attributes.Usage
 import org.gradle.api.component.AdhocComponentWithVariants
+import org.gradle.api.component.ConfigurationVariantDetails
 import org.gradle.api.plugins.JavaBasePlugin
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.bundling.Jar
@@ -47,6 +48,8 @@ import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.dokka.gradle.tasks.DokkaGenerateTask
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 private val UNPUBLISHABLE_VARIANT_ARTIFACTS = listOf(
     ArtifactTypeDefinition.JVM_CLASS_DIRECTORY,
@@ -58,14 +61,14 @@ internal fun HasProject.addDokkaJavadocJarTask() {
     tasks {
         val dokkaHtml by when {
             "dokkaGeneratePublicationHtml" in tasks -> named<DokkaGenerateTask>("dokkaGeneratePublicationHtml")
-            "dokkaHtml" in tasks -> named<DokkaTask>("dokkaHtml")
-            else -> error("Could not find dokka task. Both 'dokkaGenerateHtml' and 'dokkaHtml' are null.")
+            "dokkaHtml" in tasks                    -> named<DokkaTask>("dokkaHtml")
+            else                                    -> error("Could not find dokka task. Both 'dokkaGenerateHtml' and 'dokkaHtml' are null.")
         }
 
         val javadocJar by maybeRegistering(Jar::class) {
             when (val dokkaHtmlTask = dokkaHtml) {
                 is DokkaGenerateTask -> configureJavadocJar(dokkaHtmlTask)
-                is DokkaTask -> configureJavadocJarLegacyDokka(dokkaHtmlTask)
+                is DokkaTask         -> configureJavadocJarLegacyDokka(dokkaHtmlTask)
             }
         }
 
@@ -79,13 +82,31 @@ internal fun HasProject.addDokkaJavadocJarTask() {
                 }
 
                 project.components.withType<AdhocComponentWithVariants> {
-                    addVariantsFromConfiguration(javadocConfiguration) {
-                        mapToMavenScope("runtime")
-                        mapToOptional()
+                    addVariantsFromConfiguration(javadocConfiguration, ConfigurationVariantDetails::configureVariant)
+                }
+            }
+        }
 
-                        if (configurationVariant.artifacts.any { it.type in UNPUBLISHABLE_VARIANT_ARTIFACTS })
-                            skip()
-                    }
+        kotlin {
+            if (this !is KotlinMultiplatformExtension)
+                return@kotlin
+
+            val javadocConfiguration by configurations.maybeRegister("javadocElements") {
+                configureConfiguration(project, javadocArtifact)
+            }
+
+            @OptIn(ExperimentalKotlinGradlePluginApi::class)
+            publishing {
+                adhocSoftwareComponent {
+                    addVariantsFromConfiguration(javadocConfiguration, ConfigurationVariantDetails::configureVariant)
+                }
+            }
+
+            targets.configureEach {
+                mavenPublication {
+                    // TODO 2025-10-03 (solonovamax): This does not attach the proper metadata to the artifact,
+                    //  however I cannot for the life of me figure out the correct way to do that with the KMP targets.
+                    artifact(javadocArtifact)
                 }
             }
         }
@@ -96,6 +117,14 @@ internal fun HasProject.addDokkaJavadocJarTask() {
             }
         }
     }
+}
+
+private fun ConfigurationVariantDetails.configureVariant() {
+    mapToMavenScope("runtime")
+    mapToOptional()
+
+    if (configurationVariant.artifacts.any { it.type in UNPUBLISHABLE_VARIANT_ARTIFACTS })
+        skip()
 }
 
 private fun Configuration.configureConfiguration(project: Project, javadocArtifact: PublishArtifact) {
