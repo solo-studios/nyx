@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
+ * Copyright (c) 2024-2025 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file PublishToSonatypeMavenRepository.kt is part of nyx
- * Last modified on 10-06-2024 03:24 p.m.
+ * Last modified on 09-10-2025 09:50 p.m.
  *
  * MIT License
  *
@@ -16,7 +16,7 @@
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
- * GRADLE-CONVENTIONS-PLUGIN IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * NYX IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -53,7 +53,6 @@ import org.gradle.internal.serialization.Transient
 import org.gradle.internal.service.ServiceRegistry
 import org.gradle.kotlin.dsl.support.get
 import org.gradle.kotlin.dsl.the
-import org.gradle.util.internal.BuildCommencedTimeProvider
 import org.gradle.work.DisableCachingByDefault
 import java.io.Serializable
 import java.net.URI
@@ -61,7 +60,8 @@ import javax.inject.Inject
 
 
 /**
- * Publishes a [org.gradle.api.publish.maven.MavenPublication] to a [MavenArtifactRepository].
+ * Publishes a [org.gradle.api.publish.maven.MavenPublication] to a
+ * [MavenArtifactRepository].
  *
  * @since 1.4
  */
@@ -122,10 +122,8 @@ public abstract class PublishToSonatypeMavenRepository : AbstractPublishToMaven(
     }
 
     private fun validatingMavenPublisher(): MavenPublisher {
-        // evil hack
-        val timeProvider = BuildCommencedTimeProvider(project.gradle.startParameter)
         return ValidatingMavenPublisher(
-            SonatypeMavenRemotePublisher(temporaryDirFactory, timeProvider, project.the<SonatypePublishExtension>())
+            SonatypeMavenRemotePublisher(temporaryDirFactory, project.the<SonatypePublishExtension>())
         )
     }
 

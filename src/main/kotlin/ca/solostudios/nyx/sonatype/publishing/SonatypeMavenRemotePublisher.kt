@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2024 solonovamax <solonovamax@12oclockpoint.com>
+ * Copyright (c) 2024-2025 solonovamax <solonovamax@12oclockpoint.com>
  *
  * The file SonatypeMavenRemotePublisher.kt is part of nyx
- * Last modified on 10-06-2024 03:21 p.m.
+ * Last modified on 09-10-2025 09:49 p.m.
  *
  * MIT License
  *
@@ -16,7 +16,7 @@
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
- * GRADLE-CONVENTIONS-PLUGIN IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * NYX IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -34,8 +34,6 @@ import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.util.encodeBase64ToString
 import com.github.kittinunf.result.getOrElse
-import org.apache.maven.artifact.repository.metadata.Metadata
-import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader
 import org.gradle.api.UncheckedIOException
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository
 import org.gradle.api.artifacts.repositories.PasswordCredentials
@@ -44,26 +42,16 @@ import org.gradle.api.internal.artifacts.repositories.resolver.ExternalResourceR
 import org.gradle.api.publish.maven.internal.publisher.MavenNormalizedPublication
 import org.gradle.api.publish.maven.internal.publisher.MavenPublisher
 import org.gradle.internal.Factory
-import org.gradle.internal.UncheckedException
 import org.gradle.internal.hash.HashFunction
 import org.gradle.internal.hash.Hashing
-import org.gradle.internal.resource.ExternalResourceName
-import org.gradle.internal.resource.ExternalResourceReadResult
-import org.gradle.internal.resource.ExternalResourceRepository
 import org.gradle.internal.resource.ReadableContent
 import org.gradle.internal.resource.local.ByteArrayReadableContent
 import org.gradle.internal.resource.local.FileReadableContent
-import org.gradle.util.internal.BuildCommencedTimeProvider
 import org.slf4j.kotlin.getLogger
 import org.slf4j.kotlin.warn
 import java.io.File
 import java.io.IOException
-import java.io.InputStream
-import java.net.URI
 import java.nio.charset.StandardCharsets
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.TimeZone
 import java.util.regex.Pattern
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
@@ -71,19 +59,10 @@ import java.util.zip.ZipOutputStream
 
 internal class SonatypeMavenRemotePublisher(
     private val tempDirFactory: Factory<File>,
-    private val timeProvider: BuildCommencedTimeProvider,
     private val publishExtension: SonatypePublishExtension,
 ) : MavenPublisher {
-    private val logger by getLogger()
-
     override fun publish(publication: MavenNormalizedPublication, artifactRepository: MavenArtifactRepository?) {
-        val repositoryUrl = artifactRepository!!.url
-
         artifactRepository as DefaultMavenArtifactRepository
-
-        val protocol = repositoryUrl.scheme.lowercase()
-        val transport = artifactRepository.getTransport(protocol)
-        val repository = transport.repository
 
         val credentials = when {
             publishExtension.username.isPresent && publishExtension.password.isPresent -> {
@@ -105,7 +84,7 @@ internal class SonatypeMavenRemotePublisher(
                 )
             }
 
-            else -> {
+            else                                                                       -> {
                 val passwordCredentials = artifactRepository.configuredCredentials.orNull as? PasswordCredentials
                     ?: error("Only PasswordCredentials are supported for uploading to Sonatype. Please use PasswordCredentials.")
                 val username = passwordCredentials.username ?: error("The username must be set for publishing to Sonatype Central.")
@@ -115,24 +94,26 @@ internal class SonatypeMavenRemotePublisher(
             }
         }
 
-        publish(publication, repository, repositoryUrl, credentials)
+        publish(publication, credentials)
     }
 
     private fun publish(
         publication: MavenNormalizedPublication,
-        repository: ExternalResourceRepository,
-        rootUri: URI,
         credentials: SonatypeCredentials,
     ) {
         val groupId = publication.groupId
         val artifactId = publication.artifactId
         val version = publication.version
 
-        val publisher = ModuleArtifactPublisher(tempDirFactory, rootUri, groupId, artifactId, version, credentials, publishExtension)
+        val publisher = ModuleArtifactPublisher(tempDirFactory, groupId, artifactId, version, credentials, publishExtension)
 
         // Use the timestamped version for all published artifacts:
         if (version.isSnapshot)
-            publisher.artifactVersion = snapshotVersion(version, repository, publisher.snapshotMetadataLocation)
+            throw IllegalArgumentException(
+                "You cannot publish snapshots to maven central, " +
+                        "please read this for how to publish snapshots: " +
+                        "https://central.sonatype.org/publish/publish-portal-snapshots/#publishing-via-other-methods"
+            )
 
         publishArtifactsAndMetadata(publication, publisher)
 
@@ -152,40 +133,8 @@ internal class SonatypeMavenRemotePublisher(
     private val String.isSnapshot: Boolean
         get() = if (endsWith(SNAPSHOT_VERSION, ignoreCase = true)) true else VERSION_FILE_PATTERN.matcher(this).matches()
 
-    private fun snapshotVersion(
-        version: String,
-        repository: ExternalResourceRepository,
-        metadataResource: ExternalResourceName,
-    ): String {
-        val timestamp = timeProvider.formatTimestamp()
-        val buildNumber = nextBuildNumber(repository, metadataResource)
-
-        return version.replace(SNAPSHOT_VERSION, "${timestamp}-${buildNumber}")
-    }
-
-    private fun nextBuildNumber(repository: ExternalResourceRepository, metadataResource: ExternalResourceName): Int {
-        return readExistingMetadata(repository, metadataResource)
-            ?.result?.versioning?.snapshot?.buildNumber
-            ?.takeIf { it > 0 }
-            ?: return 1
-    }
-
-    fun readExistingMetadata(
-        repository: ExternalResourceRepository,
-        metadataResource: ExternalResourceName,
-    ): ExternalResourceReadResult<Metadata>? {
-        return repository.resource(metadataResource).withContentIfPresent { inputStream: InputStream ->
-            try {
-                return@withContentIfPresent MetadataXpp3Reader().read(inputStream, false)
-            } catch (e: Exception) {
-                throw UncheckedException.throwAsUncheckedException(e)
-            }
-        }
-    }
-
     private class ModuleArtifactPublisher(
         temporaryDirFactory: Factory<File>,
-        rootUri: URI,
         groupId: String,
         private val artifactId: String,
         private val moduleVersion: String,
@@ -217,13 +166,6 @@ internal class SonatypeMavenRemotePublisher(
         }
 
         private val uploadName = "$groupId:$artifactId:$artifactVersion"
-
-        val snapshotMetadataPath = "$groupPath/$artifactId/$moduleVersion/$METADATA_FILENAME"
-
-        /**
-         * Return the location of the snapshot `maven-metadata.xml`, which contains details of the latest published snapshot for a Maven module.
-         */
-        val snapshotMetadataLocation = ExternalResourceName(rootUri, snapshotMetadataPath)
 
         /**
          * Publishes a single module artifact, based on classifier and extension.
@@ -311,34 +253,25 @@ internal class SonatypeMavenRemotePublisher(
             uploadSonatypeZip(outputFile)
         }
 
-        @Suppress("UNUSED_VARIABLE")
         private fun uploadSonatypeZip(zipFile: File) {
             val uploadParameters = listOf(
                 "publishingType" to publishExtension.publishingType.get().name,
                 "name" to uploadName,
             )
 
-            val (request, response, result) = fuel.upload(SonatypePublishPlugin.SONATYPE_API_UPLOAD_URL, parameters = uploadParameters)
+            val (_, _, result) = fuel.upload(SonatypePublishPlugin.SONATYPE_API_UPLOAD_URL, parameters = uploadParameters)
                 .add(FileDataPart(zipFile, name = "bundle", contentType = "application/octet-stream"))
                 .responseString()
 
-            val resultString = result.getOrElse { e ->
+            result.getOrElse { e ->
                 throw e
             }
         }
     }
 
     companion object {
-        private const val METADATA_FILENAME = "maven-metadata.xml"
         private const val SNAPSHOT_VERSION = "SNAPSHOT"
         private val VERSION_FILE_PATTERN: Pattern = Pattern.compile("^(.*)-([0-9]{8}.[0-9]{6})-([0-9]+)$")
-        val utcDateFormatter = SimpleDateFormat("yyyyMMdd.HHmmss").apply {
-            timeZone = TimeZone.getTimeZone("UTC")
-        }
-
-        private fun BuildCommencedTimeProvider.formatTimestamp(): String {
-            return utcDateFormatter.format(Date(currentTime))
-        }
     }
 
     private data class SonatypeCredentials(
